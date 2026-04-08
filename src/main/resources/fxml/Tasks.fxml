@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.controller.TaskController">
+    <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+
+    <top>
+        <VBox spacing="10">
+            <Label text="Gestion des Tâches" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <TextField fx:id="searchField" promptText="Rechercher une tâche..." prefWidth="250"/>
+                <Button text="🔍 Rechercher" onAction="#handleSearch" style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6;"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <SplitPane dividerPositions="0.6">
+            <TableView fx:id="taskTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                    <TableColumn fx:id="colTitle" text="Titre" prefWidth="200"/>
+                    <TableColumn fx:id="colStatus" text="Statut" prefWidth="90"/>
+                    <TableColumn fx:id="colPriority" text="Priorité" prefWidth="90"/>
+                    <TableColumn fx:id="colProject" text="Projet" prefWidth="150"/>
+                    <TableColumn fx:id="colAssigned" text="Assigné à" prefWidth="130"/>
+                    <TableColumn fx:id="colDeadline" text="Deadline" prefWidth="100"/>
+                </columns>
+            </TableView>
+
+            <ScrollPane fitToWidth="true">
+                <VBox spacing="10">
+                    <padding><Insets top="10" left="15" right="15" bottom="10"/></padding>
+                    <Label text="Formulaire Tâche" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                    <Label text="Titre *"/>
+                    <TextField fx:id="titleField" promptText="Titre de la tâche"/>
+
+                    <Label text="Description"/>
+                    <TextArea fx:id="descriptionField" prefRowCount="2"/>
+
+                    <HBox spacing="10">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Statut"/>
+                            <ComboBox fx:id="statusCombo" maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Priorité"/>
+                            <ComboBox fx:id="priorityCombo" maxWidth="Infinity"/>
+                        </VBox>
+                    </HBox>
+
+                    <Label text="Projet *"/>
+                    <ComboBox fx:id="projectCombo" maxWidth="Infinity"/>
+
+                    <Label text="Sprint"/>
+                    <ComboBox fx:id="sprintCombo" maxWidth="Infinity"/>
+
+                    <Label text="Assigné à"/>
+                    <ComboBox fx:id="assignedCombo" maxWidth="Infinity"/>
+
+                    <HBox spacing="10">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Story Points"/>
+                            <Spinner fx:id="storyPointsSpinner" maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Deadline"/>
+                            <DatePicker fx:id="deadlinePicker" maxWidth="Infinity"/>
+                        </VBox>
+                    </HBox>
+
+                    <CheckBox fx:id="blockedCheck" text="Tâche bloquée"/>
+
+                    <Label fx:id="messageLabel" text="" wrapText="true"/>
+
+                    <HBox spacing="10">
+                        <Button text="💾 Sauvegarder" onAction="#handleSave" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 6;"/>
+                        <Button text="🗑 Supprimer" onAction="#handleDelete" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                style="-fx-background-color: #FF6B6B; -fx-text-fill: white; -fx-background-radius: 6;"/>
+                        <Button text="✖ Effacer" onAction="#handleClear" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                style="-fx-background-color: #aaa; -fx-text-fill: white; -fx-background-radius: 6;"/>
+                    </HBox>
+                </VBox>
+            </ScrollPane>
+        </SplitPane>
+    </center>
+</BorderPane>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.controller.SprintController">
+    <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+
+    <top>
+        <Label text="Gestion des Sprints" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    </top>
+
+    <center>
+        <SplitPane dividerPositions="0.6">
+            <TableView fx:id="sprintTable">
+                <columns>
+                    <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                    <TableColumn fx:id="colNumber" text="#" prefWidth="50"/>
+                    <TableColumn fx:id="colName" text="Nom" prefWidth="180"/>
+                    <TableColumn fx:id="colStatus" text="Statut" prefWidth="90"/>
+                    <TableColumn fx:id="colProject" text="Projet" prefWidth="160"/>
+                    <TableColumn fx:id="colStart" text="Début" prefWidth="100"/>
+                    <TableColumn fx:id="colEnd" text="Fin" prefWidth="100"/>
+                </columns>
+            </TableView>
+
+            <ScrollPane fitToWidth="true">
+                <VBox spacing="10">
+                    <padding><Insets top="10" left="15" right="15" bottom="10"/></padding>
+                    <Label text="Formulaire Sprint" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                    <Label text="Projet *"/>
+                    <ComboBox fx:id="projectCombo" maxWidth="Infinity"/>
+
+                    <Label text="Nom *"/>
+                    <TextField fx:id="nameField" promptText="Nom du sprint"/>
+
+                    <Label text="Objectif"/>
+                    <TextArea fx:id="goalField" prefRowCount="2"/>
+
+                    <HBox spacing="10">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Numéro"/>
+                            <Spinner fx:id="numberSpinner" maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Statut"/>
+                            <ComboBox fx:id="statusCombo" maxWidth="Infinity"/>
+                        </VBox>
+                    </HBox>
+
+                    <HBox spacing="10">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Date début"/>
+                            <DatePicker fx:id="startDatePicker" maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Date fin"/>
+                            <DatePicker fx:id="endDatePicker" maxWidth="Infinity"/>
+                        </VBox>
+                    </HBox>
+
+                    <Label text="Rétrospective"/>
+                    <TextArea fx:id="retrospectiveField" prefRowCount="2"/>
+
+                    <Label fx:id="messageLabel" text="" wrapText="true"/>
+
+                    <HBox spacing="10">
+                        <Button text="💾 Sauvegarder" onAction="#handleSave" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 6;"/>
+                        <Button text="🗑 Supprimer" onAction="#handleDelete" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                style="-fx-background-color: #FF6B6B; -fx-text-fill: white; -fx-background-radius: 6;"/>
+                        <Button text="✖ Effacer" onAction="#handleClear" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                style="-fx-background-color: #aaa; -fx-text-fill: white; -fx-background-radius: 6;"/>
+                    </HBox>
+                </VBox>
+            </ScrollPane>
+        </SplitPane>
+    </center>
+</BorderPane>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.controller.DashboardController"
+            prefWidth="1200" prefHeight="750">
+
+    <!-- Sidebar -->
+    <left>
+        <VBox spacing="5" style="-fx-background-color: #1a1a2e; -fx-pref-width: 220px;" prefWidth="220">
+            <padding><Insets top="20" bottom="20" left="10" right="10"/></padding>
+
+            <Label text="SmartPFE" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #a12c2f;"/>
+            <Label fx:id="welcomeLabel" text="Bonjour" style="-fx-text-fill: white; -fx-font-size: 13px;"/>
+            <Label fx:id="roleLabel" text="" style="-fx-text-fill: #aaa; -fx-font-size: 11px;"/>
+
+            <Separator style="-fx-background-color: #333;"/>
+
+            <Button text="🏠  Dashboard" onAction="#showProjects" maxWidth="Infinity"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER-LEFT; -fx-cursor: hand; -fx-font-size: 13px;"/>
+            <Button text="📁  Projets" onAction="#showProjects" maxWidth="Infinity"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER-LEFT; -fx-cursor: hand; -fx-font-size: 13px;"/>
+            <Button text="🔄  Sprints" onAction="#showSprints" maxWidth="Infinity"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER-LEFT; -fx-cursor: hand; -fx-font-size: 13px;"/>
+            <Button text="✅  Tâches" onAction="#showTasks" maxWidth="Infinity"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER-LEFT; -fx-cursor: hand; -fx-font-size: 13px;"/>
+            <Button text="📅  Meetings" onAction="#showMeetings" maxWidth="Infinity"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER-LEFT; -fx-cursor: hand; -fx-font-size: 13px;"/>
+            <Button text="📋  Candidatures" onAction="#showCandidatures" maxWidth="Infinity"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER-LEFT; -fx-cursor: hand; -fx-font-size: 13px;"/>
+            <Button text="👥  Utilisateurs" onAction="#showUsers" maxWidth="Infinity"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER-LEFT; -fx-cursor: hand; -fx-font-size: 13px;"/>
+
+            <Separator style="-fx-background-color: #333;"/>
+            <VBox VBox.vgrow="ALWAYS"/>
+            <Button text="🚪  Déconnexion" onAction="#handleLogout" maxWidth="Infinity"
+                    style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-cursor: hand; -fx-font-size: 13px; -fx-background-radius: 8;"/>
+        </VBox>
+    </left>
+
+    <!-- Main content -->
+    <center>
+        <BorderPane fx:id="contentArea">
+            <center>
+                <!-- Stats cards -->
+                <VBox spacing="20" alignment="TOP_CENTER">
+                    <padding><Insets top="30" left="30" right="30"/></padding>
+                    <Label text="Tableau de Bord" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                    <HBox spacing="20">
+                        <VBox alignment="CENTER" spacing="5" style="-fx-background-color: #a12c2f; -fx-background-radius: 12; -fx-pref-width: 160; -fx-pref-height: 100;">
+                            <Label fx:id="projectCountLabel" text="0" style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                            <Label text="Projets" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+                        </VBox>
+                        <VBox alignment="CENTER" spacing="5" style="-fx-background-color: #667eea; -fx-background-radius: 12; -fx-pref-width: 160; -fx-pref-height: 100;">
+                            <Label fx:id="sprintCountLabel" text="0" style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                            <Label text="Sprints" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+                        </VBox>
+                        <VBox alignment="CENTER" spacing="5" style="-fx-background-color: #06D6A0; -fx-background-radius: 12; -fx-pref-width: 160; -fx-pref-height: 100;">
+                            <Label fx:id="taskCountLabel" text="0" style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                            <Label text="Tâches" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+                        </VBox>
+                        <VBox alignment="CENTER" spacing="5" style="-fx-background-color: #FF6B6B; -fx-background-radius: 12; -fx-pref-width: 160; -fx-pref-height: 100;">
+                            <Label fx:id="userCountLabel" text="0" style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                            <Label text="Utilisateurs" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </center>
+        </BorderPane>
+    </center>
+</BorderPane>
