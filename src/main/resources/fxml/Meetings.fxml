@@ -16,11 +16,10 @@
             <TableView fx:id="meetingTable">
                 <columns>
                     <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
-                    <TableColumn fx:id="colTitle" text="Titre" prefWidth="200"/>
-                    <TableColumn fx:id="colType" text="Type" prefWidth="100"/>
-                    <TableColumn fx:id="colStatus" text="Statut" prefWidth="90"/>
+                    <TableColumn fx:id="colType" text="Type" prefWidth="130"/>
+                    <TableColumn fx:id="colStatus" text="Statut" prefWidth="100"/>
                     <TableColumn fx:id="colProject" text="Projet" prefWidth="160"/>
-                    <TableColumn fx:id="colDate" text="Date" prefWidth="140"/>
+                    <TableColumn fx:id="colDate" text="Date planifiée" prefWidth="150"/>
                 </columns>
             </TableView>
 
@@ -28,12 +27,6 @@
                 <VBox spacing="10">
                     <padding><Insets top="10" left="15" right="15" bottom="10"/></padding>
                     <Label text="Formulaire Meeting" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-
-                    <Label text="Titre *"/>
-                    <TextField fx:id="titleField"/>
-
-                    <Label text="Description"/>
-                    <TextArea fx:id="descriptionField" prefRowCount="2"/>
 
                     <Label text="Projet *"/>
                     <ComboBox fx:id="projectCombo" maxWidth="Infinity"/>
@@ -49,14 +42,26 @@
                         </VBox>
                     </HBox>
 
+                    <Label text="Date planifiée"/>
+                    <DatePicker fx:id="datePicker" maxWidth="Infinity"/>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Durée (min)"/>
+                        <Spinner fx:id="durationSpinner" prefWidth="100"/>
+                        <CheckBox fx:id="onlineCheck" text="En ligne"/>
+                    </HBox>
+
                     <Label text="Lieu"/>
                     <TextField fx:id="locationField"/>
 
                     <Label text="Lien (online)"/>
                     <TextField fx:id="linkField"/>
 
-                    <Label text="Date planifiée"/>
-                    <DatePicker fx:id="datePicker" maxWidth="Infinity"/>
+                    <Label text="Agenda"/>
+                    <TextArea fx:id="agendaField" prefRowCount="2"/>
+
+                    <Label text="Notes"/>
+                    <TextArea fx:id="notesField" prefRowCount="2"/>
 
                     <Label fx:id="messageLabel" text="" wrapText="true"/>
 

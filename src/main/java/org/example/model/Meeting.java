@@ -6,18 +6,19 @@ public class Meeting {
     private int id;
     private int projectId;
     private String projectTitle;
-    private String title;
-    private String description;
     private String meetingType;
     private String location;
     private String meetingLink;
     private String status;
+    private String agenda;
+    private String notes;
+    private int duration;
+    private boolean isOnline;
     private LocalDateTime scheduledDate;
     private LocalDateTime createdAt;
 
     public Meeting() {}
 
-    // Getters & Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -26,12 +27,6 @@ public class Meeting {
 
     public String getProjectTitle() { return projectTitle; }
     public void setProjectTitle(String projectTitle) { this.projectTitle = projectTitle; }
-
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
-
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
 
     public String getMeetingType() { return meetingType; }
     public void setMeetingType(String meetingType) { this.meetingType = meetingType; }
@@ -45,6 +40,18 @@ public class Meeting {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
+    public String getAgenda() { return agenda; }
+    public void setAgenda(String agenda) { this.agenda = agenda; }
+
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
+
+    public int getDuration() { return duration; }
+    public void setDuration(int duration) { this.duration = duration; }
+
+    public boolean isOnline() { return isOnline; }
+    public void setOnline(boolean online) { isOnline = online; }
+
     public LocalDateTime getScheduledDate() { return scheduledDate; }
     public void setScheduledDate(LocalDateTime scheduledDate) { this.scheduledDate = scheduledDate; }
 
@@ -52,5 +59,5 @@ public class Meeting {
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
     @Override
-    public String toString() { return title; }
+    public String toString() { return meetingType + " - " + (scheduledDate != null ? scheduledDate.toLocalDate() : ""); }
 }
