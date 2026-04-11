@@ -9,10 +9,10 @@
 
     <top>
         <VBox spacing="10">
-            <Label text="Gestion des Projets" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Label text="Project Management" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <TextField fx:id="searchField" promptText="Rechercher un projet..." prefWidth="250"/>
-                <Button text="🔍 Rechercher" onAction="#handleSearch" style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6;"/>
+                <TextField fx:id="searchField" promptText="Search a project..." prefWidth="250"/>
+                <Button text="🔍 Search" onAction="#handleSearch" style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6;"/>
             </HBox>
         </VBox>
     </top>
@@ -23,11 +23,11 @@
             <TableView fx:id="projectTable" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
-                    <TableColumn fx:id="colTitle" text="Titre" prefWidth="200"/>
+                    <TableColumn fx:id="colTitle" text="Title" prefWidth="200"/>
                     <TableColumn fx:id="colType" text="Type" prefWidth="100"/>
-                    <TableColumn fx:id="colStatus" text="Statut" prefWidth="100"/>
-                    <TableColumn fx:id="colOwner" text="Étudiant" prefWidth="150"/>
-                    <TableColumn fx:id="colSupervisor" text="Superviseur" prefWidth="150"/>
+                    <TableColumn fx:id="colStatus" text="Status" prefWidth="100"/>
+                    <TableColumn fx:id="colOwner" text="Student" prefWidth="150"/>
+                    <TableColumn fx:id="colSupervisor" text="Supervisor" prefWidth="150"/>
                 </columns>
             </TableView>
 
@@ -35,10 +35,10 @@
             <ScrollPane fitToWidth="true">
                 <VBox spacing="12">
                     <padding><Insets top="10" left="15" right="15" bottom="10"/></padding>
-                    <Label text="Formulaire Projet" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    <Label text="Project Form" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
 
-                    <Label text="Titre *"/>
-                    <TextField fx:id="titleField" promptText="Titre du projet"/>
+                    <Label text="Title *"/>
+                    <TextField fx:id="titleField" promptText="Project title"/>
 
                     <Label text="Description"/>
                     <TextArea fx:id="descriptionField" promptText="Description..." prefRowCount="3"/>
@@ -46,23 +46,23 @@
                     <Label text="Type"/>
                     <ComboBox fx:id="typeCombo" maxWidth="Infinity"/>
 
-                    <Label text="Statut"/>
+                    <Label text="Status"/>
                     <ComboBox fx:id="statusCombo" maxWidth="Infinity"/>
 
-                    <Label text="Étudiant (propriétaire)"/>
+                    <Label text="Student (owner)"/>
                     <ComboBox fx:id="ownerCombo" maxWidth="Infinity"/>
 
-                    <Label text="Superviseur"/>
+                    <Label text="Supervisor"/>
                     <ComboBox fx:id="supervisorCombo" maxWidth="Infinity"/>
 
                     <Label fx:id="messageLabel" text="" wrapText="true"/>
 
                     <HBox spacing="10">
-                        <Button text="💾 Sauvegarder" onAction="#handleSave" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                        <Button text="💾 Save" onAction="#handleSave" maxWidth="Infinity" HBox.hgrow="ALWAYS"
                                 style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                        <Button text="🗑 Supprimer" onAction="#handleDelete" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                        <Button text="🗑 Delete" onAction="#handleDelete" maxWidth="Infinity" HBox.hgrow="ALWAYS"
                                 style="-fx-background-color: #FF6B6B; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                        <Button text="✖ Effacer" onAction="#handleClear" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                        <Button text="✖ Clear" onAction="#handleClear" maxWidth="Infinity" HBox.hgrow="ALWAYS"
                                 style="-fx-background-color: #aaa; -fx-text-fill: white; -fx-background-radius: 6;"/>
                     </HBox>
                 </VBox>

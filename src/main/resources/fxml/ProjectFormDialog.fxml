@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.controller.ProjectFormDialogController"
+      spacing="0" style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 25, 0, 0, 5);">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" style="-fx-background-color: #2d2d2d; -fx-background-radius: 16 16 0 0; -fx-padding: 20 24;">
+        <VBox spacing="3" HBox.hgrow="ALWAYS">
+            <Label fx:id="dialogTitle" text="Create New Project"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            <Label text="Fill in the project details below"
+                   style="-fx-font-size: 12px; -fx-text-fill: #bbb;"/>
+        </VBox>
+    </HBox>
+    
+    <!-- Form Content -->
+    <VBox spacing="20">
+        <padding><Insets top="24" bottom="30" left="35" right="35"/></padding>
+
+        <!-- Form Fields -->
+        <ScrollPane fitToWidth="true" prefHeight="420" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                    style="-fx-background-color: transparent; -fx-border-color: transparent;">
+            <VBox spacing="16">
+            <!-- Title -->
+            <VBox spacing="6">
+                <Label text="Project Title *" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #333;"/>
+                <TextField fx:id="titleField" promptText="Enter project title"
+                           style="-fx-pref-height: 42px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd; -fx-border-width: 1.5; -fx-padding: 0 14;"/>
+                <Label fx:id="titleError" text="" style="-fx-text-fill: #dc2626; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+            </VBox>
+
+            <!-- Description -->
+            <VBox spacing="6">
+                <Label text="Description" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #333;"/>
+                <TextArea fx:id="descriptionField" promptText="Describe your project..."
+                          prefRowCount="3" wrapText="true"
+                          style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd; -fx-border-width: 1.5; -fx-padding: 10 14;"/>
+            </VBox>
+
+            <!-- Project Type -->
+            <VBox spacing="6">
+                <Label text="Project Type *" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #333;"/>
+                <ComboBox fx:id="typeCombo" promptText="Select type" maxWidth="Infinity"
+                          style="-fx-pref-height: 42px; -fx-background-radius: 8;"/>
+                <Label fx:id="typeError" text="" style="-fx-text-fill: #dc2626; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+            </VBox>
+
+            <!-- Join Code (Optional) -->
+            <VBox spacing="6">
+                <Label text="Join Code (Optional)" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #333;"/>
+                <TextField fx:id="joinCodeField" promptText="Leave empty to auto-generate"
+                           style="-fx-pref-height: 42px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd; -fx-border-width: 1.5; -fx-padding: 0 14;"/>
+                <Label text="A unique code for team members to join this project" style="-fx-text-fill: #888; -fx-font-size: 11px;"/>
+            </VBox>
+
+            <!-- Status -->
+            <VBox spacing="6">
+                <Label text="Status" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #333;"/>
+                <ComboBox fx:id="statusCombo" promptText="Select status" maxWidth="Infinity"
+                          style="-fx-pref-height: 42px; -fx-background-radius: 8;"/>
+            </VBox>
+
+            <!-- Supervisor -->
+            <VBox spacing="6">
+                <Label text="Supervisor (Optional)" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #333;"/>
+                <ComboBox fx:id="supervisorCombo" promptText="Select supervisor" maxWidth="Infinity"
+                          style="-fx-pref-height: 42px; -fx-background-radius: 8;"/>
+            </VBox>
+            </VBox>
+        </ScrollPane>
+
+        <!-- Error Message -->
+        <Label fx:id="errorLabel" text="" wrapText="true"
+               style="-fx-text-fill: #dc2626; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-color: #fee2e2; -fx-background-radius: 8; -fx-padding: 12;" visible="false"/>
+
+        <!-- Buttons -->
+        <HBox spacing="12" alignment="CENTER_RIGHT">
+            <Button text="Cancel" onAction="#handleCancel"
+                    style="-fx-background-color: #f3f4f6; -fx-text-fill: #666; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 12 28; -fx-cursor: hand; -fx-font-size: 13px;"/>
+            <Button fx:id="saveButton" text="Create Project" onAction="#handleSave"
+                    style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 12 28; -fx-cursor: hand; -fx-font-size: 13px; -fx-effect: dropshadow(gaussian, rgba(161,44,47,0.35), 10, 0, 0, 3);"/>
+        </HBox>
+    </VBox>
+
+</VBox>

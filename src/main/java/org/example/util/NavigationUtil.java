@@ -10,7 +10,18 @@ public class NavigationUtil {
     public static void navigateTo(String fxmlFile) {
         try {
             FXMLLoader loader = new FXMLLoader(NavigationUtil.class.getResource("/fxml/" + fxmlFile));
-            Scene scene = new Scene(loader.load());
+            
+            // Garder les dimensions actuelles de la fenêtre
+            double width = Main.primaryStage.getWidth();
+            double height = Main.primaryStage.getHeight();
+            
+            // Si la fenêtre n'a pas encore de dimensions, utiliser des valeurs par défaut
+            if (width == 0 || height == 0) {
+                width = 1200;
+                height = 750;
+            }
+            
+            Scene scene = new Scene(loader.load(), width, height);
             scene.getStylesheets().add(NavigationUtil.class.getResource("/css/style.css").toExternalForm());
             Main.primaryStage.setScene(scene);
         } catch (Exception e) {

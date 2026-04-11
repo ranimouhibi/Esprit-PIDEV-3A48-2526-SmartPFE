@@ -9,12 +9,12 @@
 
     <top>
         <VBox spacing="10">
-            <Label text="Gestion des Utilisateurs" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Label text="User Management" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
             <HBox spacing="10">
-                <TextField fx:id="searchField" promptText="Rechercher..." prefWidth="200"/>
+                <TextField fx:id="searchField" promptText="Search..." prefWidth="200"/>
                 <Button text="🔍" onAction="#handleSearch" style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                <ComboBox fx:id="roleFilterCombo" promptText="Filtrer par rôle"/>
-                <Button text="Filtrer" onAction="#handleFilter" style="-fx-background-color: #06D6A0; -fx-text-fill: white; -fx-background-radius: 6;"/>
+                <ComboBox fx:id="roleFilterCombo" promptText="Filter by role"/>
+                <Button text="Filter" onAction="#handleFilter" style="-fx-background-color: #06D6A0; -fx-text-fill: white; -fx-background-radius: 6;"/>
             </HBox>
         </VBox>
     </top>
@@ -24,43 +24,43 @@
             <TableView fx:id="userTable">
                 <columns>
                     <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
-                    <TableColumn fx:id="colName" text="Nom" prefWidth="150"/>
+                    <TableColumn fx:id="colName" text="Name" prefWidth="150"/>
                     <TableColumn fx:id="colEmail" text="Email" prefWidth="200"/>
-                    <TableColumn fx:id="colRole" text="Rôle" prefWidth="100"/>
-                    <TableColumn fx:id="colActive" text="Actif" prefWidth="70"/>
+                    <TableColumn fx:id="colRole" text="Role" prefWidth="100"/>
+                    <TableColumn fx:id="colActive" text="Active" prefWidth="70"/>
                 </columns>
             </TableView>
 
             <ScrollPane fitToWidth="true">
                 <VBox spacing="10">
                     <padding><Insets top="10" left="15" right="15" bottom="10"/></padding>
-                    <Label text="Formulaire Utilisateur" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    <Label text="User Form" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
 
-                    <Label text="Nom *"/>
-                    <TextField fx:id="nameField" promptText="Nom complet"/>
+                    <Label text="Name *"/>
+                    <TextField fx:id="nameField" promptText="Full name"/>
 
                     <Label text="Email *"/>
                     <TextField fx:id="emailField" promptText="email@example.com"/>
 
-                    <Label text="Mot de passe"/>
-                    <PasswordField fx:id="passwordField" promptText="Laisser vide pour ne pas changer"/>
+                    <Label text="Password"/>
+                    <PasswordField fx:id="passwordField" promptText="Leave empty to keep unchanged"/>
 
-                    <Label text="Téléphone"/>
+                    <Label text="Phone"/>
                     <TextField fx:id="phoneField" promptText="+216 XX XXX XXX"/>
 
-                    <Label text="Rôle *"/>
+                    <Label text="Role *"/>
                     <ComboBox fx:id="roleCombo" maxWidth="Infinity"/>
 
-                    <CheckBox fx:id="activeCheck" text="Compte actif" selected="true"/>
+                    <CheckBox fx:id="activeCheck" text="Active account" selected="true"/>
 
                     <Label fx:id="messageLabel" text="" wrapText="true"/>
 
                     <HBox spacing="10">
-                        <Button text="💾 Sauvegarder" onAction="#handleSave" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                        <Button text="💾 Save" onAction="#handleSave" maxWidth="Infinity" HBox.hgrow="ALWAYS"
                                 style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                        <Button text="🗑 Supprimer" onAction="#handleDelete" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                        <Button text="🗑 Delete" onAction="#handleDelete" maxWidth="Infinity" HBox.hgrow="ALWAYS"
                                 style="-fx-background-color: #FF6B6B; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                        <Button text="✖ Effacer" onAction="#handleClear" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                        <Button text="✖ Clear" onAction="#handleClear" maxWidth="Infinity" HBox.hgrow="ALWAYS"
                                 style="-fx-background-color: #aaa; -fx-text-fill: white; -fx-background-radius: 6;"/>
                     </HBox>
                 </VBox>

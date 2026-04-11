@@ -12,6 +12,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -25,6 +26,7 @@ public class DashboardController implements Initializable {
     @FXML private Label taskCountLabel;
     @FXML private Label userCountLabel;
     @FXML private BorderPane contentArea;
+    @FXML private VBox statsPane;
 
     private final ProjectDAO projectDAO = new ProjectDAO();
     private final SprintDAO sprintDAO = new SprintDAO();
@@ -35,8 +37,8 @@ public class DashboardController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         User user = SessionManager.getCurrentUser();
         if (user != null) {
-            welcomeLabel.setText("Bonjour, " + user.getName());
-            roleLabel.setText("Rôle: " + user.getRole().toUpperCase());
+            welcomeLabel.setText("Hello, " + user.getName());
+            roleLabel.setText("Role: " + user.getRole().toUpperCase());
         }
         loadStats();
     }
@@ -52,12 +54,15 @@ public class DashboardController implements Initializable {
         }
     }
 
+    @FXML public void showDashboard() { contentArea.setCenter(statsPane); loadStats(); }
     @FXML public void showProjects() { loadContent("Projects.fxml"); }
     @FXML public void showSprints() { loadContent("Sprints.fxml"); }
     @FXML public void showTasks() { loadContent("Tasks.fxml"); }
     @FXML public void showUsers() { loadContent("Users.fxml"); }
     @FXML public void showMeetings() { loadContent("Meetings.fxml"); }
     @FXML public void showCandidatures() { loadContent("Candidatures.fxml"); }
+    @FXML public void showDocuments() { loadContent("Projects.fxml"); } // TODO: créer Documents.fxml
+    @FXML public void showComments() { loadContent("Projects.fxml"); } // TODO: créer Comments.fxml
 
     private void loadContent(String fxml) {
         Pane pane = NavigationUtil.loadPane(fxml);

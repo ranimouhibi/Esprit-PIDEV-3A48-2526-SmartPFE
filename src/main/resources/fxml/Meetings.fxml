@@ -8,7 +8,7 @@
     <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
 
     <top>
-        <Label text="Gestion des Meetings" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+        <Label text="Meeting Management" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
     </top>
 
     <center>
@@ -16,19 +16,27 @@
             <TableView fx:id="meetingTable">
                 <columns>
                     <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+<<<<<<< Updated upstream
                     <TableColumn fx:id="colTitle" text="Titre" prefWidth="200"/>
                     <TableColumn fx:id="colType" text="Type" prefWidth="100"/>
                     <TableColumn fx:id="colStatus" text="Statut" prefWidth="90"/>
                     <TableColumn fx:id="colProject" text="Projet" prefWidth="160"/>
                     <TableColumn fx:id="colDate" text="Date" prefWidth="140"/>
+=======
+                    <TableColumn fx:id="colType" text="Type" prefWidth="130"/>
+                    <TableColumn fx:id="colStatus" text="Status" prefWidth="100"/>
+                    <TableColumn fx:id="colProject" text="Project" prefWidth="160"/>
+                    <TableColumn fx:id="colDate" text="Scheduled date" prefWidth="150"/>
+>>>>>>> Stashed changes
                 </columns>
             </TableView>
 
             <ScrollPane fitToWidth="true">
                 <VBox spacing="10">
                     <padding><Insets top="10" left="15" right="15" bottom="10"/></padding>
-                    <Label text="Formulaire Meeting" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    <Label text="Meeting Form" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
 
+<<<<<<< Updated upstream
                     <Label text="Titre *"/>
                     <TextField fx:id="titleField"/>
 
@@ -36,6 +44,9 @@
                     <TextArea fx:id="descriptionField" prefRowCount="2"/>
 
                     <Label text="Projet *"/>
+=======
+                    <Label text="Project *"/>
+>>>>>>> Stashed changes
                     <ComboBox fx:id="projectCombo" maxWidth="Infinity"/>
 
                     <HBox spacing="10">
@@ -44,15 +55,28 @@
                             <ComboBox fx:id="typeCombo" maxWidth="Infinity"/>
                         </VBox>
                         <VBox spacing="5" HBox.hgrow="ALWAYS">
-                            <Label text="Statut"/>
+                            <Label text="Status"/>
                             <ComboBox fx:id="statusCombo" maxWidth="Infinity"/>
                         </VBox>
                     </HBox>
 
+<<<<<<< Updated upstream
                     <Label text="Lieu"/>
+=======
+                    <Label text="Scheduled date"/>
+                    <DatePicker fx:id="datePicker" maxWidth="Infinity"/>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Duration (min)"/>
+                        <Spinner fx:id="durationSpinner" prefWidth="100"/>
+                        <CheckBox fx:id="onlineCheck" text="Online"/>
+                    </HBox>
+
+                    <Label text="Location"/>
+>>>>>>> Stashed changes
                     <TextField fx:id="locationField"/>
 
-                    <Label text="Lien (online)"/>
+                    <Label text="Link (online)"/>
                     <TextField fx:id="linkField"/>
 
                     <Label text="Date planifiée"/>
@@ -61,11 +85,11 @@
                     <Label fx:id="messageLabel" text="" wrapText="true"/>
 
                     <HBox spacing="10">
-                        <Button text="💾 Sauvegarder" onAction="#handleSave" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                        <Button text="💾 Save" onAction="#handleSave" maxWidth="Infinity" HBox.hgrow="ALWAYS"
                                 style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                        <Button text="🗑 Supprimer" onAction="#handleDelete" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                        <Button text="🗑 Delete" onAction="#handleDelete" maxWidth="Infinity" HBox.hgrow="ALWAYS"
                                 style="-fx-background-color: #FF6B6B; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                        <Button text="✖ Effacer" onAction="#handleClear" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                        <Button text="✖ Clear" onAction="#handleClear" maxWidth="Infinity" HBox.hgrow="ALWAYS"
                                 style="-fx-background-color: #aaa; -fx-text-fill: white; -fx-background-radius: 6;"/>
                     </HBox>
                 </VBox>
