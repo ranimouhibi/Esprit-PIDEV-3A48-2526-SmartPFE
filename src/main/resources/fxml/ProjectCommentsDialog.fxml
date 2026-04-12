@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.controller.ProjectCommentsDialogController"
+      spacing="0" style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 25, 0, 0, 5);">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" style="-fx-background-color: #2d2d2d; -fx-background-radius: 16 16 0 0; -fx-padding: 20 24;">
+        <VBox spacing="3" HBox.hgrow="ALWAYS">
+            <Label fx:id="dialogTitle" text="Project Comments"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            <Label fx:id="projectNameLabel" text="Project name"
+                   style="-fx-font-size: 12px; -fx-text-fill: #bbb;"/>
+        </VBox>
+        <HBox spacing="10">
+            <Button text="Export PDF" onAction="#handleExportPDF"
+                    style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 16; -fx-cursor: hand; -fx-font-size: 11px;"/>
+            <Button fx:id="addCommentBtn" text="+ Add Comment" onAction="#handleToggleForm"
+                    style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand; -fx-font-size: 12px;"/>
+        </HBox>
+    </HBox>
+
+    <!-- Stats Bar -->
+    <HBox spacing="0" style="-fx-background-color: #f9fafb; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+        <HBox HBox.hgrow="ALWAYS" alignment="CENTER" spacing="6"
+              style="-fx-border-color: #e0e0e0; -fx-border-width: 0 1 0 0; -fx-padding: 14 0;">
+            <Label fx:id="statTotal" text="0"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2d2d2d;"/>
+            <Label text="Total" style="-fx-font-size: 11px; -fx-text-fill: #888;"/>
+        </HBox>
+        <HBox HBox.hgrow="ALWAYS" alignment="CENTER" spacing="6"
+              style="-fx-border-color: #e0e0e0; -fx-border-width: 0 1 0 0; -fx-padding: 14 0;">
+            <Label fx:id="statUrgent" text="0"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ef4444;"/>
+            <Label text="Urgent" style="-fx-font-size: 11px; -fx-text-fill: #888;"/>
+        </HBox>
+        <HBox HBox.hgrow="ALWAYS" alignment="CENTER" spacing="6"
+              style="-fx-border-color: #e0e0e0; -fx-border-width: 0 1 0 0; -fx-padding: 14 0;">
+            <Label fx:id="statMedium" text="0"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #f59e0b;"/>
+            <Label text="Medium" style="-fx-font-size: 11px; -fx-text-fill: #888;"/>
+        </HBox>
+        <HBox HBox.hgrow="ALWAYS" alignment="CENTER" spacing="6"
+              style="-fx-padding: 14 0;">
+            <Label fx:id="statLow" text="0"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #10b981;"/>
+            <Label text="Low" style="-fx-font-size: 11px; -fx-text-fill: #888;"/>
+        </HBox>
+    </HBox>
+
+    <!-- Search and Filters Bar -->
+    <HBox spacing="10" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0; -fx-padding: 12 24;">
+        <TextField fx:id="searchField" promptText="Search subject or content..."
+                   prefWidth="220" style="-fx-pref-height: 36px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd; -fx-border-width: 1.5;"/>
+        <ComboBox fx:id="filterType" promptText="All Types" prefWidth="140"
+                  style="-fx-pref-height: 36px; -fx-background-radius: 8;"/>
+        <ComboBox fx:id="filterImportance" promptText="All Importance" prefWidth="150"
+                  style="-fx-pref-height: 36px; -fx-background-radius: 8;"/>
+        <ComboBox fx:id="sortCombo" promptText="Sort by..." prefWidth="130"
+                  style="-fx-pref-height: 36px; -fx-background-radius: 8;"/>
+        <Button text="Search" onAction="#handleSearch"
+                style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 18; -fx-cursor: hand; -fx-pref-height: 36px;"/>
+        <Button text="Reset" onAction="#handleReset"
+                style="-fx-background-color: #6b7280; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 18; -fx-cursor: hand; -fx-pref-height: 36px;"/>
+    </HBox>
+
+    <!-- Comment Form (Hidden by default) -->
+    <VBox fx:id="commentFormContainer" spacing="16" visible="false" managed="false"
+          style="-fx-background-color: #f0f4ff; -fx-border-color: #667eea; -fx-border-width: 0 0 0 4;">
+        <padding><Insets top="20" bottom="20" left="24" right="24"/></padding>
+
+        <Label fx:id="formTitle" text="New Comment"
+               style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #2d2d2d;"/>
+
+        <!-- Subject -->
+        <VBox spacing="4">
+            <Label text="Subject *" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #333;"/>
+            <TextField fx:id="subjectField" promptText="Enter subject"
+                       style="-fx-pref-height: 36px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd; -fx-border-width: 1.5;"/>
+            <Label fx:id="subjectError" text="" style="-fx-text-fill: #dc2626; -fx-font-size: 10px; -fx-font-weight: bold;"/>
+        </VBox>
+
+        <!-- Content -->
+        <VBox spacing="4">
+            <Label text="Comment *" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #333;"/>
+            <TextArea fx:id="contentField" promptText="Write your comment..." prefRowCount="3" wrapText="true"
+                      style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd; -fx-border-width: 1.5;"/>
+            <Label fx:id="contentError" text="" style="-fx-text-fill: #dc2626; -fx-font-size: 10px; -fx-font-weight: bold;"/>
+        </VBox>
+
+        <!-- Type, Target, Importance in one row -->
+        <HBox spacing="12">
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="Type *" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #333;"/>
+                <ComboBox fx:id="typeCombo" promptText="Select type" maxWidth="Infinity"
+                          style="-fx-pref-height: 36px; -fx-background-radius: 8;"/>
+                <Label fx:id="typeError" text="" style="-fx-text-fill: #dc2626; -fx-font-size: 10px; -fx-font-weight: bold;"/>
+            </VBox>
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="Target *" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #333;"/>
+                <ComboBox fx:id="targetCombo" promptText="Select target" maxWidth="Infinity"
+                          style="-fx-pref-height: 36px; -fx-background-radius: 8;"/>
+                <Label fx:id="targetError" text="" style="-fx-text-fill: #dc2626; -fx-font-size: 10px; -fx-font-weight: bold;"/>
+            </VBox>
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="Importance *" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #333;"/>
+                <ComboBox fx:id="importanceCombo" promptText="Select importance" maxWidth="Infinity"
+                          style="-fx-pref-height: 36px; -fx-background-radius: 8;"/>
+                <Label fx:id="importanceError" text="" style="-fx-text-fill: #dc2626; -fx-font-size: 10px; -fx-font-weight: bold;"/>
+            </VBox>
+        </HBox>
+
+        <!-- Form Actions -->
+        <HBox spacing="12" alignment="CENTER_RIGHT">
+            <Button text="Cancel" onAction="#handleCancelForm"
+                    style="-fx-background-color: #f3f4f6; -fx-text-fill: #666; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 24; -fx-cursor: hand; -fx-font-size: 12px;"/>
+            <Button text="Save Comment" onAction="#handleSaveComment"
+                    style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 24; -fx-cursor: hand; -fx-font-size: 12px;"/>
+        </HBox>
+    </VBox>
+
+    <!-- Comments List -->
+    <ScrollPane fitToWidth="true" prefHeight="380" prefWidth="780" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                style="-fx-background-color: #f9fafb; -fx-border-color: transparent;">
+        <VBox spacing="10" fx:id="commentsContainer" style="-fx-background-color: #f9fafb;">
+            <padding><Insets top="16" bottom="16" left="24" right="24"/></padding>
+        </VBox>
+    </ScrollPane>
+
+    <!-- Footer -->
+    <HBox spacing="12" alignment="CENTER_RIGHT"
+          style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 1 0 0 0; -fx-background-radius: 0 0 16 16;">
+        <padding><Insets top="14" bottom="14" left="24" right="24"/></padding>
+        <Label fx:id="resultCountLabel" text="" style="-fx-text-fill: #888; -fx-font-size: 12px;" HBox.hgrow="ALWAYS"/>
+        <Button text="Close" onAction="#handleClose"
+                style="-fx-background-color: #6b7280; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 28; -fx-cursor: hand; -fx-font-size: 13px;"/>
+    </HBox>
+
+</VBox>

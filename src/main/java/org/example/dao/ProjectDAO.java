@@ -36,6 +36,57 @@ public class ProjectDAO {
         return list;
     }
 
+    // Find all projects where user is owner OR member (approved or pending)
+    public List<Project> findByUserProjects(int userId) throws SQLException {
+        List<Project> list = new ArrayList<>();
+        String sql = SELECT_BASE + 
+            "WHERE p.owner_id = ? OR p.id IN (SELECT project_id FROM project_members WHERE user_id = ? AND status IN ('pending', 'approved')) " +
+            "ORDER BY p.created_at DESC";
+        try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, userId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) list.add(mapRow(rs));
+        }
+        return list;
+    }
+
+    // Add member to project
+    public void addMember(int projectId, int userId) throws SQLException {
+        String sql = "INSERT INTO project_members (project_id, user_id, status, joined_at) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
+            ps.setInt(1, projectId);
+            ps.setInt(2, userId);
+            ps.setString(3, "pending"); // Status: pending, approved, rejected
+            ps.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
+            ps.executeUpdate();
+        }
+    }
+
+    // Check if user is already a member
+    public boolean isMember(int projectId, int userId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM project_members WHERE project_id = ? AND user_id = ?";
+        try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
+            ps.setInt(1, projectId);
+            ps.setInt(2, userId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        }
+        return false;
+    }
+
+    public Project findByJoinCode(String joinCode) throws SQLException {
+        String sql = SELECT_BASE + "WHERE p.join_code = ?";
+        try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
+            ps.setString(1, joinCode);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return mapRow(rs);
+        }
+        return null;
+    }
+
     public List<Project> findBySupervisor(int supervisorId) throws SQLException {
         List<Project> list = new ArrayList<>();
         String sql = SELECT_BASE + "WHERE p.supervisor_id = ? ORDER BY p.created_at DESC";

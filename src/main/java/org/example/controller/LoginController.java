@@ -22,7 +22,7 @@ public class LoginController {
         String password = passwordField.getText();
 
         if (email.isEmpty() || password.isEmpty()) {
-            errorLabel.setText("Veuillez remplir tous les champs.");
+            errorLabel.setText("Please fill in all fields.");
             return;
         }
 
@@ -30,12 +30,17 @@ public class LoginController {
             User user = userDAO.authenticate(email, password);
             if (user != null) {
                 SessionManager.setCurrentUser(user);
-                NavigationUtil.navigateTo("Dashboard.fxml");
+                switch (user.getRole()) {
+                    case "student"       -> NavigationUtil.navigateTo("StudentDashboard.fxml");
+                    case "supervisor"    -> NavigationUtil.navigateTo("SupervisorDashboard.fxml");
+                    case "establishment" -> NavigationUtil.navigateTo("EstablishmentDashboard.fxml");
+                    default              -> NavigationUtil.navigateTo("Dashboard.fxml"); // admin
+                }
             } else {
-                errorLabel.setText("Email ou mot de passe incorrect.");
+                errorLabel.setText("Incorrect email or password.");
             }
         } catch (Exception e) {
-            errorLabel.setText("Erreur de connexion à la base de données.");
+            errorLabel.setText("Database connection error.");
             e.printStackTrace();
         }
     }

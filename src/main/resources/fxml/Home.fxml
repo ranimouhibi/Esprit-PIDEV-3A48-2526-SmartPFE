@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.controller.HomeController"
+            fitToWidth="true" hbarPolicy="NEVER"
+            style="-fx-background-color: white; -fx-border-color: transparent;">
+
+    <VBox spacing="0" style="-fx-background-color: white;">
+
+        <!-- ═══ NAVBAR ═══ -->
+        <HBox alignment="CENTER_LEFT"
+              style="-fx-background-color: white; -fx-border-color: #ececec; -fx-border-width: 0 0 1 0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);"
+              prefHeight="64">
+            <padding><Insets left="50" right="50"/></padding>
+            <Label text="Smart-PFE" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #a12c2f;"/>
+            <HBox HBox.hgrow="ALWAYS"/>
+            <HBox spacing="36" alignment="CENTER">
+                <Label text="Home" style="-fx-font-size: 13px; -fx-text-fill: #222; -fx-cursor: hand; -fx-font-weight: bold;"/>
+                <Label text="About" style="-fx-font-size: 13px; -fx-text-fill: #666; -fx-cursor: hand;"/>
+                <Button text="SIGN IN" onAction="#handleSignIn"
+                        style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px; -fx-background-radius: 22; -fx-padding: 10 28; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(161,44,47,0.35), 10, 0, 0, 3);"/>
+            </HBox>
+        </HBox>
+
+        <!-- ═══ HERO SECTION ═══ -->
+        <HBox style="-fx-background-color: #2d2d2d;" prefHeight="440" spacing="0" alignment="CENTER">
+            <padding><Insets left="80" right="60"/></padding>
+
+            <!-- Left -->
+            <VBox spacing="22" HBox.hgrow="ALWAYS" maxWidth="500">
+                <Label text="WELCOME TO SMART-PFE"
+                       style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #a12c2f; -fx-letter-spacing: 3;"/>
+                <Label text="Manage Your Academic Projects With Ease"
+                       style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white; -fx-wrap-text: true; -fx-line-spacing: 4;"
+                       wrapText="true" maxWidth="460"/>
+                <Label text="The all-in-one platform for students, supervisors, and establishments to collaborate, track progress, and manage PFE projects efficiently with modern tools and real-time updates."
+                       style="-fx-font-size: 13px; -fx-text-fill: #b0b0b0; -fx-line-spacing: 3;" wrapText="true" maxWidth="440"/>
+                <HBox spacing="16">
+                    <Button text="GET STARTED FREE" onAction="#handleSignIn"
+                            style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 26; -fx-padding: 13 30; -fx-cursor: hand; -fx-font-size: 13px; -fx-effect: dropshadow(gaussian, rgba(161,44,47,0.4), 12, 0, 0, 4);"/>
+                    <Button text="LEARN MORE"
+                            style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 26; -fx-padding: 13 30; -fx-cursor: hand; -fx-font-size: 13px; -fx-border-color: rgba(255,255,255,0.5); -fx-border-radius: 26; -fx-border-width: 1.5;"/>
+                </HBox>
+            </VBox>
+
+            <!-- Right cards -->
+            <VBox spacing="14" alignment="CENTER" HBox.hgrow="ALWAYS" maxWidth="380">
+                <padding><Insets left="40"/></padding>
+                <!-- Card 1 -->
+                <VBox spacing="10" style="-fx-background-color: #3a3a3a; -fx-background-radius: 16; -fx-border-color: rgba(255,255,255,0.07); -fx-border-radius: 16; -fx-border-width: 1;" maxWidth="340">
+                    <padding><Insets top="22" bottom="22" left="22" right="22"/></padding>
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <Label text="📊" style="-fx-font-size: 24px; -fx-background-color: #a12c2f; -fx-background-radius: 10; -fx-padding: 10 12;"/>
+                        <VBox spacing="5">
+                            <Label text="Project Tracking" style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 14px;"/>
+                            <Label text="Real-time updates and sprint management with Scrum methodology"
+                                   style="-fx-text-fill: #999; -fx-font-size: 12px;" wrapText="true" maxWidth="230"/>
+                        </VBox>
+                    </HBox>
+                    <HBox prefHeight="3" maxWidth="160" style="-fx-background-color: #a12c2f; -fx-background-radius: 2;"/>
+                </VBox>
+                <!-- Card 2 -->
+                <VBox spacing="10" style="-fx-background-color: #3a3a3a; -fx-background-radius: 16; -fx-border-color: rgba(255,255,255,0.07); -fx-border-radius: 16; -fx-border-width: 1;" maxWidth="340">
+                    <padding><Insets top="22" bottom="22" left="22" right="22"/></padding>
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <Label text="💬" style="-fx-font-size: 24px; -fx-background-color: #a12c2f; -fx-background-radius: 10; -fx-padding: 10 12;"/>
+                        <VBox spacing="5">
+                            <Label text="Secure Communication" style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 14px;"/>
+                            <Label text="Integrated meeting requests, reports, and team collaboration"
+                                   style="-fx-text-fill: #999; -fx-font-size: 12px;" wrapText="true" maxWidth="230"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </HBox>
+
+        <!-- ═══ STATS BAR ═══ -->
+        <HBox style="-fx-background-color: #a12c2f;" prefHeight="80" alignment="CENTER" spacing="0">
+            <VBox alignment="CENTER" HBox.hgrow="ALWAYS" spacing="3">
+                <Label text="500+" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Students" style="-fx-text-fill: rgba(255,255,255,0.75); -fx-font-size: 12px;"/>
+            </VBox>
+            <Separator orientation="VERTICAL" style="-fx-background-color: rgba(255,255,255,0.2);"/>
+            <VBox alignment="CENTER" HBox.hgrow="ALWAYS" spacing="3">
+                <Label text="120+" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Projects" style="-fx-text-fill: rgba(255,255,255,0.75); -fx-font-size: 12px;"/>
+            </VBox>
+            <Separator orientation="VERTICAL" style="-fx-background-color: rgba(255,255,255,0.2);"/>
+            <VBox alignment="CENTER" HBox.hgrow="ALWAYS" spacing="3">
+                <Label text="50+" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Supervisors" style="-fx-text-fill: rgba(255,255,255,0.75); -fx-font-size: 12px;"/>
+            </VBox>
+            <Separator orientation="VERTICAL" style="-fx-background-color: rgba(255,255,255,0.2);"/>
+            <VBox alignment="CENTER" HBox.hgrow="ALWAYS" spacing="3">
+                <Label text="15+" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Establishments" style="-fx-text-fill: rgba(255,255,255,0.75); -fx-font-size: 12px;"/>
+            </VBox>
+        </HBox>
+
+        <!-- ═══ FEATURES SECTION ═══ -->
+        <VBox spacing="36" alignment="CENTER" style="-fx-background-color: #f7f7f7;">
+            <padding><Insets top="60" bottom="60" left="60" right="60"/></padding>
+            <VBox spacing="10" alignment="CENTER">
+                <Label text="OUR FEATURES"
+                       style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #a12c2f; -fx-letter-spacing: 3;"/>
+                <Label text="EVERYTHING YOU NEED TO SUCCEED"
+                       style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+                <Label text="Smart-PFE provides all the tools you need to manage your academic projects from start to finish"
+                       style="-fx-font-size: 13px; -fx-text-fill: #888;" wrapText="true"/>
+            </VBox>
+
+            <HBox spacing="18" alignment="CENTER">
+                <!-- Card Student -->
+                <VBox spacing="14" alignment="TOP_CENTER"
+                      style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 14, 0, 0, 4); -fx-border-color: #f0f0f0; -fx-border-radius: 16; -fx-border-width: 1;"
+                      prefWidth="210" prefHeight="210">
+                    <padding><Insets top="28" bottom="24" left="18" right="18"/></padding>
+                    <Label text="🎓" style="-fx-font-size: 32px; -fx-background-color: #a12c2f; -fx-background-radius: 14; -fx-padding: 12 14;"/>
+                    <Label text="For Students" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #1e1e1e;"/>
+                    <Label text="Create projects, collaborate with teams, apply for offers, and track your progress with Scrum boards"
+                           style="-fx-text-fill: #888; -fx-font-size: 11px;" wrapText="true" textAlignment="CENTER"/>
+                </VBox>
+                <!-- Card Supervisor -->
+                <VBox spacing="14" alignment="TOP_CENTER"
+                      style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 14, 0, 0, 4); -fx-border-color: #f0f0f0; -fx-border-radius: 16; -fx-border-width: 1;"
+                      prefWidth="210" prefHeight="210">
+                    <padding><Insets top="28" bottom="24" left="18" right="18"/></padding>
+                    <Label text="👨‍🏫" style="-fx-font-size: 32px; -fx-background-color: #a12c2f; -fx-background-radius: 14; -fx-padding: 12 14;"/>
+                    <Label text="For Supervisors" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #1e1e1e;"/>
+                    <Label text="Supervise multiple projects, schedule meetings, provide feedback, and approve deliverables"
+                           style="-fx-text-fill: #888; -fx-font-size: 11px;" wrapText="true" textAlignment="CENTER"/>
+                </VBox>
+                <!-- Card Establishment -->
+                <VBox spacing="14" alignment="TOP_CENTER"
+                      style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 14, 0, 0, 4); -fx-border-color: #f0f0f0; -fx-border-radius: 16; -fx-border-width: 1;"
+                      prefWidth="210" prefHeight="210">
+                    <padding><Insets top="28" bottom="24" left="18" right="18"/></padding>
+                    <Label text="🏛️" style="-fx-font-size: 32px; -fx-background-color: #a12c2f; -fx-background-radius: 14; -fx-padding: 12 14;"/>
+                    <Label text="For Establishments" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #1e1e1e;"/>
+                    <Label text="Manage users, create project offers, validate submissions, and generate institutional reports"
+                           style="-fx-text-fill: #888; -fx-font-size: 11px;" wrapText="true" textAlignment="CENTER"/>
+                </VBox>
+                <!-- Card Progress -->
+                <VBox spacing="14" alignment="TOP_CENTER"
+                      style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 14, 0, 0, 4); -fx-border-color: #f0f0f0; -fx-border-radius: 16; -fx-border-width: 1;"
+                      prefWidth="210" prefHeight="210">
+                    <padding><Insets top="28" bottom="24" left="18" right="18"/></padding>
+                    <Label text="📈" style="-fx-font-size: 32px; -fx-background-color: #a12c2f; -fx-background-radius: 14; -fx-padding: 12 14;"/>
+                    <Label text="Progress Tracking" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #1e1e1e;"/>
+                    <Label text="Monitor project advancement with burndown charts, sprint statistics, and real-time dashboards"
+                           style="-fx-text-fill: #888; -fx-font-size: 11px;" wrapText="true" textAlignment="CENTER"/>
+                </VBox>
+            </HBox>
+        </VBox>
+
+        <!-- ═══ RECENT PROJECTS SECTION ═══ -->
+        <VBox spacing="24" style="-fx-background-color: white;">
+            <padding><Insets top="60" bottom="60" left="60" right="60"/></padding>
+            <HBox alignment="CENTER_LEFT">
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <Label text="RECENT PROJECTS"
+                           style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #a12c2f; -fx-letter-spacing: 3;"/>
+                    <Label text="Latest Academic Projects"
+                           style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+                </VBox>
+                <Button text="Sign In to View All →" onAction="#handleSignIn"
+                        style="-fx-background-color: transparent; -fx-text-fill: #a12c2f; -fx-font-weight: bold; -fx-cursor: hand; -fx-font-size: 13px; -fx-border-color: #a12c2f; -fx-border-radius: 20; -fx-border-width: 1.5; -fx-padding: 8 20;"/>
+            </HBox>
+
+            <!-- Project Cards Row -->
+            <HBox spacing="18">
+                <!-- Project Card 1 -->
+                <VBox spacing="12" HBox.hgrow="ALWAYS"
+                      style="-fx-background-color: #fafafa; -fx-background-radius: 14; -fx-border-color: #ececec; -fx-border-radius: 14; -fx-border-width: 1;">
+                    <padding><Insets top="22" bottom="22" left="22" right="22"/></padding>
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="📁" style="-fx-font-size: 20px;"/>
+                        <Label text="PFE" style="-fx-background-color: #a12c2f22; -fx-text-fill: #a12c2f; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 3 8;"/>
+                        <HBox HBox.hgrow="ALWAYS"/>
+                        <Label text="● Active" style="-fx-text-fill: #22c55e; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                    </HBox>
+                    <Label text="AI-Based Student Evaluation System"
+                           style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #1e1e1e;" wrapText="true"/>
+                    <Label text="An intelligent system to evaluate student performance using machine learning algorithms and real-time data."
+                           style="-fx-text-fill: #888; -fx-font-size: 12px;" wrapText="true"/>
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <Label text="👤 Ahmed B." style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
+                        <HBox HBox.hgrow="ALWAYS"/>
+                        <Label text="Sprint 3/5" style="-fx-font-size: 11px; -fx-text-fill: #a12c2f; -fx-font-weight: bold;"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Project Card 2 -->
+                <VBox spacing="12" HBox.hgrow="ALWAYS"
+                      style="-fx-background-color: #fafafa; -fx-background-radius: 14; -fx-border-color: #ececec; -fx-border-radius: 14; -fx-border-width: 1;">
+                    <padding><Insets top="22" bottom="22" left="22" right="22"/></padding>
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="📁" style="-fx-font-size: 20px;"/>
+                        <Label text="STAGE" style="-fx-background-color: #3b82f622; -fx-text-fill: #3b82f6; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 3 8;"/>
+                        <HBox HBox.hgrow="ALWAYS"/>
+                        <Label text="● Active" style="-fx-text-fill: #22c55e; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                    </HBox>
+                    <Label text="Smart Campus Management Platform"
+                           style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #1e1e1e;" wrapText="true"/>
+                    <Label text="A comprehensive platform to manage campus resources, schedules, and student services digitally."
+                           style="-fx-text-fill: #888; -fx-font-size: 12px;" wrapText="true"/>
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <Label text="👤 Sara M." style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
+                        <HBox HBox.hgrow="ALWAYS"/>
+                        <Label text="Sprint 1/4" style="-fx-font-size: 11px; -fx-text-fill: #3b82f6; -fx-font-weight: bold;"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Project Card 3 -->
+                <VBox spacing="12" HBox.hgrow="ALWAYS"
+                      style="-fx-background-color: #fafafa; -fx-background-radius: 14; -fx-border-color: #ececec; -fx-border-radius: 14; -fx-border-width: 1;">
+                    <padding><Insets top="22" bottom="22" left="22" right="22"/></padding>
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="📁" style="-fx-font-size: 20px;"/>
+                        <Label text="PFE" style="-fx-background-color: #a12c2f22; -fx-text-fill: #a12c2f; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 3 8;"/>
+                        <HBox HBox.hgrow="ALWAYS"/>
+                        <Label text="● Completed" style="-fx-text-fill: #888; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                    </HBox>
+                    <Label text="E-Learning Platform with Adaptive Content"
+                           style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #1e1e1e;" wrapText="true"/>
+                    <Label text="Adaptive learning system that personalizes content delivery based on student progress and learning style."
+                           style="-fx-text-fill: #888; -fx-font-size: 12px;" wrapText="true"/>
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <Label text="👤 Malek K." style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
+                        <HBox HBox.hgrow="ALWAYS"/>
+                        <Label text="Sprint 5/5 ✓" style="-fx-font-size: 11px; -fx-text-fill: #22c55e; -fx-font-weight: bold;"/>
+                    </HBox>
+                </VBox>
+            </HBox>
+        </VBox>
+
+        <!-- ═══ CTA SECTION ═══ -->
+        <HBox alignment="CENTER" style="-fx-background-color: #2d2d2d;" prefHeight="140" spacing="40">
+            <VBox spacing="8" alignment="CENTER_LEFT" maxWidth="500">
+                <Label text="Ready to manage your PFE project?"
+                       style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Join thousands of students and supervisors already using Smart-PFE."
+                       style="-fx-font-size: 13px; -fx-text-fill: #aaa;"/>
+            </VBox>
+            <Button text="GET STARTED FREE" onAction="#handleSignIn"
+                    style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 26; -fx-padding: 14 34; -fx-cursor: hand; -fx-font-size: 14px; -fx-effect: dropshadow(gaussian, rgba(161,44,47,0.4), 12, 0, 0, 4);"/>
+        </HBox>
+
+        <!-- ═══ FOOTER ═══ -->
+        <HBox alignment="CENTER" prefHeight="52" style="-fx-background-color: #1e1e1e;" spacing="20">
+            <Label text="Smart-PFE" style="-fx-font-weight: bold; -fx-text-fill: #a12c2f; -fx-font-size: 13px;"/>
+            <Label text="·" style="-fx-text-fill: #555;"/>
+            <Label text="© 2025 Academic Project Management Platform"
+                   style="-fx-text-fill: #555; -fx-font-size: 11px;"/>
+            <Label text="·" style="-fx-text-fill: #555;"/>
+            <Label text="All rights reserved" style="-fx-text-fill: #555; -fx-font-size: 11px;"/>
+        </HBox>
+
+    </VBox>
+</ScrollPane>

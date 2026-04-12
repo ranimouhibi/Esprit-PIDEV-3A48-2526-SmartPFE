@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.controller.DocumentController"
+      spacing="0" style="-fx-background-color: #f4f6fb;">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+        <padding><Insets top="20" bottom="20" left="30" right="30"/></padding>
+        <VBox spacing="4" HBox.hgrow="ALWAYS">
+            <Label text="Documents Management" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+            <Label text="All uploaded project documents" style="-fx-font-size: 13px; -fx-text-fill: #888;"/>
+        </VBox>
+        <Button text="Export PDF" onAction="#handleExportPDF"
+                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand; -fx-font-size: 12px;"/>
+    </HBox>
+
+    <!-- Stats Bar -->
+    <HBox spacing="0" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+        <padding><Insets top="16" bottom="16" left="30" right="30"/></padding>
+        
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 12 24;">
+            <Label fx:id="statTotal" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+            <Label text="Total" style="-fx-font-size: 11px; -fx-text-fill: #888;"/>
+        </VBox>
+        
+        <Region HBox.hgrow="ALWAYS"/>
+        
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #667eea22; -fx-background-radius: 8; -fx-padding: 12 24;">
+            <Label fx:id="statProposals" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #667eea;"/>
+            <Label text="Proposals" style="-fx-font-size: 10px; -fx-text-fill: #667eea;"/>
+        </VBox>
+        
+        <Region prefWidth="12"/>
+        
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #3b82f622; -fx-background-radius: 8; -fx-padding: 12 24;">
+            <Label fx:id="statReports" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #3b82f6;"/>
+            <Label text="Reports" style="-fx-font-size: 10px; -fx-text-fill: #3b82f6;"/>
+        </VBox>
+        
+        <Region prefWidth="12"/>
+        
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #8b5cf622; -fx-background-radius: 8; -fx-padding: 12 24;">
+            <Label fx:id="statPresentations" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8b5cf6;"/>
+            <Label text="Presentations" style="-fx-font-size: 10px; -fx-text-fill: #8b5cf6;"/>
+        </VBox>
+    </HBox>
+
+    <!-- Filters -->
+    <HBox spacing="12" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+        <padding><Insets top="14" bottom="14" left="30" right="30"/></padding>
+        <TextField fx:id="searchField" promptText="Search by filename or project..."
+                   prefWidth="280" style="-fx-pref-height: 38px; -fx-background-radius: 19; -fx-border-radius: 19; -fx-border-color: #ddd; -fx-border-width: 1.5; -fx-padding: 0 16;"/>
+        <ComboBox fx:id="filterCategory" promptText="All Categories" prefWidth="150"
+                  style="-fx-pref-height: 38px; -fx-background-radius: 8;"/>
+        <ComboBox fx:id="sortCombo" promptText="Sort by" prefWidth="150"
+                  style="-fx-pref-height: 38px; -fx-background-radius: 8;"/>
+        <Button text="Reset" onAction="#handleReset"
+                style="-fx-background-color: #6b7280; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 9 20; -fx-cursor: hand; -fx-pref-height: 38px;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="countLabel" text="" style="-fx-text-fill: #888; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+    </HBox>
+
+    <!-- Documents list -->
+    <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER"
+                style="-fx-background-color: transparent; -fx-border-color: transparent;">
+        <VBox fx:id="docsContainer" spacing="10">
+            <padding><Insets top="20" bottom="20" left="30" right="30"/></padding>
+        </VBox>
+    </ScrollPane>
+
+</VBox>

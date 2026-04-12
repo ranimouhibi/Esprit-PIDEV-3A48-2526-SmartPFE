@@ -4,18 +4,32 @@
 <?import javafx.geometry.Insets?>
 
 <VBox xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.example.controller.ProjectController"
+      fx:controller="org.example.controller.StudentProjectsController"
       spacing="0" style="-fx-background-color: #f4f6fb;">
 
     <!-- Header -->
     <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
         <padding><Insets top="20" bottom="20" left="30" right="30"/></padding>
         <VBox spacing="4" HBox.hgrow="ALWAYS">
-            <Label text="Projects Management" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
-            <Label text="View and manage all projects in the system" style="-fx-font-size: 13px; -fx-text-fill: #888;"/>
+            <Label text="My Projects" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+            <Label text="Create and manage your academic projects" style="-fx-font-size: 13px; -fx-text-fill: #888;"/>
         </VBox>
-        <Button text="Export PDF" onAction="#handleExportPDF"
-                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand; -fx-font-size: 12px;"/>
+        <HBox spacing="12" alignment="CENTER_RIGHT">
+            <Button text="Export PDF" onAction="#handleExportPDF"
+                    style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand; -fx-font-size: 12px;"/>
+            <VBox spacing="4" alignment="CENTER_RIGHT">
+                <Label text="Join a Team Project:" style="-fx-font-size: 11px; -fx-text-fill: #666; -fx-font-weight: bold;"/>
+                <HBox spacing="8" alignment="CENTER_RIGHT">
+                    <TextField fx:id="joinCodeInput" promptText="Enter join code..."
+                               style="-fx-pref-width: 160px; -fx-pref-height: 36px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #3b82f6; -fx-border-width: 1.5; -fx-padding: 0 12; -fx-font-family: 'Courier New'; -fx-font-weight: bold;"/>
+                    <Button text="Join" onAction="#handleJoinProject"
+                            style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 20; -fx-cursor: hand; -fx-font-size: 12px;"/>
+                </HBox>
+            </VBox>
+            <Separator orientation="VERTICAL" style="-fx-padding: 0 8;"/>
+            <Button text="+ New Project" onAction="#handleAddProject"
+                    style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 12 24; -fx-cursor: hand; -fx-font-size: 13px; -fx-effect: dropshadow(gaussian, rgba(161,44,47,0.3), 8, 0, 0, 2);"/>
+        </HBox>
     </HBox>
 
     <!-- Stats Bar -->
@@ -47,26 +61,19 @@
             <Label fx:id="statInProgress" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #22c55e;"/>
             <Label text="In Progress" style="-fx-font-size: 10px; -fx-text-fill: #22c55e;"/>
         </VBox>
-        
-        <Region prefWidth="12"/>
-        
-        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #10b98122; -fx-background-radius: 8; -fx-padding: 12 20;">
-            <Label fx:id="statFinished" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #10b981;"/>
-            <Label text="Finished" style="-fx-font-size: 10px; -fx-text-fill: #10b981;"/>
-        </VBox>
     </HBox>
 
     <!-- Search & Filter -->
     <HBox spacing="12" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
         <padding><Insets top="16" bottom="16" left="30" right="30"/></padding>
-        <TextField fx:id="searchField" promptText="Search projects..." prefWidth="280"
+        <TextField fx:id="searchField" promptText="Search projects..." prefWidth="300"
                    style="-fx-pref-height: 38px; -fx-background-radius: 19; -fx-border-radius: 19; -fx-border-color: #ddd; -fx-border-width: 1.5; -fx-padding: 0 16;"/>
-        <ComboBox fx:id="filterType" promptText="All Types" prefWidth="130"
+        <ComboBox fx:id="filterType" promptText="All Types" prefWidth="150"
                   style="-fx-pref-height: 38px; -fx-background-radius: 8; -fx-border-radius: 8;"/>
         <ComboBox fx:id="filterStatus" promptText="All Status" prefWidth="150"
                   style="-fx-pref-height: 38px; -fx-background-radius: 8; -fx-border-radius: 8;"/>
-        <ComboBox fx:id="sortCombo" promptText="Sort by" prefWidth="150"
-                  style="-fx-pref-height: 38px; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+        <Button text="Search" onAction="#handleSearch"
+                style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand;"/>
         <Button text="Reset" onAction="#handleReset"
                 style="-fx-background-color: #6b7280; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand;"/>
     </HBox>
