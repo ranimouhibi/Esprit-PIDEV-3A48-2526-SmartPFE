@@ -32,6 +32,7 @@ public class SupervisorDashboardController implements Initializable {
     @FXML private Label navMeetings;
     @FXML private Label navProjects;
     @FXML private Label navTasks;
+    @FXML private Label navSprints;
     @FXML private Label navDocuments;
     @FXML private Label navComments;
     @FXML private Label navProfile;
@@ -108,6 +109,17 @@ public class SupervisorDashboardController implements Initializable {
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
         contentArea.setCenter(null);
         javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Tasks.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
+    }
+
+    @FXML public void showSprints() {
+        setActiveNav(navSprints);
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Sprints.fxml");
         if (pane != null) {
             contentArea.setCenter(pane);
             pane.setVisible(true);

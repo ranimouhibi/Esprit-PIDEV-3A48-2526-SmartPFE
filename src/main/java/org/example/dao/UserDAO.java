@@ -2,7 +2,6 @@ package org.example.dao;
 
 import org.example.config.DatabaseConfig;
 import org.example.model.User;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -12,16 +11,12 @@ import java.util.List;
 public class UserDAO {
 
     public User authenticate(String email, String password) throws SQLException {
-        String sql = "SELECT * FROM users WHERE email = ? AND is_active = 1";
+        String sql = "SELECT * FROM users WHERE email = ? AND password = ? AND is_active = 1";
         try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
             ps.setString(1, email);
+            ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                String hashed = rs.getString("password").replace("$2y$", "$2a$");
-                if (BCrypt.checkpw(password, hashed)) {
-                    return mapRow(rs);
-                }
-            }
+            if (rs.next()) return mapRow(rs);
         }
         return null;
     }
@@ -61,7 +56,7 @@ public class UserDAO {
         String sql = "INSERT INTO users (email, password, role, name, phone, is_active, is_verified, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, user.getEmail());
-            ps.setString(2, BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
+            ps.setString(2, user.getPassword());
             ps.setString(3, user.getRole());
             ps.setString(4, user.getName());
             ps.setString(5, user.getPhone());

@@ -76,10 +76,12 @@ public class SprintDAO {
     }
 
     public void delete(int id) throws SQLException {
-        String sql = "DELETE FROM sprints WHERE id = ?";
-        try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
+        Connection conn = DatabaseConfig.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM tasks WHERE sprint_id = ?")) {
+            ps.setInt(1, id); ps.executeUpdate();
+        }
+        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM sprints WHERE id = ?")) {
+            ps.setInt(1, id); ps.executeUpdate();
         }
     }
 

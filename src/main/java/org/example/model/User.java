@@ -47,5 +47,8 @@ public class User {
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
     @Override
-    public String toString() { return name + " (" + email + ")"; }
+    public String toString() {
+        if (email == null || email.isEmpty()) return name;
+        return name + " (" + email + ")";
+    }
 }

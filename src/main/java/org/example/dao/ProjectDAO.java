@@ -63,6 +63,31 @@ public class ProjectDAO {
         }
     }
 
+    /** Returns all users who are members of a project (owner + approved members). */
+    public List<org.example.model.User> findProjectMembers(int projectId) throws SQLException {
+        List<org.example.model.User> members = new ArrayList<>();
+        String sql = "SELECT u.* FROM users u " +
+            "WHERE u.id = (SELECT owner_id FROM projects WHERE id = ?) " +
+            "UNION " +
+            "SELECT u.* FROM users u " +
+            "INNER JOIN project_members pm ON pm.user_id = u.id " +
+            "WHERE pm.project_id = ? AND pm.status IN ('pending', 'approved')";
+        try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
+            ps.setInt(1, projectId);
+            ps.setInt(2, projectId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                org.example.model.User u = new org.example.model.User();
+                u.setId(rs.getInt("id"));
+                u.setName(rs.getString("name"));
+                u.setEmail(rs.getString("email"));
+                u.setRole(rs.getString("role"));
+                members.add(u);
+            }
+        }
+        return members;
+    }
+
     // Check if user is already a member
     public boolean isMember(int projectId, int userId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM project_members WHERE project_id = ? AND user_id = ?";
@@ -96,6 +121,13 @@ public class ProjectDAO {
             while (rs.next()) list.add(mapRow(rs));
         }
         return list;
+    }
+
+    /** Returns projects visible to the given user based on their role. */
+    public List<Project> findForUser(int userId, String role) throws SQLException {
+        if ("admin".equals(role)) return findAll();
+        if ("supervisor".equals(role)) return findBySupervisor(userId);
+        return findByUserProjects(userId); // student — owner or member
     }
 
     public Project findById(int id) throws SQLException {

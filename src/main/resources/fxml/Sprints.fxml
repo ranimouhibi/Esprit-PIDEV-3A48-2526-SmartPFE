@@ -4,78 +4,52 @@
 <?import javafx.geometry.Insets?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.example.controller.SprintController">
-    <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+            fx:controller="org.example.controller.SprintController"
+            style="-fx-background-color: #f4f6fb;">
+    <padding><Insets top="28" left="32" right="32" bottom="28"/></padding>
 
     <top>
-        <Label text="Sprint Management" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+        <VBox spacing="14">
+            <padding><Insets bottom="8"/></padding>
+            <Label text="Sprints" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+            <HBox spacing="10" alignment="CENTER_LEFT"
+                  style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 12 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                <Button text="New Sprint"   onAction="#handleAddDialog"  minWidth="110"
+                        style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 9 18; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                <Button text="Edit"         onAction="#handleEditDialog" minWidth="80"
+                        style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 9 18; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                <Button text="Delete"       onAction="#handleDelete"     minWidth="80"
+                        style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 9 18; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                <Button text="Statistics"   onAction="#handleStats"      minWidth="100"
+                        style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 9 18; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                <Button text="Export PDF"   onAction="#handleExportPdf"  minWidth="110"
+                        style="-fx-background-color: #6b7280; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 9 18; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="searchField" promptText="Search sprints..." prefWidth="230"
+                           style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e5e7eb; -fx-padding: 8 12; -fx-background-color: #f9fafb;"/>
+                <Label fx:id="messageLabel" text="" wrapText="true" style="-fx-font-size: 12px;"/>
+            </HBox>
+        </VBox>
     </top>
 
     <center>
-        <SplitPane dividerPositions="0.6">
-            <TableView fx:id="sprintTable">
+        <VBox style="-fx-background-color: white; -fx-background-radius: 14; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 10, 0, 0, 3);">
+            <padding><Insets top="6" left="6" right="6" bottom="6"/></padding>
+            <TableView fx:id="sprintTable" VBox.vgrow="ALWAYS"
+                       style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-table-cell-border-color: transparent;">
                 <columns>
-                    <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
-                    <TableColumn fx:id="colNumber" text="#" prefWidth="50"/>
-                    <TableColumn fx:id="colName" text="Name" prefWidth="180"/>
-                    <TableColumn fx:id="colStatus" text="Status" prefWidth="90"/>
-                    <TableColumn fx:id="colProject" text="Project" prefWidth="160"/>
-                    <TableColumn fx:id="colStart" text="Start" prefWidth="100"/>
-                    <TableColumn fx:id="colEnd" text="End" prefWidth="100"/>
+                    <TableColumn fx:id="colId"      text="ID"      prefWidth="60"/>
+                    <TableColumn fx:id="colNumber"  text="#"       prefWidth="60"/>
+                    <TableColumn fx:id="colName"    text="Name"    prefWidth="230"/>
+                    <TableColumn fx:id="colStatus"  text="Status"  prefWidth="110"/>
+                    <TableColumn fx:id="colProject" text="Project" prefWidth="210"/>
+                    <TableColumn fx:id="colStart"   text="Start"   prefWidth="120"/>
+                    <TableColumn fx:id="colEnd"     text="End"     prefWidth="120"/>
                 </columns>
+                <placeholder>
+                    <Label text="No sprints found." style="-fx-text-fill: #9ca3af; -fx-font-size: 14px;"/>
+                </placeholder>
             </TableView>
-
-            <ScrollPane fitToWidth="true">
-                <VBox spacing="10">
-                    <padding><Insets top="10" left="15" right="15" bottom="10"/></padding>
-                    <Label text="Sprint Form" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-
-                    <Label text="Project *"/>
-                    <ComboBox fx:id="projectCombo" maxWidth="Infinity"/>
-
-                    <Label text="Name *"/>
-                    <TextField fx:id="nameField" promptText="Sprint name"/>
-
-                    <Label text="Goal"/>
-                    <TextArea fx:id="goalField" prefRowCount="2"/>
-
-                    <HBox spacing="10">
-                        <VBox spacing="5" HBox.hgrow="ALWAYS">
-                            <Label text="Number"/>
-                            <Spinner fx:id="numberSpinner" maxWidth="Infinity"/>
-                        </VBox>
-                        <VBox spacing="5" HBox.hgrow="ALWAYS">
-                            <Label text="Status"/>
-                            <ComboBox fx:id="statusCombo" maxWidth="Infinity"/>
-                        </VBox>
-                    </HBox>
-
-                    <HBox spacing="10">
-                        <VBox spacing="5" HBox.hgrow="ALWAYS">
-                            <Label text="Start date"/>
-                            <DatePicker fx:id="startDatePicker" maxWidth="Infinity"/>
-                        </VBox>
-                        <VBox spacing="5" HBox.hgrow="ALWAYS">
-                            <Label text="End date"/>
-                            <DatePicker fx:id="endDatePicker" maxWidth="Infinity"/>
-                        </VBox>
-                    </HBox>
-
-                    <Label text="Retrospective"/>
-                    <TextArea fx:id="retrospectiveField" prefRowCount="2"/>
-
-                    <Label fx:id="messageLabel" text="" wrapText="true"/>
-
-                    <HBox spacing="10">
-                        <Button text="💾 Save" onAction="#handleSave" maxWidth="Infinity" HBox.hgrow="ALWAYS"
-                                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                        <Button text="🗑 Delete" onAction="#handleDelete" maxWidth="Infinity" HBox.hgrow="ALWAYS"
-                                style="-fx-background-color: #FF6B6B; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                        <Button text="✖ Clear" onAction="#handleClear" maxWidth="Infinity" HBox.hgrow="ALWAYS"
-                                style="-fx-background-color: #aaa; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                    </HBox>
-                </VBox>
-            </ScrollPane>
-        </SplitPane>
+        </VBox>
     </center>
 </BorderPane>

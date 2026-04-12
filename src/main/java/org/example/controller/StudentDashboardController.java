@@ -35,6 +35,8 @@ public class StudentDashboardController implements Initializable {
     @FXML private Label navMeetings;
     @FXML private Label navOffers;
     @FXML private Label navProjects;
+    @FXML private Label navSprints;
+    @FXML private Label navTasks;
     @FXML private Label navDocuments;
     @FXML private Label navProfile;
 
