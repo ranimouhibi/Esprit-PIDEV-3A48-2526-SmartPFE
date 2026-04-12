@@ -3,30 +3,78 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox xmlns:fx="http://javafx.com/fxml"
-      spacing="0" style="-fx-background-color: #f4f6fb;">
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.controller.MeetingController">
+    <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
 
-    <!-- Header -->
-    <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
-        <padding><Insets top="20" bottom="20" left="30" right="30"/></padding>
-        <VBox spacing="4" HBox.hgrow="ALWAYS">
-            <Label text="Meetings" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
-            <Label text="Schedule and manage your project meetings" style="-fx-font-size: 13px; -fx-text-fill: #888;"/>
-        </VBox>
-    </HBox>
+    <top>
+        <Label text="Gestion des Meetings" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    </top>
 
-    <!-- Content -->
-    <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent; -fx-border-color: transparent;">
-        <VBox spacing="20" alignment="CENTER">
-            <padding><Insets top="80" bottom="80" left="30" right="30"/></padding>
-            
-            <Label text="[M]" style="-fx-font-size: 64px; -fx-font-weight: bold; -fx-text-fill: #667eea;"/>
-            <Label text="Meetings Feature" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
-            <Label text="This feature is coming soon!" style="-fx-font-size: 14px; -fx-text-fill: #888;"/>
-            <Label text="You will be able to schedule and manage all project meetings here." 
-                   style="-fx-font-size: 13px; -fx-text-fill: #999; -fx-text-alignment: center;" 
-                   wrapText="true" maxWidth="400"/>
-        </VBox>
-    </ScrollPane>
+    <center>
+        <SplitPane dividerPositions="0.6">
+            <TableView fx:id="meetingTable">
+                <columns>
+                    <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                    <TableColumn fx:id="colType" text="Type" prefWidth="130"/>
+                    <TableColumn fx:id="colStatus" text="Statut" prefWidth="100"/>
+                    <TableColumn fx:id="colProject" text="Projet" prefWidth="160"/>
+                    <TableColumn fx:id="colDate" text="Date planifiée" prefWidth="150"/>
+                </columns>
+            </TableView>
 
-</VBox>
+            <ScrollPane fitToWidth="true">
+                <VBox spacing="10">
+                    <padding><Insets top="10" left="15" right="15" bottom="10"/></padding>
+                    <Label text="Formulaire Meeting" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                    <Label text="Projet *"/>
+                    <ComboBox fx:id="projectCombo" maxWidth="Infinity"/>
+
+                    <HBox spacing="10">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Type"/>
+                            <ComboBox fx:id="typeCombo" maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Statut"/>
+                            <ComboBox fx:id="statusCombo" maxWidth="Infinity"/>
+                        </VBox>
+                    </HBox>
+
+                    <Label text="Date planifiée"/>
+                    <DatePicker fx:id="datePicker" maxWidth="Infinity"/>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Durée (min)"/>
+                        <Spinner fx:id="durationSpinner" prefWidth="100"/>
+                        <CheckBox fx:id="onlineCheck" text="En ligne"/>
+                    </HBox>
+
+                    <Label text="Lieu"/>
+                    <TextField fx:id="locationField"/>
+
+                    <Label text="Lien (online)"/>
+                    <TextField fx:id="linkField"/>
+
+                    <Label text="Agenda"/>
+                    <TextArea fx:id="agendaField" prefRowCount="2"/>
+
+                    <Label text="Notes"/>
+                    <TextArea fx:id="notesField" prefRowCount="2"/>
+
+                    <Label fx:id="messageLabel" text="" wrapText="true"/>
+
+                    <HBox spacing="10">
+                        <Button text="💾 Sauvegarder" onAction="#handleSave" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 6;"/>
+                        <Button text="🗑 Supprimer" onAction="#handleDelete" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                style="-fx-background-color: #FF6B6B; -fx-text-fill: white; -fx-background-radius: 6;"/>
+                        <Button text="✖ Effacer" onAction="#handleClear" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                style="-fx-background-color: #aaa; -fx-text-fill: white; -fx-background-radius: 6;"/>
+                    </HBox>
+                </VBox>
+            </ScrollPane>
+        </SplitPane>
+    </center>
+</BorderPane>
