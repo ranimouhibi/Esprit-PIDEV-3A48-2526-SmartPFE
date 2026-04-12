@@ -39,6 +39,7 @@
                 <TextArea fx:id="descriptionField" promptText="Describe your project..."
                           prefRowCount="3" wrapText="true"
                           style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd; -fx-border-width: 1.5; -fx-padding: 10 14;"/>
+                <Label fx:id="descriptionError" text="" style="-fx-text-fill: #dc2626; -fx-font-size: 11px; -fx-font-weight: bold;"/>
             </VBox>
 
             <!-- Project Type -->
@@ -54,7 +55,8 @@
                 <Label text="Join Code (Optional)" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #333;"/>
                 <TextField fx:id="joinCodeField" promptText="Leave empty to auto-generate"
                            style="-fx-pref-height: 42px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd; -fx-border-width: 1.5; -fx-padding: 0 14;"/>
-                <Label text="A unique code for team members to join this project" style="-fx-text-fill: #888; -fx-font-size: 11px;"/>
+                <Label fx:id="joinCodeError" text="" style="-fx-text-fill: #dc2626; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                <Label text="4-10 characters, uppercase letters and numbers only" style="-fx-text-fill: #888; -fx-font-size: 11px;"/>
             </VBox>
 
             <!-- Status -->

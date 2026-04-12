@@ -27,6 +27,8 @@ public class ProjectFormDialogController implements Initializable {
     @FXML private ComboBox<User> supervisorCombo;
     @FXML private Label titleError;
     @FXML private Label typeError;
+    @FXML private Label descriptionError;
+    @FXML private Label joinCodeError;
     @FXML private Label errorLabel;
     @FXML private Button saveButton;
 
@@ -54,6 +56,41 @@ public class ProjectFormDialogController implements Initializable {
         // Real-time validation
         titleField.textProperty().addListener((obs, old, newVal) -> validateTitle());
         typeCombo.valueProperty().addListener((obs, old, newVal) -> validateType());
+        descriptionField.textProperty().addListener((obs, old, newVal) -> validateDescription());
+        joinCodeField.textProperty().addListener((obs, old, newVal) -> validateJoinCode());
+        
+        // Input restrictions
+        setupInputRestrictions();
+    }
+
+    private void setupInputRestrictions() {
+        // Title: letters, numbers, spaces, and common punctuation only
+        titleField.textProperty().addListener((obs, old, newVal) -> {
+            if (newVal != null && !newVal.matches("[a-zA-Z0-9\\s\\-_.,!?()àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇ]*")) {
+                titleField.setText(old);
+            }
+        });
+        
+        // Description: letters, numbers, spaces, and common punctuation
+        descriptionField.textProperty().addListener((obs, old, newVal) -> {
+            if (newVal != null && !newVal.matches("[a-zA-Z0-9\\s\\-_.,!?()\\n\\ràâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇ]*")) {
+                descriptionField.setText(old);
+            }
+        });
+        
+        // Join Code: uppercase letters and numbers only, max 10 chars
+        joinCodeField.textProperty().addListener((obs, old, newVal) -> {
+            if (newVal != null) {
+                // Convert to uppercase and remove invalid chars
+                String filtered = newVal.toUpperCase().replaceAll("[^A-Z0-9]", "");
+                if (filtered.length() > 10) {
+                    filtered = filtered.substring(0, 10);
+                }
+                if (!newVal.equals(filtered)) {
+                    joinCodeField.setText(filtered);
+                }
+            }
+        });
     }
 
     private void loadSupervisors() {
@@ -157,6 +194,8 @@ public class ProjectFormDialogController implements Initializable {
         
         if (!validateTitle()) valid = false;
         if (!validateType()) valid = false;
+        if (!validateDescription()) valid = false;
+        if (!validateJoinCode()) valid = false;
         
         return valid;
     }
@@ -182,8 +221,69 @@ public class ProjectFormDialogController implements Initializable {
             return false;
         }
         
+        // Check for valid characters
+        if (!title.matches("[a-zA-Z0-9\\s\\-_.,!?()àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇ]+")) {
+            titleError.setText("! Title contains invalid characters");
+            titleField.setStyle("-fx-border-color: #dc2626; -fx-border-width: 2; -fx-border-radius: 8;");
+            return false;
+        }
+        
         titleError.setText("");
         titleField.setStyle("-fx-border-color: #22c55e; -fx-border-width: 2; -fx-border-radius: 8;");
+        return true;
+    }
+
+    private boolean validateDescription() {
+        String description = descriptionField.getText().trim();
+        
+        // Description is optional, but if provided, validate it
+        if (!description.isEmpty()) {
+            if (description.length() > 1000) {
+                descriptionError.setText("! Description is too long (max 1000 characters)");
+                descriptionField.setStyle("-fx-border-color: #dc2626; -fx-border-width: 2; -fx-border-radius: 8;");
+                return false;
+            }
+            
+            // Check for valid characters
+            if (!description.matches("[a-zA-Z0-9\\s\\-_.,!?()\\n\\ràâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇ]+")) {
+                descriptionError.setText("! Description contains invalid characters");
+                descriptionField.setStyle("-fx-border-color: #dc2626; -fx-border-width: 2; -fx-border-radius: 8;");
+                return false;
+            }
+        }
+        
+        descriptionError.setText("");
+        descriptionField.setStyle("-fx-border-color: #22c55e; -fx-border-width: 2; -fx-border-radius: 8;");
+        return true;
+    }
+
+    private boolean validateJoinCode() {
+        String code = joinCodeField.getText().trim();
+        
+        // Join code is optional (will be auto-generated if empty)
+        if (!code.isEmpty()) {
+            if (code.length() < 4) {
+                joinCodeError.setText("! Join code must be at least 4 characters");
+                joinCodeField.setStyle("-fx-border-color: #dc2626; -fx-border-width: 2; -fx-border-radius: 8;");
+                return false;
+            }
+            
+            if (code.length() > 10) {
+                joinCodeError.setText("! Join code is too long (max 10 characters)");
+                joinCodeField.setStyle("-fx-border-color: #dc2626; -fx-border-width: 2; -fx-border-radius: 8;");
+                return false;
+            }
+            
+            // Only uppercase letters and numbers
+            if (!code.matches("[A-Z0-9]+")) {
+                joinCodeError.setText("! Join code must contain only letters and numbers");
+                joinCodeField.setStyle("-fx-border-color: #dc2626; -fx-border-width: 2; -fx-border-radius: 8;");
+                return false;
+            }
+        }
+        
+        joinCodeError.setText("");
+        joinCodeField.setStyle("-fx-border-color: #22c55e; -fx-border-width: 2; -fx-border-radius: 8;");
         return true;
     }
 

@@ -15,6 +15,8 @@
             <Label text="Create and manage your academic projects" style="-fx-font-size: 13px; -fx-text-fill: #888;"/>
         </VBox>
         <HBox spacing="12" alignment="CENTER_RIGHT">
+            <Button text="Export PDF" onAction="#handleExportPDF"
+                    style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand; -fx-font-size: 12px;"/>
             <VBox spacing="4" alignment="CENTER_RIGHT">
                 <Label text="Join a Team Project:" style="-fx-font-size: 11px; -fx-text-fill: #666; -fx-font-weight: bold;"/>
                 <HBox spacing="8" alignment="CENTER_RIGHT">
@@ -28,6 +30,37 @@
             <Button text="+ New Project" onAction="#handleAddProject"
                     style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 12 24; -fx-cursor: hand; -fx-font-size: 13px; -fx-effect: dropshadow(gaussian, rgba(161,44,47,0.3), 8, 0, 0, 2);"/>
         </HBox>
+    </HBox>
+
+    <!-- Stats Bar -->
+    <HBox spacing="0" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+        <padding><Insets top="16" bottom="16" left="30" right="30"/></padding>
+        
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 12 20;">
+            <Label fx:id="statTotal" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+            <Label text="Total" style="-fx-font-size: 11px; -fx-text-fill: #888;"/>
+        </VBox>
+        
+        <Region HBox.hgrow="ALWAYS"/>
+        
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #3b82f622; -fx-background-radius: 8; -fx-padding: 12 20;">
+            <Label fx:id="statIndividual" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #3b82f6;"/>
+            <Label text="Individual" style="-fx-font-size: 10px; -fx-text-fill: #3b82f6;"/>
+        </VBox>
+        
+        <Region prefWidth="12"/>
+        
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #8b5cf622; -fx-background-radius: 8; -fx-padding: 12 20;">
+            <Label fx:id="statTeam" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8b5cf6;"/>
+            <Label text="Team" style="-fx-font-size: 10px; -fx-text-fill: #8b5cf6;"/>
+        </VBox>
+        
+        <Region prefWidth="12"/>
+        
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #22c55e22; -fx-background-radius: 8; -fx-padding: 12 20;">
+            <Label fx:id="statInProgress" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #22c55e;"/>
+            <Label text="In Progress" style="-fx-font-size: 10px; -fx-text-fill: #22c55e;"/>
+        </VBox>
     </HBox>
 
     <!-- Search & Filter -->

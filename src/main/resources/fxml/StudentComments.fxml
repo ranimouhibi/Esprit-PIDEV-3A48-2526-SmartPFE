@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.controller.StudentCommentController"
+      spacing="0" style="-fx-background-color: #f4f6fb;">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+        <padding><Insets top="20" bottom="20" left="30" right="30"/></padding>
+        <VBox spacing="4" HBox.hgrow="ALWAYS">
+            <Label text="My Comments" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+            <Label text="Manage comments on your projects" style="-fx-font-size: 13px; -fx-text-fill: #888;"/>
+        </VBox>
+        <Button text="+ New Comment" onAction="#handleAddComment"
+                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 12 24; -fx-cursor: hand; -fx-font-size: 13px; -fx-effect: dropshadow(gaussian, rgba(161,44,47,0.3), 8, 0, 0, 2);"/>
+    </HBox>
+
+    <!-- Filter by Project -->
+    <HBox spacing="12" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+        <padding><Insets top="16" bottom="16" left="30" right="30"/></padding>
+        <Label text="Filter by Project:" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #666;"/>
+        <ComboBox fx:id="projectFilter" promptText="All Projects" prefWidth="250"
+                  style="-fx-pref-height: 38px; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+        <Button text="Filter" onAction="#handleFilter"
+                style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand;"/>
+        <Button text="Reset" onAction="#handleReset"
+                style="-fx-background-color: #6b7280; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand;"/>
+    </HBox>
+
+    <!-- Comments Grid -->
+    <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER"
+                style="-fx-background-color: transparent; -fx-border-color: transparent;">
+        <VBox spacing="20">
+            <padding><Insets top="24" bottom="24" left="30" right="30"/></padding>
+            <FlowPane fx:id="commentsContainer" hgap="20" vgap="20" prefWrapLength="1000"/>
+        </VBox>
+    </ScrollPane>
+
+</VBox>

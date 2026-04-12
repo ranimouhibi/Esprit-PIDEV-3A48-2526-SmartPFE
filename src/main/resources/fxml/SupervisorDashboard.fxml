@@ -10,7 +10,7 @@
     <!-- NAVBAR -->
     <HBox alignment="CENTER_LEFT"
           style="-fx-background-color: #2d2d2d; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 8, 0, 0, 2);"
-          prefHeight="62">
+          prefHeight="62" minHeight="62" maxHeight="62">
         <padding><Insets left="40" right="40"/></padding>
         <Label text="SMART PFE" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;"/>
         <HBox HBox.hgrow="ALWAYS"/>
@@ -21,11 +21,11 @@
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label fx:id="navProjects" text="MY PROJECTS" onMouseClicked="#showProjects"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
-            <Label fx:id="navTasks" text="TASKS" onMouseClicked="#showTasks"
+            <Label fx:id="navComments" text="COMMENTS" onMouseClicked="#showComments"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label fx:id="navDocuments" text="DOCUMENTS" onMouseClicked="#showDocuments"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
-            <Label fx:id="navComments" text="COMMENTS" onMouseClicked="#showComments"
+            <Label fx:id="navTasks" text="TASKS" onMouseClicked="#showTasks"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label fx:id="navProfile" text="PROFILE" onMouseClicked="#showProfile"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>

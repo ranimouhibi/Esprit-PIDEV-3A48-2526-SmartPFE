@@ -3,97 +3,30 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.example.controller.MeetingController">
-    <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+<VBox xmlns:fx="http://javafx.com/fxml"
+      spacing="0" style="-fx-background-color: #f4f6fb;">
 
-    <top>
-        <Label text="Meeting Management" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
-    </top>
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+        <padding><Insets top="20" bottom="20" left="30" right="30"/></padding>
+        <VBox spacing="4" HBox.hgrow="ALWAYS">
+            <Label text="Meetings" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+            <Label text="Schedule and manage your project meetings" style="-fx-font-size: 13px; -fx-text-fill: #888;"/>
+        </VBox>
+    </HBox>
 
-    <center>
-        <SplitPane dividerPositions="0.6">
-            <TableView fx:id="meetingTable">
-                <columns>
-                    <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
-<<<<<<< Updated upstream
-                    <TableColumn fx:id="colTitle" text="Titre" prefWidth="200"/>
-                    <TableColumn fx:id="colType" text="Type" prefWidth="100"/>
-                    <TableColumn fx:id="colStatus" text="Statut" prefWidth="90"/>
-                    <TableColumn fx:id="colProject" text="Projet" prefWidth="160"/>
-                    <TableColumn fx:id="colDate" text="Date" prefWidth="140"/>
-=======
-                    <TableColumn fx:id="colType" text="Type" prefWidth="130"/>
-                    <TableColumn fx:id="colStatus" text="Status" prefWidth="100"/>
-                    <TableColumn fx:id="colProject" text="Project" prefWidth="160"/>
-                    <TableColumn fx:id="colDate" text="Scheduled date" prefWidth="150"/>
->>>>>>> Stashed changes
-                </columns>
-            </TableView>
+    <!-- Content -->
+    <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent; -fx-border-color: transparent;">
+        <VBox spacing="20" alignment="CENTER">
+            <padding><Insets top="80" bottom="80" left="30" right="30"/></padding>
+            
+            <Label text="[M]" style="-fx-font-size: 64px; -fx-font-weight: bold; -fx-text-fill: #667eea;"/>
+            <Label text="Meetings Feature" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+            <Label text="This feature is coming soon!" style="-fx-font-size: 14px; -fx-text-fill: #888;"/>
+            <Label text="You will be able to schedule and manage all project meetings here." 
+                   style="-fx-font-size: 13px; -fx-text-fill: #999; -fx-text-alignment: center;" 
+                   wrapText="true" maxWidth="400"/>
+        </VBox>
+    </ScrollPane>
 
-            <ScrollPane fitToWidth="true">
-                <VBox spacing="10">
-                    <padding><Insets top="10" left="15" right="15" bottom="10"/></padding>
-                    <Label text="Meeting Form" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-
-<<<<<<< Updated upstream
-                    <Label text="Titre *"/>
-                    <TextField fx:id="titleField"/>
-
-                    <Label text="Description"/>
-                    <TextArea fx:id="descriptionField" prefRowCount="2"/>
-
-                    <Label text="Projet *"/>
-=======
-                    <Label text="Project *"/>
->>>>>>> Stashed changes
-                    <ComboBox fx:id="projectCombo" maxWidth="Infinity"/>
-
-                    <HBox spacing="10">
-                        <VBox spacing="5" HBox.hgrow="ALWAYS">
-                            <Label text="Type"/>
-                            <ComboBox fx:id="typeCombo" maxWidth="Infinity"/>
-                        </VBox>
-                        <VBox spacing="5" HBox.hgrow="ALWAYS">
-                            <Label text="Status"/>
-                            <ComboBox fx:id="statusCombo" maxWidth="Infinity"/>
-                        </VBox>
-                    </HBox>
-
-<<<<<<< Updated upstream
-                    <Label text="Lieu"/>
-=======
-                    <Label text="Scheduled date"/>
-                    <DatePicker fx:id="datePicker" maxWidth="Infinity"/>
-
-                    <HBox spacing="10" alignment="CENTER_LEFT">
-                        <Label text="Duration (min)"/>
-                        <Spinner fx:id="durationSpinner" prefWidth="100"/>
-                        <CheckBox fx:id="onlineCheck" text="Online"/>
-                    </HBox>
-
-                    <Label text="Location"/>
->>>>>>> Stashed changes
-                    <TextField fx:id="locationField"/>
-
-                    <Label text="Link (online)"/>
-                    <TextField fx:id="linkField"/>
-
-                    <Label text="Date planifiée"/>
-                    <DatePicker fx:id="datePicker" maxWidth="Infinity"/>
-
-                    <Label fx:id="messageLabel" text="" wrapText="true"/>
-
-                    <HBox spacing="10">
-                        <Button text="💾 Save" onAction="#handleSave" maxWidth="Infinity" HBox.hgrow="ALWAYS"
-                                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                        <Button text="🗑 Delete" onAction="#handleDelete" maxWidth="Infinity" HBox.hgrow="ALWAYS"
-                                style="-fx-background-color: #FF6B6B; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                        <Button text="✖ Clear" onAction="#handleClear" maxWidth="Infinity" HBox.hgrow="ALWAYS"
-                                style="-fx-background-color: #aaa; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                    </HBox>
-                </VBox>
-            </ScrollPane>
-        </SplitPane>
-    </center>
-</BorderPane>
+</VBox>

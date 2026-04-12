@@ -1,9 +1,12 @@
 package org.example.controller;
 
+import org.example.dao.CommentDAO;
 import org.example.dao.ProjectDAO;
 import org.example.model.Project;
 import org.example.model.User;
+import org.example.util.PDFExporter;
 import org.example.util.SessionManager;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -11,10 +14,12 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.io.File;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -28,17 +33,25 @@ public class StudentProjectsController implements Initializable {
     @FXML private ComboBox<String> filterType;
     @FXML private ComboBox<String> filterStatus;
     @FXML private FlowPane projectsContainer;
+    
+    // Stats
+    @FXML private Label statTotal;
+    @FXML private Label statIndividual;
+    @FXML private Label statTeam;
+    @FXML private Label statInProgress;
 
     private final ProjectDAO projectDAO = new ProjectDAO();
+    private final CommentDAO commentDAO = new CommentDAO();
     private List<Project> allProjects;
+    private List<Project> filteredProjects;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        filterType.getItems().addAll("All Types", "individual", "team");
+        filterType.setItems(FXCollections.observableArrayList("All Types", "individual", "team"));
         filterType.setValue("All Types");
         
-        filterStatus.getItems().addAll("All Status", "created", "waiting_supervisor", "supervised", 
-            "waiting_validation", "in_progress", "suspended", "finished", "archived");
+        filterStatus.setItems(FXCollections.observableArrayList("All Status", "created", "waiting_supervisor", "supervised", 
+            "waiting_validation", "in_progress", "suspended", "finished", "archived"));
         filterStatus.setValue("All Status");
         
         loadProjects();
@@ -49,11 +62,24 @@ public class StudentProjectsController implements Initializable {
             User user = SessionManager.getCurrentUser();
             // Load all projects where user is owner OR member
             allProjects = projectDAO.findByUserProjects(user.getId());
+            updateStats();
             displayProjects(allProjects);
         } catch (Exception e) {
             e.printStackTrace();
             showAlert("Error", "Failed to load projects: " + e.getMessage(), Alert.AlertType.ERROR);
         }
+    }
+
+    private void updateStats() {
+        int total = allProjects.size();
+        long individual = allProjects.stream().filter(p -> "individual".equals(p.getProjectType())).count();
+        long team = allProjects.stream().filter(p -> "team".equals(p.getProjectType())).count();
+        long inProgress = allProjects.stream().filter(p -> "in_progress".equals(p.getStatus())).count();
+
+        if (statTotal != null) statTotal.setText(String.valueOf(total));
+        if (statIndividual != null) statIndividual.setText(String.valueOf(individual));
+        if (statTeam != null) statTeam.setText(String.valueOf(team));
+        if (statInProgress != null) statInProgress.setText(String.valueOf(inProgress));
     }
 
     private void displayProjects(List<Project> projects) {
@@ -162,6 +188,19 @@ public class StudentProjectsController implements Initializable {
         HBox actions = new HBox(8);
         actions.setAlignment(javafx.geometry.Pos.CENTER);
         
+        Button commentsBtn = new Button("View Comments");
+        commentsBtn.setStyle("-fx-background-color: #667eea; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;");
+        // Show comment count on button
+        try {
+            int count = commentDAO.findByProject(project.getId()).size();
+            commentsBtn.setText("Comments (" + count + ")");
+        } catch (Exception ignored) {}
+        commentsBtn.setOnAction(e -> handleViewComments(project));
+
+        Button docsBtn = new Button("Documents");
+        docsBtn.setStyle("-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;");
+        docsBtn.setOnAction(e -> handleViewDocuments(project));
+        
         Button editBtn = new Button("Edit");
         editBtn.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;");
         editBtn.setOnAction(e -> handleEditProject(project));
@@ -170,7 +209,7 @@ public class StudentProjectsController implements Initializable {
         deleteBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;");
         deleteBtn.setOnAction(e -> handleDeleteProject(project));
         
-        actions.getChildren().addAll(editBtn, deleteBtn);
+        actions.getChildren().addAll(commentsBtn, docsBtn, editBtn, deleteBtn);
 
         // Add all elements to card
         card.getChildren().addAll(header, title, description);
@@ -184,15 +223,14 @@ public class StudentProjectsController implements Initializable {
 
     private String getStatusColor(String status) {
         if (status == null) return "#888";
-        return switch (status.toLowerCase()) {
-            case "in_progress" -> "#22c55e";
-            case "supervised", "waiting_validation" -> "#3b82f6";
-            case "finished" -> "#10b981";
-            case "archived" -> "#888";
-            case "suspended" -> "#ef4444";
-            case "waiting_supervisor" -> "#f59e0b";
-            default -> "#6b7280";
-        };
+        String s = status.toLowerCase();
+        if (s.equals("in_progress")) return "#22c55e";
+        if (s.equals("supervised") || s.equals("waiting_validation")) return "#3b82f6";
+        if (s.equals("finished")) return "#10b981";
+        if (s.equals("archived")) return "#888";
+        if (s.equals("suspended")) return "#ef4444";
+        if (s.equals("waiting_supervisor")) return "#f59e0b";
+        return "#6b7280";
     }
 
     @FXML
@@ -202,6 +240,60 @@ public class StudentProjectsController implements Initializable {
 
     private void handleEditProject(Project project) {
         openProjectDialog(project);
+    }
+
+    private void handleViewDocuments(Project project) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ProjectDocumentsDialog.fxml"));
+            VBox dialogContent = loader.load();
+            ProjectDocumentsDialogController controller = loader.getController();
+            controller.setProject(project, true); // true = student can upload
+
+            Stage dialog = new Stage();
+            dialog.initModality(Modality.APPLICATION_MODAL);
+            dialog.initStyle(StageStyle.UNDECORATED);
+            
+            Scene scene = new Scene(dialogContent);
+            scene.setFill(javafx.scene.paint.Color.WHITE); // Force white background
+            dialog.setScene(scene);
+            
+            controller.setDialogStage(dialog);
+            dialog.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Error", "Failed to open documents: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    private void handleViewComments(Project project) {
+        try {
+            // Count comments for badge
+            int count = 0;
+            try { count = commentDAO.findByProject(project.getId()).size(); } catch (Exception ignored) {}
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ProjectCommentsDialog.fxml"));
+            VBox dialogContent = loader.load();
+
+            ProjectCommentsDialogController controller = loader.getController();
+            controller.setProject(project);
+
+            Stage dialog = new Stage();
+            dialog.initModality(Modality.APPLICATION_MODAL);
+            dialog.initStyle(StageStyle.UNDECORATED);
+            
+            Scene scene = new Scene(dialogContent);
+            scene.setFill(javafx.scene.paint.Color.WHITE); // Force white background
+            dialog.setScene(scene);
+
+            controller.setDialogStage(dialog);
+            dialog.showAndWait();
+
+            // Refresh cards after closing (comment count may have changed)
+            loadProjects();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Error", "Failed to open comments: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
     }
 
     private void openProjectDialog(Project project) {
@@ -214,7 +306,7 @@ public class StudentProjectsController implements Initializable {
             
             Stage dialog = new Stage();
             dialog.initModality(Modality.APPLICATION_MODAL);
-            dialog.initStyle(StageStyle.TRANSPARENT);
+            dialog.initStyle(StageStyle.UNDECORATED);
             dialog.setScene(new Scene(dialogContent, 520, 650));
             
             controller.setDialogStage(dialog);
@@ -252,13 +344,13 @@ public class StudentProjectsController implements Initializable {
         String typeFilter = filterType.getValue();
         String statusFilter = filterStatus.getValue();
         
-        List<Project> filtered = allProjects.stream()
+        filteredProjects = allProjects.stream()
             .filter(p -> query.isEmpty() || p.getTitle().toLowerCase().contains(query))
             .filter(p -> typeFilter.equals("All Types") || p.getProjectType().equals(typeFilter))
             .filter(p -> statusFilter.equals("All Status") || p.getStatus().equals(statusFilter))
             .toList();
         
-        displayProjects(filtered);
+        displayProjects(filteredProjects);
     }
 
     @FXML
@@ -267,6 +359,32 @@ public class StudentProjectsController implements Initializable {
         filterType.setValue("All Types");
         filterStatus.setValue("All Status");
         displayProjects(allProjects);
+    }
+
+    @FXML
+    public void handleExportPDF() {
+        List<Project> toExport = filteredProjects != null && !filteredProjects.isEmpty() ? filteredProjects : allProjects;
+        
+        if (toExport.isEmpty()) {
+            showAlert("Warning", "No projects to export", Alert.AlertType.WARNING);
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save PDF Report");
+        fileChooser.setInitialFileName("my_projects_report.pdf");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
+        
+        File file = fileChooser.showSaveDialog(projectsContainer.getScene().getWindow());
+        if (file != null) {
+            try {
+                PDFExporter.exportProjects(toExport, file);
+                showAlert("Success", "PDF exported successfully!", Alert.AlertType.INFORMATION);
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert("Error", "Failed to export PDF: " + e.getMessage(), Alert.AlertType.ERROR);
+            }
+        }
     }
 
     @FXML

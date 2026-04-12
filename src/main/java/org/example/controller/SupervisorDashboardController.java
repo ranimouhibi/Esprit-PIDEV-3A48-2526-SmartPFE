@@ -64,9 +64,9 @@ public class SupervisorDashboardController implements Initializable {
         navHome.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
         navMeetings.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
         navProjects.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navTasks.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navDocuments.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
         navComments.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
+        navDocuments.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
+        navTasks.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
         navProfile.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
         
         activeLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #a12c2f; -fx-cursor: hand;");
@@ -74,37 +74,77 @@ public class SupervisorDashboardController implements Initializable {
 
     @FXML public void showHome() { 
         setActiveNav(navHome);
-        contentArea.setCenter(homePane.getParent() instanceof javafx.scene.control.ScrollPane sp ? sp : homePane); 
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.Node node = homePane.getParent() instanceof javafx.scene.control.ScrollPane sp ? sp : homePane;
+        contentArea.setCenter(node);
+        if (node != null) node.setVisible(true);
     }
     
     @FXML public void showMeetings() { 
         setActiveNav(navMeetings);
-        contentArea.setCenter(NavigationUtil.loadPane("Meetings.fxml")); 
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Meetings.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
     }
     
     @FXML public void showProjects() { 
         setActiveNav(navProjects);
-        contentArea.setCenter(NavigationUtil.loadPane("Projects.fxml")); 
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Projects.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
     }
     
     @FXML public void showTasks() { 
         setActiveNav(navTasks);
-        contentArea.setCenter(NavigationUtil.loadPane("Tasks.fxml")); 
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Tasks.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
     }
     
     @FXML public void showDocuments() { 
         setActiveNav(navDocuments);
-        contentArea.setCenter(NavigationUtil.loadPane("Projects.fxml")); // TODO
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Documents.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
     }
     
     @FXML public void showComments() { 
         setActiveNav(navComments);
-        contentArea.setCenter(NavigationUtil.loadPane("Projects.fxml")); // TODO
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Comments.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
     }
     
     @FXML public void showProfile() { 
         setActiveNav(navProfile);
-        contentArea.setCenter(NavigationUtil.loadPane("Users.fxml")); 
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Users.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
     }
 
     @FXML

@@ -9,6 +9,7 @@ import org.example.util.NavigationUtil;
 import org.example.util.SessionManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -35,7 +36,6 @@ public class StudentDashboardController implements Initializable {
     @FXML private Label navOffers;
     @FXML private Label navProjects;
     @FXML private Label navDocuments;
-    @FXML private Label navComments;
     @FXML private Label navProfile;
 
     private final ProjectDAO projectDAO = new ProjectDAO();
@@ -71,7 +71,6 @@ public class StudentDashboardController implements Initializable {
         navOffers.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
         navProjects.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
         navDocuments.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navComments.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
         navProfile.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
         
         // Set active
@@ -80,25 +79,44 @@ public class StudentDashboardController implements Initializable {
 
     @FXML public void showHome() { 
         setActiveNav(navHome);
-        contentArea.setCenter(homePane.getParent() instanceof javafx.scene.control.ScrollPane sp ? sp : homePane); 
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.Node node = homePane.getParent() instanceof javafx.scene.control.ScrollPane sp ? sp : homePane;
+        contentArea.setCenter(node);
+        if (node != null) node.setVisible(true);
     }
     
     @FXML public void showMeetings() { 
         setActiveNav(navMeetings);
-        contentArea.setCenter(NavigationUtil.loadPane("Meetings.fxml")); 
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Meetings.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
     }
     
     @FXML public void showOffers() { 
         setActiveNav(navOffers);
-        contentArea.setCenter(NavigationUtil.loadPane("Candidatures.fxml")); 
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Candidatures.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
     }
     
     @FXML public void showProjects() { 
         setActiveNav(navProjects);
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
         try {
             javafx.scene.layout.Pane pane = NavigationUtil.loadPane("StudentProjects.fxml");
             if (pane != null) {
                 contentArea.setCenter(pane);
+                pane.setVisible(true);
             } else {
                 System.err.println("ERROR: StudentProjects.fxml returned null!");
             }
@@ -110,30 +128,57 @@ public class StudentDashboardController implements Initializable {
     
     @FXML public void showDocuments() { 
         setActiveNav(navDocuments);
-        contentArea.setCenter(NavigationUtil.loadPane("Projects.fxml")); // TODO: créer Documents.fxml
-    }
-    
-    @FXML public void showComments() { 
-        setActiveNav(navComments);
-        contentArea.setCenter(NavigationUtil.loadPane("Projects.fxml")); // TODO: créer Comments.fxml
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Documents.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
     }
     
     @FXML public void showTasks() { 
-        contentArea.setCenter(NavigationUtil.loadPane("Tasks.fxml")); 
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Tasks.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
     }
     
     @FXML public void showSprints() { 
-        contentArea.setCenter(NavigationUtil.loadPane("Sprints.fxml")); 
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Sprints.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
     }
     
     @FXML public void showProfile() { 
         setActiveNav(navProfile);
-        contentArea.setCenter(NavigationUtil.loadPane("Users.fxml")); 
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Users.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
     }
 
     @FXML
     public void handleLogout() {
         SessionManager.logout();
         NavigationUtil.navigateTo("Home.fxml");
+    }
+
+    private void showAlert(String title, String message, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

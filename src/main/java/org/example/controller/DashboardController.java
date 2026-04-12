@@ -9,6 +9,7 @@ import org.example.util.NavigationUtil;
 import org.example.util.SessionManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -27,6 +28,19 @@ public class DashboardController implements Initializable {
     @FXML private Label userCountLabel;
     @FXML private BorderPane contentArea;
     @FXML private VBox statsPane;
+
+    // Sidebar buttons
+    @FXML private Button btnProjects;
+    @FXML private Button btnComments;
+    @FXML private Button btnDocuments;
+    @FXML private Button btnSprints;
+    @FXML private Button btnTasks;
+    @FXML private Button btnMeetings;
+    @FXML private Button btnCandidatures;
+    @FXML private Button btnUsers;
+
+    private static final String STYLE_INACTIVE = "-fx-background-color: transparent; -fx-text-fill: #ccc; -fx-alignment: CENTER-LEFT; -fx-cursor: hand; -fx-font-size: 13px; -fx-background-radius: 8; -fx-padding: 9 12;";
+    private static final String STYLE_ACTIVE   = "-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-alignment: CENTER-LEFT; -fx-cursor: hand; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 9 12;";
 
     private final ProjectDAO projectDAO = new ProjectDAO();
     private final SprintDAO sprintDAO = new SprintDAO();
@@ -54,19 +68,44 @@ public class DashboardController implements Initializable {
         }
     }
 
-    @FXML public void showDashboard() { contentArea.setCenter(statsPane); loadStats(); }
-    @FXML public void showProjects() { loadContent("Projects.fxml"); }
-    @FXML public void showSprints() { loadContent("Sprints.fxml"); }
-    @FXML public void showTasks() { loadContent("Tasks.fxml"); }
-    @FXML public void showUsers() { loadContent("Users.fxml"); }
-    @FXML public void showMeetings() { loadContent("Meetings.fxml"); }
-    @FXML public void showCandidatures() { loadContent("Candidatures.fxml"); }
-    @FXML public void showDocuments() { loadContent("Projects.fxml"); } // TODO: créer Documents.fxml
-    @FXML public void showComments() { loadContent("Projects.fxml"); } // TODO: créer Comments.fxml
+    private void setActiveButton(Button active) {
+        Button[] all = {btnProjects, btnComments, btnDocuments, btnSprints, btnTasks, btnMeetings, btnCandidatures, btnUsers};
+        for (Button b : all) {
+            b.setStyle(STYLE_INACTIVE);
+        }
+        active.setStyle(STYLE_ACTIVE);
+    }
+
+    @FXML public void showDashboard() {
+        // Reset all buttons
+        Button[] all = {btnProjects, btnComments, btnDocuments, btnSprints, btnTasks, btnMeetings, btnCandidatures, btnUsers};
+        for (Button b : all) b.setStyle(STYLE_INACTIVE);
+        contentArea.setCenter(statsPane);
+        loadStats();
+    }
+
+    @FXML public void showProjects()     { setActiveButton(btnProjects);     loadContent("Projects.fxml"); }
+    @FXML public void showComments()     { setActiveButton(btnComments);     loadContent("Comments.fxml"); }
+    @FXML public void showDocuments()    { setActiveButton(btnDocuments);    loadContent("Documents.fxml"); }
+    @FXML public void showSprints()      { setActiveButton(btnSprints);      loadContent("Sprints.fxml"); }
+    @FXML public void showTasks()        { setActiveButton(btnTasks);        loadContent("Tasks.fxml"); }
+    @FXML public void showMeetings()     { setActiveButton(btnMeetings);     loadContent("Meetings.fxml"); }
+    @FXML public void showCandidatures() { setActiveButton(btnCandidatures); loadContent("Candidatures.fxml"); }
+    @FXML public void showUsers()        { setActiveButton(btnUsers);        loadContent("Users.fxml"); }
 
     private void loadContent(String fxml) {
+        // Clear old content completely
+        if (contentArea.getCenter() != null) {
+            contentArea.getCenter().setVisible(false);
+            contentArea.setCenter(null);
+        }
+        
+        // Load new content
         Pane pane = NavigationUtil.loadPane(fxml);
-        contentArea.setCenter(pane);
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
     }
 
     @FXML

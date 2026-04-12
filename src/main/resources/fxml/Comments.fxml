@@ -4,15 +4,15 @@
 <?import javafx.geometry.Insets?>
 
 <VBox xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.example.controller.ProjectController"
+      fx:controller="org.example.controller.CommentController"
       spacing="0" style="-fx-background-color: #f4f6fb;">
 
     <!-- Header -->
     <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
         <padding><Insets top="20" bottom="20" left="30" right="30"/></padding>
         <VBox spacing="4" HBox.hgrow="ALWAYS">
-            <Label text="Projects Management" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
-            <Label text="View and manage all projects in the system" style="-fx-font-size: 13px; -fx-text-fill: #888;"/>
+            <Label text="Comments Management" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+            <Label text="View and manage all project comments" style="-fx-font-size: 13px; -fx-text-fill: #888;"/>
         </VBox>
         <Button text="Export PDF" onAction="#handleExportPDF"
                 style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand; -fx-font-size: 12px;"/>
@@ -22,48 +22,41 @@
     <HBox spacing="0" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
         <padding><Insets top="16" bottom="16" left="30" right="30"/></padding>
         
-        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 12 20;">
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 12 24;">
             <Label fx:id="statTotal" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
             <Label text="Total" style="-fx-font-size: 11px; -fx-text-fill: #888;"/>
         </VBox>
         
         <Region HBox.hgrow="ALWAYS"/>
         
-        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #3b82f622; -fx-background-radius: 8; -fx-padding: 12 20;">
-            <Label fx:id="statIndividual" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #3b82f6;"/>
-            <Label text="Individual" style="-fx-font-size: 10px; -fx-text-fill: #3b82f6;"/>
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #ef444422; -fx-background-radius: 8; -fx-padding: 12 24;">
+            <Label fx:id="statUrgent" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #ef4444;"/>
+            <Label text="Urgent" style="-fx-font-size: 10px; -fx-text-fill: #ef4444;"/>
         </VBox>
         
         <Region prefWidth="12"/>
         
-        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #8b5cf622; -fx-background-radius: 8; -fx-padding: 12 20;">
-            <Label fx:id="statTeam" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8b5cf6;"/>
-            <Label text="Team" style="-fx-font-size: 10px; -fx-text-fill: #8b5cf6;"/>
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #f59e0b22; -fx-background-radius: 8; -fx-padding: 12 24;">
+            <Label fx:id="statMedium" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #f59e0b;"/>
+            <Label text="Medium" style="-fx-font-size: 10px; -fx-text-fill: #f59e0b;"/>
         </VBox>
         
         <Region prefWidth="12"/>
         
-        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #22c55e22; -fx-background-radius: 8; -fx-padding: 12 20;">
-            <Label fx:id="statInProgress" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #22c55e;"/>
-            <Label text="In Progress" style="-fx-font-size: 10px; -fx-text-fill: #22c55e;"/>
-        </VBox>
-        
-        <Region prefWidth="12"/>
-        
-        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #10b98122; -fx-background-radius: 8; -fx-padding: 12 20;">
-            <Label fx:id="statFinished" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #10b981;"/>
-            <Label text="Finished" style="-fx-font-size: 10px; -fx-text-fill: #10b981;"/>
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #10b98122; -fx-background-radius: 8; -fx-padding: 12 24;">
+            <Label fx:id="statLow" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #10b981;"/>
+            <Label text="Low" style="-fx-font-size: 10px; -fx-text-fill: #10b981;"/>
         </VBox>
     </HBox>
 
     <!-- Search & Filter -->
     <HBox spacing="12" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
         <padding><Insets top="16" bottom="16" left="30" right="30"/></padding>
-        <TextField fx:id="searchField" promptText="Search projects..." prefWidth="280"
+        <TextField fx:id="searchField" promptText="Search comments..." prefWidth="280"
                    style="-fx-pref-height: 38px; -fx-background-radius: 19; -fx-border-radius: 19; -fx-border-color: #ddd; -fx-border-width: 1.5; -fx-padding: 0 16;"/>
-        <ComboBox fx:id="filterType" promptText="All Types" prefWidth="130"
+        <ComboBox fx:id="filterType" promptText="All Types" prefWidth="140"
                   style="-fx-pref-height: 38px; -fx-background-radius: 8; -fx-border-radius: 8;"/>
-        <ComboBox fx:id="filterStatus" promptText="All Status" prefWidth="150"
+        <ComboBox fx:id="filterImportance" promptText="All Importance" prefWidth="150"
                   style="-fx-pref-height: 38px; -fx-background-radius: 8; -fx-border-radius: 8;"/>
         <ComboBox fx:id="sortCombo" promptText="Sort by" prefWidth="150"
                   style="-fx-pref-height: 38px; -fx-background-radius: 8; -fx-border-radius: 8;"/>
@@ -71,12 +64,12 @@
                 style="-fx-background-color: #6b7280; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand;"/>
     </HBox>
 
-    <!-- Projects Grid -->
+    <!-- Comments Grid -->
     <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER"
                 style="-fx-background-color: transparent; -fx-border-color: transparent;">
         <VBox spacing="20">
             <padding><Insets top="24" bottom="24" left="30" right="30"/></padding>
-            <FlowPane fx:id="projectsContainer" hgap="20" vgap="20" prefWrapLength="1000"/>
+            <FlowPane fx:id="commentsContainer" hgap="20" vgap="20" prefWrapLength="1000"/>
         </VBox>
     </ScrollPane>
 

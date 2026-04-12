@@ -10,7 +10,7 @@
     <!-- NAVBAR -->
     <HBox alignment="CENTER_LEFT"
           style="-fx-background-color: #2d2d2d; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 8, 0, 0, 2);"
-          prefHeight="62">
+          prefHeight="62" minHeight="62" maxHeight="62">
         <padding><Insets left="40" right="40"/></padding>
         <Label text="SMART PFE" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;"/>
         <HBox HBox.hgrow="ALWAYS"/>

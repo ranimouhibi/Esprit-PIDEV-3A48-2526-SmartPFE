@@ -45,11 +45,53 @@ public class EstablishmentDashboardController implements Initializable {
         }
     }
 
-    @FXML public void showHome() { contentArea.setCenter(homePane.getParent() instanceof javafx.scene.control.ScrollPane sp ? sp : homePane); }
-    @FXML public void showUsers() { contentArea.setCenter(NavigationUtil.loadPane("Users.fxml")); }
-    @FXML public void showProjects() { contentArea.setCenter(NavigationUtil.loadPane("Projects.fxml")); }
-    @FXML public void showApplications() { contentArea.setCenter(NavigationUtil.loadPane("Candidatures.fxml")); }
-    @FXML public void showProfile() { contentArea.setCenter(NavigationUtil.loadPane("Users.fxml")); }
+    @FXML public void showHome() { 
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.Node node = homePane.getParent() instanceof javafx.scene.control.ScrollPane sp ? sp : homePane;
+        contentArea.setCenter(node);
+        if (node != null) node.setVisible(true);
+    }
+    
+    @FXML public void showUsers() { 
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Users.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
+    }
+    
+    @FXML public void showProjects() { 
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Projects.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
+    }
+    
+    @FXML public void showApplications() { 
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Candidatures.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
+    }
+    
+    @FXML public void showProfile() { 
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Users.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
+    }
 
     @FXML
     public void handleLogout() {
