@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.controller.MyCandidaturesController"
+      spacing="0" style="-fx-background-color: #f4f6fb;">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+        <padding><Insets top="20" bottom="20" left="30" right="30"/></padding>
+        <VBox spacing="4">
+            <Label text="My Applications" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+            <Label text="Track the status of your applications" style="-fx-font-size: 13px; -fx-text-fill: #888;"/>
+        </VBox>
+    </HBox>
+
+    <!-- Stats Bar -->
+    <HBox spacing="0" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+        <padding><Insets top="14" bottom="14" left="30" right="30"/></padding>
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 10 24;">
+            <Label fx:id="statTotal" text="0" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+            <Label text="Total" style="-fx-font-size: 11px; -fx-text-fill: #888;"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #f59e0b22; -fx-background-radius: 8; -fx-padding: 10 24;">
+            <Label fx:id="statPending" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #f59e0b;"/>
+            <Label text="Pending" style="-fx-font-size: 10px; -fx-text-fill: #f59e0b;"/>
+        </VBox>
+        <Region prefWidth="12"/>
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #22c55e22; -fx-background-radius: 8; -fx-padding: 10 24;">
+            <Label fx:id="statAccepted" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #22c55e;"/>
+            <Label text="Accepted" style="-fx-font-size: 10px; -fx-text-fill: #22c55e;"/>
+        </VBox>
+        <Region prefWidth="12"/>
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #ef444422; -fx-background-radius: 8; -fx-padding: 10 24;">
+            <Label fx:id="statRejected" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #ef4444;"/>
+            <Label text="Rejected" style="-fx-font-size: 10px; -fx-text-fill: #ef4444;"/>
+        </VBox>
+    </HBox>
+
+    <!-- Filter -->
+    <HBox spacing="12" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+        <padding><Insets top="12" bottom="12" left="30" right="30"/></padding>
+        <Label text="Filter by status:" style="-fx-font-size: 12px; -fx-text-fill: #666;"/>
+        <ComboBox fx:id="filterStatus" prefWidth="150" style="-fx-pref-height: 34px; -fx-background-radius: 8;"/>
+    </HBox>
+
+    <!-- Edit Form -->
+    <VBox fx:id="editFormContainer" spacing="14" visible="false" managed="false"
+          style="-fx-background-color: #f0f4ff; -fx-border-color: #667eea; -fx-border-width: 0 0 0 4;">
+        <padding><Insets top="16" bottom="16" left="30" right="30"/></padding>
+        <Label fx:id="editOfferTitle" text="" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+
+        <VBox spacing="6">
+            <Label text="Motivation Letter *" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+            <TextArea fx:id="motivationField" prefRowCount="4"
+                      style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
+            <Label fx:id="motivationError" text="" style="-fx-text-fill: #ef4444; -fx-font-size: 11px;"/>
+        </VBox>
+
+        <HBox spacing="16">
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label text="CV" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                <HBox spacing="8">
+                    <TextField fx:id="cvPathField" editable="false" HBox.hgrow="ALWAYS"
+                               style="-fx-pref-height: 34px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
+                    <Button text="Browse..." onAction="#handleBrowseCV"
+                            style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 6 14; -fx-cursor: hand;"/>
+                </HBox>
+                <Label fx:id="cvError" text="" style="-fx-text-fill: #ef4444; -fx-font-size: 11px;"/>
+            </VBox>
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label text="Portfolio URL (optional)" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                <TextField fx:id="portfolioField"
+                           style="-fx-pref-height: 34px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
+            </VBox>
+        </HBox>
+
+        <VBox spacing="6" prefWidth="400">
+            <Label text="GitHub URL (optional)" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+            <TextField fx:id="githubField"
+                       style="-fx-pref-height: 34px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
+        </VBox>
+
+        <HBox spacing="12" alignment="CENTER_RIGHT">
+            <Button text="Cancel" onAction="#handleCancelEdit"
+                    style="-fx-background-color: transparent; -fx-text-fill: #666; -fx-cursor: hand;"/>
+            <Button text="Save Changes" onAction="#handleSaveEdit"
+                    style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 24; -fx-cursor: hand;"/>
+        </HBox>
+    </VBox>
+
+    <!-- Candidatures List -->
+    <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER"
+                style="-fx-background-color: transparent; -fx-border-color: transparent;">
+        <VBox fx:id="candidaturesContainer" spacing="12">
+            <padding><Insets top="20" bottom="20" left="30" right="30"/></padding>
+        </VBox>
+    </ScrollPane>
+</VBox>

@@ -36,6 +36,7 @@ public class StudentDashboardController implements Initializable {
     @FXML private Label navOffers;
     @FXML private Label navProjects;
     @FXML private Label navDocuments;
+    @FXML private Label navApplications;
     @FXML private Label navProfile;
 
     private final ProjectDAO projectDAO = new ProjectDAO();
@@ -65,15 +66,13 @@ public class StudentDashboardController implements Initializable {
     }
 
     private void setActiveNav(Label activeLabel) {
-        // Reset all
         navHome.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
         navMeetings.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
         navOffers.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
         navProjects.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
         navDocuments.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
+        if (navApplications != null) navApplications.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
         navProfile.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        
-        // Set active
         activeLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #a12c2f; -fx-cursor: hand;");
     }
 
@@ -101,7 +100,18 @@ public class StudentDashboardController implements Initializable {
         setActiveNav(navOffers);
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
         contentArea.setCenter(null);
-        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Candidatures.fxml");
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("StudentOffers.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
+    }
+
+    @FXML public void showMyCandidatures() {
+        if (navApplications != null) setActiveNav(navApplications);
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("MyCandidatures.fxml");
         if (pane != null) {
             contentArea.setCenter(pane);
             pane.setVisible(true);

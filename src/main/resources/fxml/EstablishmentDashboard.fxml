@@ -21,6 +21,8 @@
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label text="PROJECTS" onMouseClicked="#showProjects"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
+            <Label text="OFFERS" onMouseClicked="#showOffers"
+                   style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label text="APPLICATIONS" onMouseClicked="#showApplications"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label text="PROFILE" onMouseClicked="#showProfile"

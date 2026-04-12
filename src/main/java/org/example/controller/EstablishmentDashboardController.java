@@ -82,6 +82,16 @@ public class EstablishmentDashboardController implements Initializable {
             pane.setVisible(true);
         }
     }
+
+    @FXML public void showOffers() {
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("EstablishmentOffers.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
+    }
     
     @FXML public void showProfile() { 
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);

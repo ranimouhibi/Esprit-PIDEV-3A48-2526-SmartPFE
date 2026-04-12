@@ -36,6 +36,7 @@ public class DashboardController implements Initializable {
     @FXML private Button btnSprints;
     @FXML private Button btnTasks;
     @FXML private Button btnMeetings;
+    @FXML private Button btnOffers;
     @FXML private Button btnCandidatures;
     @FXML private Button btnUsers;
 
@@ -69,7 +70,7 @@ public class DashboardController implements Initializable {
     }
 
     private void setActiveButton(Button active) {
-        Button[] all = {btnProjects, btnComments, btnDocuments, btnSprints, btnTasks, btnMeetings, btnCandidatures, btnUsers};
+        Button[] all = {btnProjects, btnComments, btnDocuments, btnSprints, btnTasks, btnMeetings, btnOffers, btnCandidatures, btnUsers};
         for (Button b : all) {
             b.setStyle(STYLE_INACTIVE);
         }
@@ -78,7 +79,7 @@ public class DashboardController implements Initializable {
 
     @FXML public void showDashboard() {
         // Reset all buttons
-        Button[] all = {btnProjects, btnComments, btnDocuments, btnSprints, btnTasks, btnMeetings, btnCandidatures, btnUsers};
+        Button[] all = {btnProjects, btnComments, btnDocuments, btnSprints, btnTasks, btnMeetings, btnOffers, btnCandidatures, btnUsers};
         for (Button b : all) b.setStyle(STYLE_INACTIVE);
         contentArea.setCenter(statsPane);
         loadStats();
@@ -90,8 +91,11 @@ public class DashboardController implements Initializable {
     @FXML public void showSprints()      { setActiveButton(btnSprints);      loadContent("Sprints.fxml"); }
     @FXML public void showTasks()        { setActiveButton(btnTasks);        loadContent("Tasks.fxml"); }
     @FXML public void showMeetings()     { setActiveButton(btnMeetings);     loadContent("Meetings.fxml"); }
+    @FXML public void showOffers()       { setActiveButton(btnOffers);       loadContent("Offers.fxml"); }
     @FXML public void showCandidatures() { setActiveButton(btnCandidatures); loadContent("Candidatures.fxml"); }
     @FXML public void showUsers()        { setActiveButton(btnUsers);        loadContent("Users.fxml"); }
+    @FXML public void showStudentOffers()  { loadContent("StudentOffers.fxml"); }
+    @FXML public void showMyCandidatures() { loadContent("MyCandidatures.fxml"); }
 
     private void loadContent(String fxml) {
         // Clear old content completely
