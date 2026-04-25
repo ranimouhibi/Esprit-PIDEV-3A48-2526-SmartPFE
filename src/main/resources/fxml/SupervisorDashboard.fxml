@@ -29,6 +29,8 @@
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label fx:id="navCandidatures" text="CANDIDATURES" onMouseClicked="#showCandidatures"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
+            <Label fx:id="navSprints" text="SPRINTS" onMouseClicked="#showSprints"
+                   style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label fx:id="navProfile" text="PROFILE" onMouseClicked="#showProfile"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Button text="LOGOUT" onAction="#handleLogout"
@@ -94,8 +96,8 @@
                                 <VBox spacing="8" alignment="CENTER"
                                       style="-fx-background-color: #a12c2f; -fx-background-radius: 14;" prefWidth="160" prefHeight="110">
                                     <Label text="👨‍🎓" style="-fx-font-size: 28px;"/>
-                                    <Label text="Students" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
-                                    <Label text="Active" style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 12px;"/>
+                                    <Label text="Pending Requests" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11px;"/>
+                                    <Label fx:id="pendingRequestsLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
                                 </VBox>
                             </HBox>
                         </VBox>
@@ -157,6 +159,34 @@
                         <Button text="Review Tasks" onAction="#showTasks"
                                 style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 22; -fx-cursor: hand;"/>
                     </HBox>
+
+                    <!-- CHATBOT WIDGET -->
+                    <VBox spacing="0" style="-fx-background-color: white; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.10),14,0,0,3);">
+                        <padding><Insets left="60" right="60" top="28" bottom="28"/></padding>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label text="🤖" style="-fx-font-size: 20px;"/>
+                            <VBox spacing="2">
+                                <Label text="SmartPFE Assistant" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #1a1a2e;"/>
+                                <Label text="Ask about candidatures, AI scores, projects, or meetings"
+                                       style="-fx-font-size: 11px; -fx-text-fill: #888;"/>
+                            </VBox>
+                        </HBox>
+                        <Separator style="-fx-padding: 6 0;"/>
+                        <ScrollPane fx:id="supChatScroll" fitToWidth="true" prefHeight="180" hbarPolicy="NEVER"
+                                    style="-fx-background-color: #f8f8f8; -fx-background: #f8f8f8; -fx-border-color: transparent;">
+                            <VBox fx:id="supChatMessages" spacing="5">
+                                <padding><Insets top="8" bottom="8" left="8" right="8"/></padding>
+                            </VBox>
+                        </ScrollPane>
+                        <HBox spacing="8" alignment="CENTER_LEFT">
+                            <padding><Insets top="8"/></padding>
+                            <TextField fx:id="supChatInput" promptText="Ask a question..." HBox.hgrow="ALWAYS"
+                                       style="-fx-pref-height: 36px; -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #ddd; -fx-padding: 0 14;"
+                                       onAction="#handleSupChatSend"/>
+                            <Button text="Send" onAction="#handleSupChatSend"
+                                    style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 18; -fx-padding: 8 20; -fx-cursor: hand; -fx-font-weight: bold;"/>
+                        </HBox>
+                    </VBox>
 
                 </VBox>
             </ScrollPane>
