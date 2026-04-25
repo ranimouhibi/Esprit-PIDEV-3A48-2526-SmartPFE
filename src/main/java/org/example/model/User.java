@@ -6,10 +6,11 @@ public class User {
     private int id;
     private String email;
     private String password;
-    private String role; // student, supervisor, establishment, admin
+    private String role;
     private String name;
     private String phone;
     private boolean isActive;
+    private int establishmentId; // links to establishments.id for role=establishment
     private LocalDateTime createdAt;
 
     public User() {}
@@ -42,6 +43,9 @@ public class User {
 
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { isActive = active; }
+
+    public int getEstablishmentId() { return establishmentId; }
+    public void setEstablishmentId(int establishmentId) { this.establishmentId = establishmentId; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

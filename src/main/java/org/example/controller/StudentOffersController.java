@@ -5,7 +5,10 @@ import org.example.dao.OfferDAO;
 import org.example.model.Candidature;
 import org.example.model.Offer;
 import org.example.model.User;
+import org.example.service.EmailNotificationService;
 import org.example.util.SessionManager;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -16,15 +19,26 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.ResourceBundle;
 
 public class StudentOffersController implements Initializable {
 
     @FXML private FlowPane offersContainer;
     @FXML private TextField searchField;
+    @FXML private ComboBox<String> sortCombo;
+    // View panels
+    @FXML private VBox listView;
+    @FXML private VBox calendarView;
+    @FXML private VBox statsView;
+    // Calendar
+    @FXML private Label calMonthLabel;
+    @FXML private GridPane calGrid;
+    // Stats
+    @FXML private VBox statsContainer;
 
     // Apply form
     @FXML private VBox applyFormContainer;
@@ -38,12 +52,19 @@ public class StudentOffersController implements Initializable {
 
     private final OfferDAO offerDAO = new OfferDAO();
     private final CandidatureDAO candidatureDAO = new CandidatureDAO();
+    private final EmailNotificationService emailService = new EmailNotificationService();
     private List<Offer> allOffers = new ArrayList<>();
     private Offer applyingOffer = null;
     private File selectedCvFile = null;
+    private YearMonth calendarMonth = YearMonth.now();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        if (sortCombo != null) {
+            sortCombo.setItems(FXCollections.observableArrayList("Newest", "Deadline", "Title"));
+            sortCombo.setValue("Newest");
+            sortCombo.valueProperty().addListener((obs, o, v) -> applyFilter());
+        }
         searchField.textProperty().addListener((obs, o, v) -> applyFilter());
 
         // Input restrictions
@@ -77,10 +98,19 @@ public class StudentOffersController implements Initializable {
 
     private void applyFilter() {
         String query = searchField.getText() != null ? searchField.getText().toLowerCase().trim() : "";
+        String sort = sortCombo != null ? sortCombo.getValue() : "Newest";
         List<Offer> filtered = new ArrayList<>();
         for (Offer o : allOffers) {
             boolean matchQ = query.isEmpty() || (o.getTitle() != null && o.getTitle().toLowerCase().contains(query));
             if (matchQ) filtered.add(o);
+        }
+        // Sort
+        if ("Deadline".equals(sort)) {
+            filtered.sort(Comparator.comparing(o -> o.getDeadline() != null ? o.getDeadline() : LocalDate.MAX));
+        } else if ("Title".equals(sort)) {
+            filtered.sort(Comparator.comparing(o -> o.getTitle() != null ? o.getTitle() : ""));
+        } else {
+            filtered.sort(Comparator.comparing(o -> o.getCreatedAt() != null ? o.getCreatedAt() : java.time.LocalDateTime.MIN, Comparator.reverseOrder()));
         }
         displayOffers(filtered);
     }
@@ -235,7 +265,8 @@ public class StudentOffersController implements Initializable {
             c.setPortfolioUrl(portfolioField.getText().trim());
             c.setGithubUrl(githubField.getText().trim());
             candidatureDAO.save(c);
-
+            // Send confirmation email async
+            emailService.sendCandidatureConfirmation(c.getId());
             handleCancelApply();
             loadOffers(); // refresh to show "Already Applied"
             showAlert("Success", "Your application has been submitted!", Alert.AlertType.INFORMATION);
@@ -247,6 +278,194 @@ public class StudentOffersController implements Initializable {
 
     @FXML public void handleReset() {
         searchField.clear();
+        if (sortCombo != null) sortCombo.setValue("Newest");
+    }
+
+    // ── View switching ────────────────────────────────────────────────────────
+
+    @FXML public void showListView() {
+        if (listView != null) { listView.setVisible(true); listView.setManaged(true); }
+        if (calendarView != null) { calendarView.setVisible(false); calendarView.setManaged(false); }
+        if (statsView != null) { statsView.setVisible(false); statsView.setManaged(false); }
+    }
+
+    @FXML public void showCalendarView() {
+        if (listView != null) { listView.setVisible(false); listView.setManaged(false); }
+        if (calendarView != null) { calendarView.setVisible(true); calendarView.setManaged(true); }
+        if (statsView != null) { statsView.setVisible(false); statsView.setManaged(false); }
+        renderCalendar();
+    }
+
+    @FXML public void showStatsView() {
+        if (listView != null) { listView.setVisible(false); listView.setManaged(false); }
+        if (calendarView != null) { calendarView.setVisible(false); calendarView.setManaged(false); }
+        if (statsView != null) { statsView.setVisible(true); statsView.setManaged(true); }
+        renderStats();
+    }
+
+    @FXML public void calPrev() { calendarMonth = calendarMonth.minusMonths(1); renderCalendar(); }
+    @FXML public void calNext() { calendarMonth = calendarMonth.plusMonths(1); renderCalendar(); }
+
+    private void renderCalendar() {
+        if (calGrid == null || calMonthLabel == null) return;
+        calMonthLabel.setText(calendarMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy")));
+        calGrid.getChildren().clear();
+
+        String[] days = {"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
+        for (int i = 0; i < 7; i++) {
+            Label h = new Label(days[i]);
+            h.setStyle("-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #888;");
+            h.setMaxWidth(Double.MAX_VALUE);
+            h.setAlignment(Pos.CENTER);
+            calGrid.add(h, i, 0);
+        }
+
+        User user = SessionManager.getCurrentUser();
+        Map<LocalDate, List<String[]>> events = new HashMap<>();
+
+        // Offer deadlines (violet)
+        for (Offer o : allOffers) {
+            if (o.getDeadline() != null) {
+                events.computeIfAbsent(o.getDeadline(), k -> new ArrayList<>())
+                      .add(new String[]{"📋 " + truncate(o.getTitle(), 14), "#8b5cf6"});
+            }
+        }
+        // My candidatures (pink/green/red by status)
+        try {
+            for (Candidature c : candidatureDAO.findByStudent(user.getId())) {
+                if (c.getCreatedAt() != null) {
+                    String color = "accepted".equals(c.getStatus()) ? "#28a745"
+                                 : "rejected".equals(c.getStatus()) ? "#dc3545" : "#ec4899";
+                    events.computeIfAbsent(c.getCreatedAt().toLocalDate(), k -> new ArrayList<>())
+                          .add(new String[]{"✉ " + truncate(c.getOfferTitle(), 12), color});
+                }
+            }
+        } catch (Exception ignored) {}
+
+        LocalDate first = calendarMonth.atDay(1);
+        int startCol = first.getDayOfWeek().getValue() - 1;
+        int daysInMonth = calendarMonth.lengthOfMonth();
+        LocalDate today = LocalDate.now();
+        int col = startCol, row = 1;
+
+        for (int day = 1; day <= daysInMonth; day++) {
+            LocalDate date = calendarMonth.atDay(day);
+            List<String[]> dayEvents = events.getOrDefault(date, List.of());
+            VBox cell = new VBox(2);
+            cell.setPadding(new Insets(3));
+            cell.setMinHeight(60);
+            cell.setStyle("-fx-background-color: " + (date.equals(today) ? "#fff3f3" : "white") +
+                "; -fx-border-color: #eee; -fx-border-width: 0.5;");
+            Label dayLbl = new Label(String.valueOf(day));
+            dayLbl.setStyle("-fx-font-size: 11px; -fx-font-weight: " + (date.equals(today) ? "bold" : "normal") +
+                "; -fx-text-fill: " + (date.equals(today) ? "#a12c2f" : "#333") + ";");
+            cell.getChildren().add(dayLbl);
+            for (String[] ev : dayEvents) {
+                Label evLbl = new Label(ev[0]);
+                evLbl.setStyle("-fx-background-color: " + ev[1] + "22; -fx-text-fill: " + ev[1] +
+                    "; -fx-font-size: 9px; -fx-background-radius: 3; -fx-padding: 1 3;");
+                evLbl.setMaxWidth(Double.MAX_VALUE);
+                cell.getChildren().add(evLbl);
+            }
+            calGrid.add(cell, col, row);
+            col++;
+            if (col == 7) { col = 0; row++; }
+        }
+    }
+
+    private void renderStats() {
+        if (statsContainer == null) return;
+        statsContainer.getChildren().clear();
+        try {
+            User user = SessionManager.getCurrentUser();
+            List<Candidature> myCandidatures = candidatureDAO.findByStudent(user.getId());
+
+            // Summary cards
+            HBox cards = new HBox(12);
+            cards.getChildren().addAll(
+                statCard("Total Offers", String.valueOf(allOffers.size()), "#667eea"),
+                statCard("My Applications", String.valueOf(myCandidatures.size()), "#a12c2f"),
+                statCard("Accepted", String.valueOf(myCandidatures.stream().filter(c -> "accepted".equals(c.getStatus())).count()), "#28a745"),
+                statCard("Pending", String.valueOf(myCandidatures.stream().filter(c -> "pending".equals(c.getStatus())).count()), "#ffc107")
+            );
+            statsContainer.getChildren().add(cards);
+
+            // Monthly distribution bar chart (simple)
+            Label chartTitle = new Label("Monthly Applications");
+            chartTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #1a1a2e;");
+            statsContainer.getChildren().add(chartTitle);
+
+            Map<String, Long> monthly = new LinkedHashMap<>();
+            for (int i = 5; i >= 0; i--) {
+                YearMonth ym = YearMonth.now().minusMonths(i);
+                String key = ym.format(DateTimeFormatter.ofPattern("MMM yy"));
+                long count = myCandidatures.stream()
+                    .filter(c -> c.getCreatedAt() != null && YearMonth.from(c.getCreatedAt()).equals(ym))
+                    .count();
+                monthly.put(key, count);
+            }
+            long maxVal = monthly.values().stream().mapToLong(v -> v).max().orElse(1);
+            if (maxVal == 0) maxVal = 1;
+
+            VBox chart = new VBox(6);
+            chart.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 16;");
+            for (Map.Entry<String, Long> entry : monthly.entrySet()) {
+                HBox barRow = new HBox(8);
+                barRow.setAlignment(Pos.CENTER_LEFT);
+                Label monthLbl = new Label(entry.getKey());
+                monthLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: #555;");
+                monthLbl.setPrefWidth(50);
+                double pct = (double) entry.getValue() / maxVal;
+                Region bar = new Region();
+                bar.setPrefHeight(18);
+                bar.setPrefWidth(Math.max(4, pct * 200));
+                bar.setStyle("-fx-background-color: #a12c2f; -fx-background-radius: 4;");
+                Label cnt = new Label(String.valueOf(entry.getValue()));
+                cnt.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #a12c2f;");
+                barRow.getChildren().addAll(monthLbl, bar, cnt);
+                chart.getChildren().add(barRow);
+            }
+            statsContainer.getChildren().add(chart);
+
+            // Status distribution
+            Label distTitle = new Label("Application Status Distribution");
+            distTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #1a1a2e;");
+            statsContainer.getChildren().add(distTitle);
+
+            Map<String, String> statusColors = Map.of("pending","#ffc107","accepted","#28a745","rejected","#dc3545","interview","#667eea");
+            HBox distRow = new HBox(12);
+            for (Map.Entry<String, String> sc : statusColors.entrySet()) {
+                long cnt = myCandidatures.stream().filter(c -> sc.getKey().equals(c.getStatus())).count();
+                VBox box = new VBox(4);
+                box.setAlignment(Pos.CENTER);
+                box.setStyle("-fx-background-color: " + sc.getValue() + "22; -fx-background-radius: 8; -fx-padding: 12 20;");
+                Label num = new Label(String.valueOf(cnt));
+                num.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: " + sc.getValue() + ";");
+                Label lbl = new Label(sc.getKey().toUpperCase());
+                lbl.setStyle("-fx-font-size: 10px; -fx-text-fill: " + sc.getValue() + ";");
+                box.getChildren().addAll(num, lbl);
+                distRow.getChildren().add(box);
+            }
+            statsContainer.getChildren().add(distRow);
+
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    private VBox statCard(String label, String value, String color) {
+        VBox box = new VBox(4);
+        box.setAlignment(Pos.CENTER);
+        box.setStyle("-fx-background-color: " + color + "; -fx-background-radius: 10; -fx-padding: 14 20;");
+        box.setMinWidth(120);
+        Label val = new Label(value);
+        val.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;");
+        Label lbl = new Label(label);
+        lbl.setStyle("-fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.85);");
+        box.getChildren().addAll(val, lbl);
+        return box;
+    }
+
+    private String truncate(String s, int max) {
+        return s != null && s.length() > max ? s.substring(0, max) + "…" : (s != null ? s : "");
     }
 
     private void showAlert(String title, String msg, Alert.AlertType type) {

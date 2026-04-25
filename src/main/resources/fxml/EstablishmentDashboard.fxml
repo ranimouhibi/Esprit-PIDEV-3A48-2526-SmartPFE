@@ -25,6 +25,8 @@
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label text="APPLICATIONS" onMouseClicked="#showApplications"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
+            <Label text="📅 CALENDAR" onMouseClicked="#showCalendar"
+                   style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label text="PROFILE" onMouseClicked="#showProfile"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Button text="LOGOUT" onAction="#handleLogout"
@@ -83,17 +85,17 @@
                                 <VBox spacing="8" alignment="CENTER"
                                       style="-fx-background-color: #3a3a3a; -fx-background-radius: 14;" prefWidth="160" prefHeight="110">
                                     <Label text="📋" style="-fx-font-size: 28px;"/>
-                                    <Label text="Applications" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                                    <Label text="Pending Apps" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
                                     <Label fx:id="applicationCountLabel" text="0"
-                                           style="-fx-text-fill: #a12c2f; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                                           style="-fx-text-fill: #ffc107; -fx-font-size: 22px; -fx-font-weight: bold;"/>
                                 </VBox>
                                 <VBox spacing="8" alignment="CENTER"
-                                      style="-fx-background-color: #3a3a3a; -fx-background-radius: 14;" prefWidth="160" prefHeight="110">
-                                    <Label text="🏛️" style="-fx-font-size: 28px;"/>
-                                    <Label text="Institution" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
-                                    <Label text="Active" style="-fx-text-fill: #22c55e; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                                      style="-fx-background-color: #28a745; -fx-background-radius: 14;" prefWidth="160" prefHeight="110">
+                                    <Label text="🎯" style="-fx-font-size: 28px;"/>
+                                    <Label text="Active Offers" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                                    <Label fx:id="offerCountLabel" text="0"
+                                           style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
                                 </VBox>
-                            </HBox>
                         </VBox>
                     </HBox>
 
@@ -152,6 +154,58 @@
                         </VBox>
                         <Button text="View Applications" onAction="#showApplications"
                                 style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 22; -fx-cursor: hand;"/>
+                    </HBox>
+
+                    <!-- AI SUGGESTIONS + CHATBOT ROW -->
+                    <HBox spacing="20" style="-fx-background-color: #f7f7f7;">
+                        <padding><Insets top="30" bottom="30" left="60" right="60"/></padding>
+
+                        <!-- AI Project Suggestions -->
+                        <VBox spacing="12" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 20; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.07),10,0,0,3);">
+                            <HBox spacing="8" alignment="CENTER_LEFT">
+                                <Label text="✨" style="-fx-font-size: 18px;"/>
+                                <Label text="AI Project Suggestions" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #1a1a2e;"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Button text="Generate" onAction="#handleAISuggestions"
+                                        style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand; -fx-font-size: 11px;"/>
+                            </HBox>
+                            <Separator/>
+                            <ScrollPane fitToWidth="true" prefHeight="160" hbarPolicy="NEVER"
+                                        style="-fx-background-color: transparent; -fx-border-color: transparent;">
+                                <TextArea fx:id="aiSuggestionsArea" editable="false" wrapText="true"
+                                          promptText="Click 'Generate' to get AI suggestions for your projects..."
+                                          style="-fx-background-color: #f8f9ff; -fx-border-color: transparent; -fx-font-size: 12px;"/>
+                            </ScrollPane>
+                        </VBox>
+
+                        <!-- Chatbot -->
+                        <VBox spacing="0" prefWidth="340"
+                              style="-fx-background-color: white; -fx-background-radius: 14; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.07),10,0,0,3);">
+                            <padding><Insets top="16" bottom="16" left="16" right="16"/></padding>
+                            <HBox spacing="8" alignment="CENTER_LEFT">
+                                <Label text="🤖" style="-fx-font-size: 18px;"/>
+                                <VBox spacing="1">
+                                    <Label text="SmartPFE Assistant" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1a1a2e;"/>
+                                    <Label text="Ask about offers, applications, stats" style="-fx-font-size: 10px; -fx-text-fill: #888;"/>
+                                </VBox>
+                            </HBox>
+                            <Separator style="-fx-padding: 6 0;"/>
+                            <ScrollPane fx:id="estChatScroll" fitToWidth="true" prefHeight="160" hbarPolicy="NEVER"
+                                        style="-fx-background-color: #f8f8f8; -fx-background: #f8f8f8; -fx-border-color: transparent;">
+                                <VBox fx:id="estChatMessages" spacing="5">
+                                    <padding><Insets top="8" bottom="8" left="8" right="8"/></padding>
+                                </VBox>
+                            </ScrollPane>
+                            <HBox spacing="8" alignment="CENTER_LEFT">
+                                <padding><Insets top="8"/></padding>
+                                <TextField fx:id="estChatInput" promptText="Ask a question..." HBox.hgrow="ALWAYS"
+                                           style="-fx-pref-height: 34px; -fx-background-radius: 17; -fx-border-radius: 17; -fx-border-color: #ddd; -fx-padding: 0 12;"
+                                           onAction="#handleEstChatSend"/>
+                                <Button text="Send" onAction="#handleEstChatSend"
+                                        style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 17; -fx-padding: 7 16; -fx-cursor: hand; -fx-font-weight: bold;"/>
+                            </HBox>
+                        </VBox>
                     </HBox>
 
                 </VBox>

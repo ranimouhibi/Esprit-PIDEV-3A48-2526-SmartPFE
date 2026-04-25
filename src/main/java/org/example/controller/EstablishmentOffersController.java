@@ -95,12 +95,27 @@ public class EstablishmentOffersController implements Initializable {
     private void loadOffers() {
         try {
             User user = SessionManager.getCurrentUser();
-            allOffers = offerDAO.findByEstablishment(user.getId());
+            int estId = user.getEstablishmentId();
+            if (estId == 0) {
+                // fallback: try to find establishment by user id
+                estId = resolveEstablishmentId(user.getId());
+            }
+            allOffers = offerDAO.findByEstablishment(estId);
             updateStats();
             applyFilter();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private int resolveEstablishmentId(int userId) {
+        try {
+            java.sql.ResultSet rs = org.example.config.DatabaseConfig.getConnection()
+                .createStatement()
+                .executeQuery("SELECT id FROM establishments WHERE id = (SELECT establishment_id FROM users WHERE id = " + userId + ")");
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception ignored) {}
+        return userId; // last resort
     }
 
     private void updateStats() {
@@ -278,6 +293,8 @@ public class EstablishmentOffersController implements Initializable {
 
         try {
             User user = SessionManager.getCurrentUser();
+            int estId = user.getEstablishmentId();
+            if (estId == 0) estId = resolveEstablishmentId(user.getId());
             int maxC = 10;
             try { maxC = Integer.parseInt(maxCandidatesField.getText().trim()); } catch (Exception ignored) {}
 
@@ -293,7 +310,7 @@ public class EstablishmentOffersController implements Initializable {
 
             if (editingOffer == null) {
                 Offer o = new Offer();
-                o.setEstablishmentId(user.getId());
+                o.setEstablishmentId(estId);
                 o.setTitle(titleField.getText().trim());
                 o.setDescription(descriptionField.getText().trim());
                 o.setObjectives(objectivesField.getText().trim());

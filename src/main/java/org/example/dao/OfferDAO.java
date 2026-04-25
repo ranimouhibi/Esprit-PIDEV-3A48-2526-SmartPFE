@@ -78,6 +78,49 @@ public class OfferDAO {
         }
     }
 
+    public Offer findById(int id) throws SQLException {
+        String sql = SELECT_BASE + "WHERE o.id = ?";
+        try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return mapRow(rs);
+        }
+        return null;
+    }
+
+    public List<Offer> findOpen() throws SQLException {
+        return findAllOpen();
+    }
+
+    public java.util.Map<String, Integer> getStats() throws SQLException {
+        java.util.Map<String, Integer> stats = new java.util.LinkedHashMap<>();
+        ResultSet rs = DatabaseConfig.getConnection().createStatement().executeQuery(
+            "SELECT COUNT(*) as total, " +
+            "SUM(CASE WHEN status='open' THEN 1 ELSE 0 END) as open_count, " +
+            "SUM(CASE WHEN status='closed' THEN 1 ELSE 0 END) as closed_count, " +
+            "SUM(CASE WHEN status='draft' THEN 1 ELSE 0 END) as draft_count, " +
+            "(SELECT COUNT(*) FROM candidatures) as total_candidatures " +
+            "FROM project_offers");
+        if (rs.next()) {
+            stats.put("total", rs.getInt("total"));
+            stats.put("open", rs.getInt("open_count"));
+            stats.put("closed", rs.getInt("closed_count"));
+            stats.put("draft", rs.getInt("draft_count"));
+            stats.put("totalCandidatures", rs.getInt("total_candidatures"));
+        }
+        return stats;
+    }
+
+    public int getCandidatureCount(int offerId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM candidatures WHERE offer_id = ?";
+        try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
+            ps.setInt(1, offerId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        }
+        return 0;
+    }
+
     public void delete(int id) throws SQLException {
         String sql = "DELETE FROM project_offers WHERE id = ?";
         try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {

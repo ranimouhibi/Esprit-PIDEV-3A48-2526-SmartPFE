@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.controller.ProjectOfferController">
+    <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+
+    <top>
+        <VBox spacing="12">
+            <Label text="Project Offers Management" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+            <!-- Stats -->
+            <HBox spacing="16">
+                <VBox style="-fx-background-color: #a12c2f; -fx-background-radius: 10; -fx-padding: 12 20;" alignment="CENTER">
+                    <Label text="Total Offers" style="-fx-text-fill: white; -fx-font-size: 11px;"/>
+                    <Label fx:id="statTotal" text="0" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                </VBox>
+                <VBox style="-fx-background-color: #28a745; -fx-background-radius: 10; -fx-padding: 12 20;" alignment="CENTER">
+                    <Label text="Open Offers" style="-fx-text-fill: white; -fx-font-size: 11px;"/>
+                    <Label fx:id="statOpen" text="0" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                </VBox>
+                <VBox style="-fx-background-color: #667eea; -fx-background-radius: 10; -fx-padding: 12 20;" alignment="CENTER">
+                    <Label text="Total Candidatures" style="-fx-text-fill: white; -fx-font-size: 11px;"/>
+                    <Label fx:id="statCandidatures" text="0" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                </VBox>
+            </HBox>
+            <padding><Insets bottom="8"/></padding>
+        </VBox>
+    </top>
+
+    <center>
+        <SplitPane dividerPositions="0.58">
+            <VBox spacing="8">
+                <TableView fx:id="offerTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                        <TableColumn fx:id="colTitle" text="Title" prefWidth="200"/>
+                        <TableColumn fx:id="colStatus" text="Status" prefWidth="90"/>
+                        <TableColumn fx:id="colDeadline" text="Deadline" prefWidth="110"/>
+                        <TableColumn fx:id="colMax" text="Max" prefWidth="60"/>
+                        <TableColumn fx:id="colCandidatures" text="Applications" prefWidth="100"/>
+                    </columns>
+                    <placeholder><Label text="No offers found"/></placeholder>
+                </TableView>
+                <HBox spacing="8">
+                    <Button text="👁 View Candidatures" onAction="#handleViewCandidatures"
+                            style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 7 14;"/>
+                    <Button text="📊 Statistics" onAction="#handleViewStats"
+                            style="-fx-background-color: #06D6A0; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 7 14;"/>
+                </HBox>
+            </VBox>
+
+            <ScrollPane fitToWidth="true">
+                <VBox spacing="10">
+                    <padding><Insets top="10" left="15" right="15" bottom="10"/></padding>
+                    <Label text="Offer Form" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                    <Label text="Title *"/>
+                    <TextField fx:id="titleField"/>
+
+                    <Label text="Description"/>
+                    <TextArea fx:id="descriptionField" prefRowCount="3"/>
+
+                    <Label text="Objectives"/>
+                    <TextArea fx:id="objectivesField" prefRowCount="2"/>
+
+                    <Label text="Required Skills"/>
+                    <TextArea fx:id="requiredSkillsField" prefRowCount="2" promptText="e.g. Java, Spring, MySQL, Docker"/>
+
+                    <HBox spacing="10">
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="Max Candidates"/>
+                            <Spinner fx:id="maxCandidatesSpinner" maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="Deadline"/>
+                            <DatePicker fx:id="deadlinePicker" maxWidth="Infinity"/>
+                        </VBox>
+                    </HBox>
+
+                    <HBox spacing="10">
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="Status"/>
+                            <ComboBox fx:id="statusCombo" maxWidth="Infinity"/>
+                        </VBox>
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="Supervisor"/>
+                            <ComboBox fx:id="supervisorCombo" maxWidth="Infinity"/>
+                        </VBox>
+                    </HBox>
+
+                    <Label fx:id="messageLabel" text="" wrapText="true"/>
+
+                    <HBox spacing="8">
+                        <Button text="💾 Save" onAction="#handleSave" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 6;"/>
+                        <Button text="🗑 Delete" onAction="#handleDelete" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                style="-fx-background-color: #FF6B6B; -fx-text-fill: white; -fx-background-radius: 6;"/>
+                        <Button text="✖ Clear" onAction="#handleClear" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                style="-fx-background-color: #aaa; -fx-text-fill: white; -fx-background-radius: 6;"/>
+                    </HBox>
+                </VBox>
+            </ScrollPane>
+        </SplitPane>
+    </center>
+</BorderPane>

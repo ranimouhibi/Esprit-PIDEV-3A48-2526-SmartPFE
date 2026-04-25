@@ -27,6 +27,8 @@
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label fx:id="navTasks" text="TASKS" onMouseClicked="#showTasks"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
+            <Label fx:id="navCandidatures" text="CANDIDATURES" onMouseClicked="#showCandidatures"
+                   style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label fx:id="navProfile" text="PROFILE" onMouseClicked="#showProfile"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Button text="LOGOUT" onAction="#handleLogout"

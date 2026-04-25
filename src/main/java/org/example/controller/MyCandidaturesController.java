@@ -1,8 +1,12 @@
 package org.example.controller;
 
 import org.example.dao.CandidatureDAO;
+import org.example.dao.CandidatureNoteDAO;
+import org.example.dao.MatchingScoreDAO;
 import org.example.model.Candidature;
+import org.example.model.MatchingScore;
 import org.example.model.User;
+import org.example.service.PDFExportService;
 import org.example.util.SessionManager;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -11,6 +15,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 
 import java.io.File;
@@ -41,6 +47,9 @@ public class MyCandidaturesController implements Initializable {
     @FXML private Label cvError;
 
     private final CandidatureDAO candidatureDAO = new CandidatureDAO();
+    private final MatchingScoreDAO matchingScoreDAO = new MatchingScoreDAO();
+    private final CandidatureNoteDAO noteDAO = new CandidatureNoteDAO();
+    private final PDFExportService pdfService = new PDFExportService();
     private List<Candidature> allCandidatures = new ArrayList<>();
     private Candidature editingCandidature = null;
     private File selectedCvFile = null;
@@ -156,12 +165,69 @@ public class MyCandidaturesController implements Initializable {
             card.getChildren().add(feedbackBox);
         }
 
-        // Actions (only for pending)
-        if ("pending".equals(c.getStatus())) {
-            Separator sep = new Separator();
-            HBox actions = new HBox(8);
-            actions.setAlignment(Pos.CENTER_RIGHT);
+        // AI Score panel
+        try {
+            MatchingScore ms = matchingScoreDAO.findByCandidature(c.getId());
+            if (ms != null) {
+                VBox scoreBox = new VBox(6);
+                scoreBox.setStyle("-fx-background-color: #f8f9ff; -fx-background-radius: 8; -fx-padding: 10; -fx-border-color: #667eea33; -fx-border-radius: 8; -fx-border-width: 1;");
 
+                HBox scoreHeader = new HBox(8);
+                scoreHeader.setAlignment(Pos.CENTER_LEFT);
+                Label scoreTitle = new Label("🤖 AI Matching Score");
+                scoreTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #1a1a2e;");
+                Label scoreVal = new Label(String.format("%.1f%%", ms.getScore()));
+                scoreVal.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: " + ms.getMatchLevelColor() + ";");
+                Label levelBadge = new Label(ms.getMatchLevel() != null ? ms.getMatchLevel().toUpperCase() : "");
+                levelBadge.setStyle("-fx-background-color: " + ms.getMatchLevelColor() + "; -fx-text-fill: white; -fx-background-radius: 4; -fx-padding: 2 8; -fx-font-size: 10px; -fx-font-weight: bold;");
+                Region sp2 = new Region(); HBox.setHgrow(sp2, Priority.ALWAYS);
+                scoreHeader.getChildren().addAll(scoreTitle, sp2, scoreVal, levelBadge);
+                scoreBox.getChildren().add(scoreHeader);
+
+                // Sub-scores
+                GridPane grid = new GridPane();
+                grid.setHgap(8); grid.setVgap(4);
+                addScoreRow(grid, "Skills", ms.getSkillsScore(), 0);
+                addScoreRow(grid, "Description", ms.getDescriptionScore(), 1);
+                addScoreRow(grid, "Keywords", ms.getKeywordsScore(), 2);
+                scoreBox.getChildren().add(grid);
+
+                // Matched skills
+                if (!ms.getMatchedSkills().isEmpty()) {
+                    FlowPane matched = new FlowPane(4, 4);
+                    for (String skill : ms.getMatchedSkills()) {
+                        Label chip = new Label(skill);
+                        chip.setStyle("-fx-background-color: #28a74522; -fx-text-fill: #28a745; -fx-background-radius: 8; -fx-padding: 2 8; -fx-font-size: 10px;");
+                        matched.getChildren().add(chip);
+                    }
+                    scoreBox.getChildren().add(matched);
+                }
+                // Missing skills
+                if (!ms.getMissingSkills().isEmpty()) {
+                    FlowPane missing = new FlowPane(4, 4);
+                    for (String skill : ms.getMissingSkills().subList(0, Math.min(5, ms.getMissingSkills().size()))) {
+                        Label chip = new Label(skill);
+                        chip.setStyle("-fx-background-color: #dc354522; -fx-text-fill: #dc3545; -fx-background-radius: 8; -fx-padding: 2 8; -fx-font-size: 10px;");
+                        missing.getChildren().add(chip);
+                    }
+                    scoreBox.getChildren().add(missing);
+                }
+                card.getChildren().add(scoreBox);
+            }
+        } catch (Exception ignored) {}
+
+        // Actions
+        Separator sep = new Separator();
+        HBox actions = new HBox(8);
+        actions.setAlignment(Pos.CENTER_RIGHT);
+
+        // PDF export button (always visible)
+        Button pdfBtn = new Button("📄 PDF");
+        pdfBtn.setStyle("-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-size: 10px; -fx-background-radius: 6; -fx-padding: 6 12; -fx-cursor: hand;");
+        pdfBtn.setOnAction(e -> exportPDF(c));
+        actions.getChildren().add(pdfBtn);
+
+        if ("pending".equals(c.getStatus())) {
             Button editBtn = new Button("Edit");
             editBtn.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-size: 10px; -fx-background-radius: 6; -fx-padding: 6 12; -fx-cursor: hand;");
             editBtn.setOnAction(e -> openEditForm(c));
@@ -169,11 +235,10 @@ public class MyCandidaturesController implements Initializable {
             Button deleteBtn = new Button("Withdraw");
             deleteBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-size: 10px; -fx-background-radius: 6; -fx-padding: 6 12; -fx-cursor: hand;");
             deleteBtn.setOnAction(e -> handleDelete(c));
-
             actions.getChildren().addAll(editBtn, deleteBtn);
-            card.getChildren().addAll(sep, actions);
         }
 
+        card.getChildren().addAll(sep, actions);
         return card;
     }
 
@@ -265,6 +330,37 @@ public class MyCandidaturesController implements Initializable {
             case "accepted": return "[OK]";
             case "rejected": return "[X]";
             default: return "[...]";
+        }
+    }
+
+    private void addScoreRow(GridPane grid, String label, double value, int row) {
+        javafx.scene.control.Label lbl = new javafx.scene.control.Label(label);
+        lbl.setStyle("-fx-font-size: 11px; -fx-text-fill: #555;");
+        javafx.scene.control.ProgressBar pb = new javafx.scene.control.ProgressBar(value / 100.0);
+        pb.setPrefWidth(120);
+        String color = value >= 80 ? "#28a745" : value >= 60 ? "#ffc107" : value >= 40 ? "#fd7e14" : "#dc3545";
+        pb.setStyle("-fx-accent: " + color + ";");
+        javafx.scene.control.Label val = new javafx.scene.control.Label(String.format("%.0f%%", value));
+        val.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: " + color + ";");
+        grid.add(lbl, 0, row);
+        grid.add(pb, 1, row);
+        grid.add(val, 2, row);
+    }
+
+    private void exportPDF(Candidature c) {
+        javafx.stage.FileChooser fc = new javafx.stage.FileChooser();
+        fc.setTitle("Save PDF");
+        fc.setInitialFileName("candidature_" + c.getId() + ".pdf");
+        fc.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("PDF", "*.pdf"));
+        File file = fc.showSaveDialog(candidaturesContainer.getScene().getWindow());
+        if (file == null) return;
+        try {
+            MatchingScore ms = matchingScoreDAO.findByCandidature(c.getId());
+            java.util.List<org.example.model.CandidatureNote> notes = noteDAO.findByCandidature(c.getId());
+            pdfService.exportCandidature(c, ms, notes, file.getAbsolutePath());
+            new Alert(Alert.AlertType.INFORMATION, "PDF exported:\n" + file.getAbsolutePath()).showAndWait();
+        } catch (Exception e) {
+            new Alert(Alert.AlertType.ERROR, "PDF error: " + e.getMessage()).showAndWait();
         }
     }
 }

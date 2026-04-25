@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.controller.CandidatureDetailController">
+
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: #f4f6fb; -fx-background: #f4f6fb;">
+            <VBox spacing="16">
+                <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+
+                <!-- Student Info -->
+                <VBox spacing="8" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.07),10,0,0,3);">
+                    <Label text="Candidature Info" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+                    <HBox spacing="20">
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="Student" style="-fx-text-fill: #888; -fx-font-size: 11px;"/>
+                            <Label fx:id="lblStudent" text="-" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                        </VBox>
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="Offer" style="-fx-text-fill: #888; -fx-font-size: 11px;"/>
+                            <Label fx:id="lblOffer" text="-" style="-fx-font-weight: bold;"/>
+                        </VBox>
+                        <VBox spacing="4">
+                            <Label text="Status" style="-fx-text-fill: #888; -fx-font-size: 11px;"/>
+                            <Label fx:id="lblStatus" text="-" style="-fx-font-weight: bold;"/>
+                        </VBox>
+                        <VBox spacing="4">
+                            <Label text="Applied On" style="-fx-text-fill: #888; -fx-font-size: 11px;"/>
+                            <Label fx:id="lblDate" text="-"/>
+                        </VBox>
+                    </HBox>
+                    <HBox spacing="20">
+                        <VBox spacing="2" HBox.hgrow="ALWAYS">
+                            <Label text="CV" style="-fx-text-fill: #888; -fx-font-size: 11px;"/>
+                            <Label fx:id="lblCvPath" text="-"/>
+                        </VBox>
+                        <VBox spacing="2" HBox.hgrow="ALWAYS">
+                            <Label text="Portfolio" style="-fx-text-fill: #888; -fx-font-size: 11px;"/>
+                            <Label fx:id="lblPortfolio" text="-"/>
+                        </VBox>
+                    </HBox>
+                    <Label text="Motivation Letter" style="-fx-text-fill: #888; -fx-font-size: 11px;"/>
+                    <TextArea fx:id="motivationArea" prefRowCount="3" editable="false"
+                              style="-fx-background-color: #f8f8f8;"/>
+                </VBox>
+
+                <!-- AI Matching Score -->
+                <VBox spacing="10" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.07),10,0,0,3);">
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <Label text="🤖 AI Matching Score" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+                        <Button text="Calculate AI Score" onAction="#handleCalculateScore"
+                                style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 5 14;"/>
+                        <Button text="💡 Gemini Suggestions" onAction="#handleGeminiSuggestions"
+                                style="-fx-background-color: #06D6A0; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 5 14;"/>
+                        <Label fx:id="lblAiStatus" text="" style="-fx-text-fill: #888; -fx-font-size: 11px;"/>
+                    </HBox>
+
+                    <!-- Overall score -->
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <Label fx:id="lblOverallScore" text="--"
+                               style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+                        <Label fx:id="lblMatchLevel" text=""
+                               style="-fx-background-radius: 6; -fx-padding: 4 12; -fx-font-weight: bold;"/>
+                    </HBox>
+                    <ProgressBar fx:id="pbOverall" maxWidth="Infinity" prefHeight="14"/>
+
+                    <!-- Sub scores -->
+                    <GridPane hgap="12" vgap="6">
+                        <columnConstraints>
+                            <ColumnConstraints prefWidth="120"/>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                            <ColumnConstraints prefWidth="60"/>
+                        </columnConstraints>
+                        <Label text="Skills" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-size: 12px;"/>
+                        <ProgressBar fx:id="pbSkills" maxWidth="Infinity" prefHeight="10" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                        <Label fx:id="lblSkillsScore" text="--" GridPane.rowIndex="0" GridPane.columnIndex="2" style="-fx-font-size: 12px;"/>
+
+                        <Label text="Description" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-size: 12px;"/>
+                        <ProgressBar fx:id="pbDescription" maxWidth="Infinity" prefHeight="10" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                        <Label fx:id="lblDescScore" text="--" GridPane.rowIndex="1" GridPane.columnIndex="2" style="-fx-font-size: 12px;"/>
+
+                        <Label text="Keywords" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-size: 12px;"/>
+                        <ProgressBar fx:id="pbKeywords" maxWidth="Infinity" prefHeight="10" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                        <Label fx:id="lblKeywordsScore" text="--" GridPane.rowIndex="2" GridPane.columnIndex="2" style="-fx-font-size: 12px;"/>
+                    </GridPane>
+
+                    <!-- Skills chips -->
+                    <Label text="Matched Skills" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                    <FlowPane fx:id="matchedSkillsPane" hgap="6" vgap="6"/>
+
+                    <Label text="Missing Skills" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                    <FlowPane fx:id="missingSkillsPane" hgap="6" vgap="6"/>
+
+                    <Label text="Recommendations" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                    <TextArea fx:id="recommendationsArea" prefRowCount="3" editable="false"
+                              style="-fx-background-color: #f8f8f8;"/>
+                </VBox>
+
+                <!-- Status Update -->
+                <VBox spacing="8" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.07),10,0,0,3);">
+                    <Label text="Update Status" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+                    <HBox spacing="12" alignment="CENTER_LEFT">
+                        <ComboBox fx:id="statusCombo" prefWidth="160"/>
+                        <Button text="✔ Update Status" onAction="#handleUpdateStatus"
+                                style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 7 16;"/>
+                        <Button text="📄 Export PDF" onAction="#handleExportPDF"
+                                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 7 16;"/>
+                    </HBox>
+                    <Label text="Feedback"/>
+                    <TextArea fx:id="feedbackArea" prefRowCount="2"/>
+                </VBox>
+
+                <!-- Notes -->
+                <VBox spacing="10" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.07),10,0,0,3);">
+                    <Label text="Notes" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+
+                    <VBox fx:id="notesContainer" spacing="6"/>
+
+                    <Separator/>
+                    <Label text="Add Note" style="-fx-font-weight: bold; -fx-font-size: 13px;"/>
+                    <TextArea fx:id="noteContentArea" prefRowCount="2" promptText="Write your note here..."/>
+                    <HBox spacing="12" alignment="CENTER_LEFT">
+                        <Label text="Rating (1-5):"/>
+                        <Spinner fx:id="ratingSpinner" prefWidth="80"/>
+                        <CheckBox fx:id="privateCheck" text="Private"/>
+                        <Button text="➕ Add Note" onAction="#handleAddNote"
+                                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 7 16;"/>
+                    </HBox>
+                    <Label fx:id="notesMessage" text="" wrapText="true"/>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

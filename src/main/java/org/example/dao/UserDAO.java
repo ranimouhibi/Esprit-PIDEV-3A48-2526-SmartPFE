@@ -106,6 +106,7 @@ public class UserDAO {
         u.setName(rs.getString("name"));
         u.setPhone(rs.getString("phone"));
         u.setActive(rs.getBoolean("is_active"));
+        try { u.setEstablishmentId(rs.getInt("establishment_id")); } catch (Exception ignored) {}
         Timestamp ts = rs.getTimestamp("created_at");
         if (ts != null) u.setCreatedAt(ts.toLocalDateTime());
         return u;

@@ -34,6 +34,7 @@ public class SupervisorDashboardController implements Initializable {
     @FXML private Label navTasks;
     @FXML private Label navDocuments;
     @FXML private Label navComments;
+    @FXML private Label navCandidatures;
     @FXML private Label navProfile;
 
     private final ProjectDAO projectDAO = new ProjectDAO();
@@ -61,14 +62,8 @@ public class SupervisorDashboardController implements Initializable {
     }
 
     private void setActiveNav(Label activeLabel) {
-        navHome.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navMeetings.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navProjects.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navComments.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navDocuments.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navTasks.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navProfile.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        
+        Label[] all = {navHome, navMeetings, navProjects, navComments, navDocuments, navTasks, navCandidatures, navProfile};
+        for (Label l : all) if (l != null) l.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
         activeLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #a12c2f; -fx-cursor: hand;");
     }
 
@@ -141,10 +136,15 @@ public class SupervisorDashboardController implements Initializable {
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
         contentArea.setCenter(null);
         javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Users.fxml");
-        if (pane != null) {
-            contentArea.setCenter(pane);
-            pane.setVisible(true);
-        }
+        if (pane != null) { contentArea.setCenter(pane); pane.setVisible(true); }
+    }
+
+    @FXML public void showCandidatures() {
+        setActiveNav(navCandidatures);
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("SupervisorCandidatures.fxml");
+        if (pane != null) { contentArea.setCenter(pane); pane.setVisible(true); }
     }
 
     @FXML

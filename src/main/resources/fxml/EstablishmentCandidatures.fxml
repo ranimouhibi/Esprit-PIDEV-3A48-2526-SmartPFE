@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.controller.EstablishmentCandidaturesController"
+            style="-fx-background-color: #f4f6fb;">
+    <padding><Insets top="20" left="24" right="24" bottom="20"/></padding>
+
+    <top>
+        <VBox spacing="12">
+            <Label text="Applications Management" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+            <!-- Stats -->
+            <HBox spacing="14">
+                <VBox style="-fx-background-color: #1a1a2e; -fx-background-radius: 10; -fx-padding: 12 20;" alignment="CENTER">
+                    <Label text="Total" style="-fx-text-fill: #aaa; -fx-font-size: 11px;"/>
+                    <Label fx:id="statTotal" text="0" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                </VBox>
+                <VBox style="-fx-background-color: #ffc107; -fx-background-radius: 10; -fx-padding: 12 20;" alignment="CENTER">
+                    <Label text="Pending" style="-fx-text-fill: #333; -fx-font-size: 11px;"/>
+                    <Label fx:id="statPending" text="0" style="-fx-text-fill: #333; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                </VBox>
+                <VBox style="-fx-background-color: #28a745; -fx-background-radius: 10; -fx-padding: 12 20;" alignment="CENTER">
+                    <Label text="Accepted" style="-fx-text-fill: white; -fx-font-size: 11px;"/>
+                    <Label fx:id="statAccepted" text="0" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                </VBox>
+                <VBox style="-fx-background-color: #dc3545; -fx-background-radius: 10; -fx-padding: 12 20;" alignment="CENTER">
+                    <Label text="Rejected" style="-fx-text-fill: white; -fx-font-size: 11px;"/>
+                    <Label fx:id="statRejected" text="0" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                </VBox>
+            </HBox>
+            <!-- Filters -->
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <ComboBox fx:id="offerFilter" promptText="Filter by offer" prefWidth="220"/>
+                <ComboBox fx:id="statusFilter" prefWidth="140"/>
+                <TextField fx:id="searchField" promptText="Search student..." prefWidth="200"/>
+                <Button text="🔄 Refresh" onAction="#handleRefresh"
+                        style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 7 14;"/>
+            </HBox>
+            <padding><Insets bottom="4"/></padding>
+        </VBox>
+    </top>
+
+    <center>
+        <TableView fx:id="candidatureTable">
+            <columns>
+                <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                <TableColumn fx:id="colStudent" text="Student" prefWidth="160"/>
+                <TableColumn fx:id="colOffer" text="Offer" prefWidth="180"/>
+                <TableColumn fx:id="colStatus" text="Status" prefWidth="100"/>
+                <TableColumn fx:id="colScore" text="AI Score" prefWidth="90"/>
+                <TableColumn fx:id="colLevel" text="Level" prefWidth="90"/>
+                <TableColumn fx:id="colDate" text="Applied" prefWidth="110"/>
+            </columns>
+            <placeholder><Label text="No applications found"/></placeholder>
+        </TableView>
+    </center>
+
+    <bottom>
+        <HBox spacing="10">
+            <padding><Insets top="10"/></padding>
+            <Button text="👁 View Detail" onAction="#handleViewDetail"
+                    style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 8 16;"/>
+            <Button text="🤖 Calculate AI Score" onAction="#handleCalculateScore"
+                    style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 8 16;"/>
+            <Button text="⚖ Compare Selected" onAction="#handleCompare"
+                    style="-fx-background-color: #06D6A0; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 8 16;"/>
+            <Button text="📊 Statistics" onAction="#handleStats"
+                    style="-fx-background-color: #ffc107; -fx-text-fill: #333; -fx-background-radius: 6; -fx-padding: 8 16;"/>
+            <Label fx:id="statusLabel" text="" style="-fx-text-fill: #666; -fx-font-size: 12px;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

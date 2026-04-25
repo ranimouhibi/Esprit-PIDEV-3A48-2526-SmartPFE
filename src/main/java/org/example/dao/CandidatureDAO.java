@@ -71,7 +71,16 @@ public class CandidatureDAO {
             ps.setTimestamp(8, Timestamp.valueOf(LocalDateTime.now()));
             ps.executeUpdate();
             ResultSet keys = ps.getGeneratedKeys();
-            if (keys.next()) c.setId(keys.getInt(1));
+            if (keys.next()) {
+                c.setId(keys.getInt(1));
+                // Auto-calculate AI matching score asynchronously
+                final int candidatureId = c.getId();
+                new Thread(() -> {
+                    try {
+                        new org.example.service.AIMatchingService().calculateMatchingScore(candidatureId);
+                    } catch (Exception ignored) {}
+                }, "ai-score-" + candidatureId).start();
+            }
         }
     }
 
@@ -96,6 +105,13 @@ public class CandidatureDAO {
             ps.setInt(4, id);
             ps.executeUpdate();
         }
+        // Send email notification asynchronously
+        final String finalFeedback = feedback;
+        new Thread(() -> {
+            try {
+                new org.example.service.EmailNotificationService().sendStatusChange(id, status, finalFeedback);
+            } catch (Exception ignored) {}
+        }, "email-status-" + id).start();
     }
 
     public void delete(int id) throws SQLException {
