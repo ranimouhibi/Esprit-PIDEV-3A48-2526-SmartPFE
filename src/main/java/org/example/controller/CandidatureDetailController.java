@@ -173,11 +173,10 @@ public class CandidatureDetailController {
         try {
             candidatureDAO.updateStatus(currentCandidature.getId(), statusCombo.getValue(), feedbackArea.getText());
             lblStatus.setText(statusCombo.getValue());
-            // Send email notification
             emailService.sendStatusChange(currentCandidature.getId(), statusCombo.getValue(), feedbackArea.getText());
-            ModernAlert.show(ModernAlert.Type.INFO, "Information", "Status updated. Email notification sent.");
+            ModernAlert.show(ModernAlert.Type.SUCCESS, "Status Updated", "Status updated successfully.\nEmail notification sent to the student.");
         } catch (Exception e) {
-            new Alert(Alert.AlertType.ERROR, "Error: " + e.getMessage()).showAndWait();
+            ModernAlert.show(ModernAlert.Type.ERROR, "Error", "Failed to update status: " + e.getMessage());
         }
     }
 
@@ -193,9 +192,9 @@ public class CandidatureDetailController {
             MatchingScore ms = matchingScoreDAO.findByCandidature(currentCandidature.getId());
             java.util.List<CandidatureNote> notes = noteDAO.findByCandidature(currentCandidature.getId());
             pdfService.exportCandidature(currentCandidature, ms, notes, file.getAbsolutePath());
-            new Alert(Alert.AlertType.INFORMATION, "PDF exported to:\n" + file.getAbsolutePath()).showAndWait();
+            ModernAlert.show(ModernAlert.Type.SUCCESS, "PDF Exported", "Report saved to:\n" + file.getName());
         } catch (Exception e) {
-            new Alert(Alert.AlertType.ERROR, "PDF export failed: " + e.getMessage()).showAndWait();
+            ModernAlert.show(ModernAlert.Type.ERROR, "Export Failed", "PDF export failed: " + e.getMessage());
         }
     }
 
