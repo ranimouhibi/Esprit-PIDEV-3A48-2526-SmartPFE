@@ -1,0 +1,22 @@
+# ═══════════════════════════════════════════════════════════════════
+# SmartPFE - Configuration File EXAMPLE
+# ═══════════════════════════════════════════════════════════════════
+# 📋 Instructions:
+# 1. Copiez ce fichier et renommez-le en "config.properties"
+# 2. Remplissez vos vraies valeurs
+# 3. Ne commitez JAMAIS le fichier config.properties
+# ═══════════════════════════════════════════════════════════════════
+
+# ─────────────────────────────────────────────────────────────────
+# Email Configuration (Gmail)
+# ─────────────────────────────────────────────────────────────────
+mail.from=votre-email@gmail.com
+mail.password=YOUR_GMAIL_APP_PASSWORD
+mail.smtp.host=smtp.gmail.com
+mail.smtp.port=587
+
+# ─────────────────────────────────────────────────────────────────
+# Google Gemini AI Configuration (100% GRATUIT)
+# ─────────────────────────────────────────────────────────────────
+gemini.api.key=VOTRE_CLE_GEMINI_ICI
+gemini.test.mode=true

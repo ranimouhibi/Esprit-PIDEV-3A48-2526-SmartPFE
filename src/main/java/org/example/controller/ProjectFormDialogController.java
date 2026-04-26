@@ -4,7 +4,9 @@ import org.example.dao.ProjectDAO;
 import org.example.dao.UserDAO;
 import org.example.model.Project;
 import org.example.model.User;
+import org.example.util.MailUtil;
 import org.example.util.SessionManager;
+import org.example.util.NotificationUtil;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -142,12 +144,23 @@ public class ProjectFormDialogController implements Initializable {
             if (project == null) {
                 project = new Project();
                 project.setOwnerId(currentUser.getId());
-                // TODO: Set establishment_id when available in User model
             }
 
-            project.setTitle(titleField.getText().trim());
+            String title = titleField.getText().trim();
+            String type  = typeCombo.getValue();
+            int excludeId = project.getId(); // 0 for new, existing id for edit
+
+            // ── Uniqueness check ──────────────────────────────────────────
+            if (projectDAO.existsDuplicate(title, type, currentUser.getId(), excludeId)) {
+                titleError.setText("! A project with the same title and type already exists today");
+                titleField.setStyle("-fx-border-color: #dc2626; -fx-border-width: 2; -fx-border-radius: 8;");
+                showError("Duplicate project: a project named \"" + title + "\" (" + type + ") was already created today.");
+                return;
+            }
+
+            project.setTitle(title);
             project.setDescription(descriptionField.getText().trim());
-            project.setProjectType(typeCombo.getValue());
+            project.setProjectType(type);
             project.setStatus(statusCombo.getValue());
             
             // Join code
@@ -164,8 +177,30 @@ public class ProjectFormDialogController implements Initializable {
 
             if (project.getId() == 0) {
                 projectDAO.save(project);
+
+                // 🔔 Notification Desktop : Projet créé
+                NotificationUtil.Notifications.projectCreated(project.getTitle());
+
+                // 📧 Send emails: to supervisor + to owner (same as EmailService.php)
+                User owner = SessionManager.getCurrentUser();
+                // Re-fetch project to get supervisor email populated by DAO
+                Project savedProject = projectDAO.findById(project.getId());
+                if (savedProject != null) {
+                    MailUtil.sendProjectCreatedEmail(savedProject, owner);
+                }
             } else {
+                String oldStatus = projectDAO.findById(project.getId()) != null
+                    ? projectDAO.findById(project.getId()).getStatus() : null;
                 projectDAO.update(project);
+
+                // 🔔 Notification Desktop : Projet mis à jour
+                NotificationUtil.Notifications.projectUpdated(project.getTitle());
+
+                // 📧 Send status-change email if status changed
+                if (oldStatus != null && !oldStatus.equals(project.getStatus())) {
+                    User owner = SessionManager.getCurrentUser();
+                    MailUtil.sendProjectStatusChangedEmail(project, owner, oldStatus);
+                }
             }
 
             if (onSaveCallback != null) {
