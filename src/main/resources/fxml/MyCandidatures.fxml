@@ -52,14 +52,12 @@
           style="-fx-background-color: #f0f4ff; -fx-border-color: #667eea; -fx-border-width: 0 0 0 4;">
         <padding><Insets top="16" bottom="16" left="30" right="30"/></padding>
         <Label fx:id="editOfferTitle" text="" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
-
         <VBox spacing="6">
             <Label text="Motivation Letter *" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
             <TextArea fx:id="motivationField" prefRowCount="4"
                       style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
             <Label fx:id="motivationError" text="" style="-fx-text-fill: #ef4444; -fx-font-size: 11px;"/>
         </VBox>
-
         <HBox spacing="16">
             <VBox spacing="6" HBox.hgrow="ALWAYS">
                 <Label text="CV" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
@@ -77,13 +75,11 @@
                            style="-fx-pref-height: 34px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
             </VBox>
         </HBox>
-
         <VBox spacing="6" prefWidth="400">
             <Label text="GitHub URL (optional)" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
             <TextField fx:id="githubField"
                        style="-fx-pref-height: 34px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
         </VBox>
-
         <HBox spacing="12" alignment="CENTER_RIGHT">
             <Button text="Cancel" onAction="#handleCancelEdit"
                     style="-fx-background-color: transparent; -fx-text-fill: #666; -fx-cursor: hand;"/>
