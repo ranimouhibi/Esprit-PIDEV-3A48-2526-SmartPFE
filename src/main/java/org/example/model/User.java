@@ -11,6 +11,7 @@ public class User {
     private String phone;
     private boolean isActive;
     private LocalDateTime createdAt;
+    private String profilePicture; // stored as base64 or file path
 
     public User() {}
 
@@ -45,6 +46,9 @@ public class User {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public String getProfilePicture() { return profilePicture; }
+    public void setProfilePicture(String profilePicture) { this.profilePicture = profilePicture; }
 
     @Override
     public String toString() { return name + " (" + email + ")"; }

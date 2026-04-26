@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.controller.StudentProfileController"
+            style="-fx-background-color: #f4f6fb;">
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+                    style="-fx-background-color: transparent; -fx-background: #f4f6fb; -fx-border-color: transparent;">
+            <VBox spacing="0" style="-fx-background-color: #f4f6fb;">
+
+                <!-- ── HEADER BANNER ──────────────────────────────────── -->
+                <HBox style="-fx-background-color: #2d2d2d;" prefHeight="160" alignment="CENTER_LEFT">
+                    <padding><Insets left="60" right="60"/></padding>
+
+                    <!-- Avatar -->
+                    <StackPane fx:id="avatarStack" prefWidth="100" prefHeight="100"
+                               style="-fx-background-color: #a12c2f; -fx-background-radius: 50; -fx-cursor: hand;"
+                               onMouseClicked="#chooseProfilePicture">
+                        <ImageView fx:id="avatarImage" fitWidth="100" fitHeight="100"
+                                   preserveRatio="false" visible="false" managed="false"/>
+                        <Label fx:id="avatarInitials" text="?"
+                               style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                        <VBox alignment="BOTTOM_CENTER" prefWidth="100" prefHeight="100" mouseTransparent="true">
+                            <Label text="📷"
+                                   style="-fx-font-size: 14px; -fx-background-color: rgba(0,0,0,0.5); -fx-padding: 3 0 2 0;"
+                                   maxWidth="100" alignment="CENTER"/>
+                        </VBox>
+                    </StackPane>
+
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <padding><Insets left="24"/></padding>
+                        <Label fx:id="headerName" text="Student Name"
+                               style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                        <Label fx:id="headerEmail" text="email@example.com"
+                               style="-fx-font-size: 13px; -fx-text-fill: #aaa;"/>
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label fx:id="headerRole" text="Student"
+                                   style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 3 12;"/>
+                            <Label fx:id="headerMember" text=""
+                                   style="-fx-text-fill: #888; -fx-font-size: 11px;"/>
+                        </HBox>
+                    </VBox>
+                </HBox>
+
+                <!-- ── BODY ───────────────────────────────────────────── -->
+                <HBox spacing="24">
+                    <padding><Insets top="32" bottom="40" left="60" right="60"/></padding>
+
+                    <!-- LEFT — Personal Info -->
+                    <VBox spacing="18" HBox.hgrow="ALWAYS"
+                          style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 12, 0, 0, 3);">
+                        <padding><Insets top="28" bottom="28" left="28" right="28"/></padding>
+
+                        <VBox spacing="4">
+                            <Label text="Personal Information"
+                                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+                            <Label text="Update your name, email and phone number"
+                                   style="-fx-font-size: 12px; -fx-text-fill: #888;"/>
+                        </VBox>
+                        <Separator/>
+
+                        <VBox spacing="6">
+                            <Label text="Full Name" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #444;"/>
+                            <TextField fx:id="nameField" promptText="Your full name"
+                                       style="-fx-pref-height: 42px; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e0e0e0; -fx-border-width: 1.5; -fx-background-color: #fafafa; -fx-padding: 0 14; -fx-font-size: 13px;"/>
+                            <Label fx:id="nameError" text="" style="-fx-text-fill: #dc2626; -fx-font-size: 11px;" visible="false" managed="false"/>
+                        </VBox>
+
+                        <VBox spacing="6">
+                            <Label text="Email Address" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #444;"/>
+                            <TextField fx:id="emailField" promptText="name@example.com"
+                                       style="-fx-pref-height: 42px; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e0e0e0; -fx-border-width: 1.5; -fx-background-color: #fafafa; -fx-padding: 0 14; -fx-font-size: 13px;"/>
+                            <Label fx:id="emailError" text="" style="-fx-text-fill: #dc2626; -fx-font-size: 11px;" visible="false" managed="false"/>
+                        </VBox>
+
+                        <VBox spacing="6">
+                            <Label text="Phone Number" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #444;"/>
+                            <TextField fx:id="phoneField" promptText="+213 6XX XXX XXX"
+                                       style="-fx-pref-height: 42px; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e0e0e0; -fx-border-width: 1.5; -fx-background-color: #fafafa; -fx-padding: 0 14; -fx-font-size: 13px;"/>
+                            <Label fx:id="phoneError" text="" style="-fx-text-fill: #dc2626; -fx-font-size: 11px;" visible="false" managed="false"/>
+                        </VBox>
+
+                        <Label fx:id="infoFeedback" text="" wrapText="true"
+                               style="-fx-font-size: 12px; -fx-font-weight: bold;" visible="false" managed="false"/>
+
+                        <Button text="Save Changes" onAction="#handleSaveInfo"
+                                prefHeight="42" maxWidth="Infinity"
+                                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;"/>
+                    </VBox>
+
+                    <!-- RIGHT column -->
+                    <VBox spacing="24" prefWidth="320" minWidth="280">
+
+                        <!-- Profile Picture card -->
+                        <VBox spacing="14"
+                              style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 12, 0, 0, 3);">
+                            <padding><Insets top="24" bottom="24" left="24" right="24"/></padding>
+
+                            <VBox spacing="4">
+                                <Label text="Profile Picture"
+                                       style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+                                <Label text="Click the avatar or choose a photo below"
+                                       style="-fx-font-size: 11px; -fx-text-fill: #888;" wrapText="true"/>
+                            </VBox>
+                            <Separator/>
+
+                            <StackPane fx:id="previewStack" prefWidth="80" prefHeight="80" maxWidth="80"
+                                       style="-fx-background-color: #a12c2f; -fx-background-radius: 40;">
+                                <ImageView fx:id="previewImage" fitWidth="80" fitHeight="80"
+                                           preserveRatio="false" visible="false" managed="false"/>
+                                <Label fx:id="previewInitials" text="?"
+                                       style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                            </StackPane>
+
+                            <Button text="Choose Photo" onAction="#chooseProfilePicture"
+                                    prefHeight="38" maxWidth="Infinity"
+                                    style="-fx-background-color: #f4f6fb; -fx-text-fill: #333; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-border-color: #ddd; -fx-border-radius: 10; -fx-cursor: hand;"/>
+
+                            <Button fx:id="removePicBtn" text="Remove Photo" onAction="#removeProfilePicture"
+                                    prefHeight="38" maxWidth="Infinity"
+                                    style="-fx-background-color: transparent; -fx-text-fill: #dc2626; -fx-font-size: 12px; -fx-background-radius: 10; -fx-border-color: #fca5a5; -fx-border-radius: 10; -fx-cursor: hand;"
+                                    visible="false" managed="false"/>
+
+                            <Label fx:id="picFeedback" text="" wrapText="true"
+                                   style="-fx-font-size: 11px;" visible="false" managed="false"/>
+                        </VBox>
+
+                        <!-- Change Password card -->
+                        <VBox spacing="14"
+                              style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 12, 0, 0, 3);">
+                            <padding><Insets top="24" bottom="24" left="24" right="24"/></padding>
+
+                            <VBox spacing="4">
+                                <Label text="Change Password"
+                                       style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+                                <Label text="Leave blank to keep current password"
+                                       style="-fx-font-size: 11px; -fx-text-fill: #888;"/>
+                            </VBox>
+                            <Separator/>
+
+                            <VBox spacing="6">
+                                <Label text="Current Password" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #444;"/>
+                                <PasswordField fx:id="currentPassField" promptText="••••••••"
+                                               style="-fx-pref-height: 40px; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e0e0e0; -fx-border-width: 1.5; -fx-background-color: #fafafa; -fx-padding: 0 14; -fx-font-size: 13px;"/>
+                                <Label fx:id="currentPassError" text="" style="-fx-text-fill: #dc2626; -fx-font-size: 11px;" visible="false" managed="false"/>
+                            </VBox>
+
+                            <VBox spacing="6">
+                                <Label text="New Password" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #444;"/>
+                                <PasswordField fx:id="newPassField" promptText="Min. 8 chars, 1 uppercase, 1 digit"
+                                               style="-fx-pref-height: 40px; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e0e0e0; -fx-border-width: 1.5; -fx-background-color: #fafafa; -fx-padding: 0 14; -fx-font-size: 13px;"/>
+                                <Label fx:id="newPassError" text="" style="-fx-text-fill: #dc2626; -fx-font-size: 11px;" visible="false" managed="false"/>
+                            </VBox>
+
+                            <VBox spacing="6">
+                                <Label text="Confirm New Password" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #444;"/>
+                                <PasswordField fx:id="confirmPassField" promptText="Repeat new password"
+                                               style="-fx-pref-height: 40px; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e0e0e0; -fx-border-width: 1.5; -fx-background-color: #fafafa; -fx-padding: 0 14; -fx-font-size: 13px;"/>
+                                <Label fx:id="confirmPassError" text="" style="-fx-text-fill: #dc2626; -fx-font-size: 11px;" visible="false" managed="false"/>
+                            </VBox>
+
+                            <Label fx:id="passFeedback" text="" wrapText="true"
+                                   style="-fx-font-size: 12px; -fx-font-weight: bold;" visible="false" managed="false"/>
+
+                            <Button text="Update Password" onAction="#handleChangePassword"
+                                    prefHeight="40" maxWidth="Infinity"
+                                    style="-fx-background-color: #1e1e1e; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;"/>
+                        </VBox>
+
+                    </VBox>
+                </HBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>
