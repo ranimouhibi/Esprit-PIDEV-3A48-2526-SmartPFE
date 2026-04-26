@@ -36,6 +36,10 @@ public class SupervisorDashboardController implements Initializable {
     @FXML private VBox supChatMessages;
     @FXML private TextField supChatInput;
     @FXML private ScrollPane supChatScroll;
+    @FXML private VBox supChatPanel;
+    @FXML private Button supChatFab;
+
+
 
     // Navigation labels
     @FXML private HBox navBar;
@@ -58,10 +62,19 @@ public class SupervisorDashboardController implements Initializable {
         User user = SessionManager.getCurrentUser();
         if (user != null) welcomeLabel.setText("WELCOME " + user.getName().toUpperCase());
         loadStats();
-        if (supChatMessages != null) {
-            addBotMessage("Hi! I'm your SmartPFE assistant. Ask me about projects, sprints, tasks, or meetings.");
+    }
+
+    @FXML public void handleSupChatToggle() {
+        if (supChatPanel == null) return;
+        boolean show = !supChatPanel.isVisible();
+        supChatPanel.setVisible(show);
+        supChatPanel.setManaged(show);
+        if (supChatFab != null) supChatFab.setText(show ? "✕" : "🤖");
+        if (show && supChatMessages != null && supChatMessages.getChildren().isEmpty()) {
+            addBotMessage("Hi! I'm your SmartPFE assistant. Ask me anything or pick a suggestion below.");
             Platform.runLater(this::showSuggestedQuestions);
         }
+        if (show && supChatScroll != null) Platform.runLater(() -> supChatScroll.setVvalue(1.0));
     }
 
     private void loadStats() {
@@ -208,7 +221,10 @@ public class SupervisorDashboardController implements Initializable {
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
         contentArea.setCenter(null);
         javafx.scene.layout.Pane pane = NavigationUtil.loadPane(fxml);
-        if (pane != null) { contentArea.setCenter(pane); pane.setVisible(true); }
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
     }
 
     private void setActiveNav(Label activeLabel) {
@@ -220,8 +236,11 @@ public class SupervisorDashboardController implements Initializable {
     @FXML public void showHome() {
         setActiveNav(navHome);
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
-        contentArea.setCenter(null);
         javafx.scene.Node node = homePane.getParent() instanceof ScrollPane sp ? sp : homePane;
+        if (node instanceof ScrollPane sp) {
+            sp.setPrefHeight(javafx.scene.layout.Region.USE_COMPUTED_SIZE);
+            sp.setMaxHeight(Double.MAX_VALUE);
+        }
         contentArea.setCenter(node);
         if (node != null) node.setVisible(true);
         loadStats();

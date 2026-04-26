@@ -93,7 +93,7 @@
     </VBox>
 
     <!-- Candidatures List -->
-    <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER"
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
                 style="-fx-background-color: transparent; -fx-border-color: transparent;">
         <VBox fx:id="candidaturesContainer" spacing="12">
             <padding><Insets top="20" bottom="20" left="30" right="30"/></padding>

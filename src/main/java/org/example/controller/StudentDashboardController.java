@@ -40,6 +40,9 @@ public class StudentDashboardController implements Initializable {
 
     // Chatbot
     @FXML private VBox chatbotPanel;
+    @FXML private Button chatFab;
+
+
     @FXML private VBox chatMessages;
     @FXML private TextField chatInput;
     @FXML private ScrollPane chatScroll;
@@ -64,10 +67,6 @@ public class StudentDashboardController implements Initializable {
         User user = SessionManager.getCurrentUser();
         if (user != null) welcomeLabel.setText("WELCOME " + user.getName().toUpperCase());
         loadStats();
-        if (chatMessages != null) {
-            addBotMessage("Hi! I'm your SmartPFE assistant. Ask me anything or pick a suggestion below.");
-            Platform.runLater(this::showSuggestedQuestions);
-        }
     }
 
     private void loadStats() {
@@ -109,8 +108,20 @@ public class StudentDashboardController implements Initializable {
 
     // ── Chatbot ───────────────────────────────────────────────────────────────
 
+    @FXML public void handleChatToggle() {
+        if (chatbotPanel == null) return;
+        boolean show = !chatbotPanel.isVisible();
+        chatbotPanel.setVisible(show);
+        chatbotPanel.setManaged(show);
+        if (chatFab != null) chatFab.setText(show ? "✕" : "🤖");
+        if (show && chatMessages != null && chatMessages.getChildren().isEmpty()) {
+            addBotMessage("Hi! I'm your SmartPFE assistant. Ask me anything or pick a suggestion below.");
+            Platform.runLater(this::showSuggestedQuestions);
+        }
+        if (show) scrollChatToBottom();
+    }
+
     @FXML public void handleChatSend() {
-        if (chatInput == null || chatInput.getText().isBlank()) return;
         String msg = chatInput.getText().trim();
         chatInput.clear();
         addUserMessage(msg);
@@ -252,7 +263,10 @@ public class StudentDashboardController implements Initializable {
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
         contentArea.setCenter(null);
         javafx.scene.layout.Pane pane = NavigationUtil.loadPane(fxml);
-        if (pane != null) { contentArea.setCenter(pane); pane.setVisible(true); }
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
     }
 
     private void setActiveNav(Label activeLabel) {
@@ -264,8 +278,11 @@ public class StudentDashboardController implements Initializable {
     @FXML public void showHome() {
         setActiveNav(navHome);
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
-        contentArea.setCenter(null);
         javafx.scene.Node node = homePane.getParent() instanceof ScrollPane sp ? sp : homePane;
+        if (node instanceof ScrollPane sp) {
+            sp.setPrefHeight(javafx.scene.layout.Region.USE_COMPUTED_SIZE);
+            sp.setMaxHeight(Double.MAX_VALUE);
+        }
         contentArea.setCenter(node);
         if (node != null) node.setVisible(true);
         loadStats();

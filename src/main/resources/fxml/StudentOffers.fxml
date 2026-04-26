@@ -79,7 +79,7 @@
 
     <!-- ═══ LIST VIEW ═══ -->
     <VBox fx:id="listView" VBox.vgrow="ALWAYS">
-        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" hbarPolicy="NEVER"
+        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
                     style="-fx-background-color: transparent; -fx-border-color: transparent;">
             <VBox spacing="20">
                 <padding><Insets top="20" bottom="20" left="30" right="30"/></padding>

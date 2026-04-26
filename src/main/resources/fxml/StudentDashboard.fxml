@@ -3,9 +3,10 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.example.controller.StudentDashboardController"
-      spacing="0" style="-fx-background-color: #f4f6fb;">
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="org.example.controller.StudentDashboardController">
+
+<VBox spacing="0" style="-fx-background-color: #f4f6fb;">
 
     <!-- NAVBAR -->
     <HBox alignment="CENTER_LEFT"
@@ -37,7 +38,8 @@
     <!-- CONTENT AREA -->
     <BorderPane fx:id="contentArea" VBox.vgrow="ALWAYS">
         <center>
-            <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                        VBox.vgrow="ALWAYS"
                         style="-fx-background-color: transparent; -fx-border-color: transparent;">
                 <VBox fx:id="homePane" spacing="0">
 
@@ -172,37 +174,60 @@
                                 style="-fx-background-color: white; -fx-text-fill: #a12c2f; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 22; -fx-cursor: hand;"/>
                     </HBox>
 
-                    <!-- CHATBOT WIDGET -->
-                    <VBox fx:id="chatbotPanel" spacing="0"
-                          style="-fx-background-color: white; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.12),16,0,0,4);">
-                        <padding><Insets left="60" right="60" top="30" bottom="30"/></padding>
-                        <HBox alignment="CENTER_LEFT" spacing="10">
-                            <Label text="🤖" style="-fx-font-size: 22px;"/>
-                            <VBox spacing="2">
-                                    <Label text="SmartPFE Assistant" style="-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1a1a2e;"/>
-                                    <Label text="Ask me anything about offers, candidatures, or your projects"
-                                           style="-fx-font-size: 11px; -fx-text-fill: #888;"/>
-                            </VBox>
-                        </HBox>
-                        <Separator style="-fx-padding: 8 0;"/>
-                        <ScrollPane fx:id="chatScroll" fitToWidth="true" prefHeight="200" hbarPolicy="NEVER"
-                                    style="-fx-background-color: #f8f8f8; -fx-background: #f8f8f8; -fx-border-color: transparent;">
-                            <VBox fx:id="chatMessages" spacing="6">
-                                <padding><Insets top="10" bottom="10" left="10" right="10"/></padding>
-                            </VBox>
-                        </ScrollPane>
-                        <HBox spacing="8" alignment="CENTER_LEFT">
-                            <padding><Insets top="10"/></padding>
-                            <TextField fx:id="chatInput" promptText="Ask a question..." HBox.hgrow="ALWAYS"
-                                       style="-fx-pref-height: 38px; -fx-background-radius: 20; -fx-border-radius: 20; -fx-border-color: #ddd; -fx-padding: 0 14;"
-                                       onAction="#handleChatSend"/>
-                            <Button text="Send" onAction="#handleChatSend"
-                                    style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand; -fx-font-weight: bold;"/>
-                        </HBox>
-                    </VBox>
-
                 </VBox>
             </ScrollPane>
         </center>
     </BorderPane>
 </VBox>
+
+<!-- ── FLOATING CHATBOT ── -->
+<StackPane alignment="BOTTOM_RIGHT" pickOnBounds="false">
+    <padding><Insets bottom="24" right="24"/></padding>
+    <VBox spacing="0" alignment="BOTTOM_RIGHT" pickOnBounds="false">
+
+        <!-- Chat popup panel (hidden by default) -->
+        <VBox fx:id="chatbotPanel" spacing="0" visible="false" managed="false"
+              style="-fx-background-color: white; -fx-background-radius: 16;
+                     -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.22),20,0,0,6);
+                     -fx-border-color: #e0e0e0; -fx-border-radius: 16; -fx-border-width: 1;"
+              prefWidth="340" maxHeight="460">
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="10"
+                  style="-fx-background-color: #a12c2f; -fx-background-radius: 16 16 0 0; -fx-padding: 12 16;">
+                <Label text="🤖" style="-fx-font-size: 18px;"/>
+                <VBox spacing="1" HBox.hgrow="ALWAYS">
+                    <Label text="SmartPFE Assistant" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: white;"/>
+                    <Label text="Ask about offers &amp; candidatures" style="-fx-font-size: 10px; -fx-text-fill: rgba(255,255,255,0.75);"/>
+                </VBox>
+                <Button text="✕" onAction="#handleChatToggle"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-cursor: hand; -fx-padding: 0 4;"/>
+            </HBox>
+            <!-- Messages -->
+            <ScrollPane fx:id="chatScroll" fitToWidth="true" prefHeight="300" hbarPolicy="NEVER"
+                        style="-fx-background-color: #f8f8f8; -fx-background: #f8f8f8; -fx-border-color: transparent;">
+                <VBox fx:id="chatMessages" spacing="5">
+                    <padding><Insets top="10" bottom="10" left="10" right="10"/></padding>
+                </VBox>
+            </ScrollPane>
+            <!-- Input -->
+            <HBox spacing="8" alignment="CENTER_LEFT"
+                  style="-fx-background-color: white; -fx-background-radius: 0 0 16 16; -fx-padding: 10 12; -fx-border-color: #eee; -fx-border-width: 1 0 0 0;">
+                <TextField fx:id="chatInput" promptText="Ask a question..." HBox.hgrow="ALWAYS"
+                           style="-fx-pref-height: 34px; -fx-background-radius: 17; -fx-border-radius: 17; -fx-border-color: #ddd; -fx-padding: 0 12;"
+                           onAction="#handleChatSend"/>
+                <Button text="➤" onAction="#handleChatSend"
+                        style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 17; -fx-padding: 7 14; -fx-cursor: hand; -fx-font-weight: bold;"/>
+            </HBox>
+        </VBox>
+
+        <!-- FAB button -->
+        <Button fx:id="chatFab" text="🤖" onAction="#handleChatToggle"
+                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-size: 22px;
+                       -fx-background-radius: 30; -fx-min-width: 58; -fx-min-height: 58;
+                       -fx-cursor: hand; -fx-effect: dropshadow(gaussian,rgba(161,44,47,0.5),14,0,0,4);">
+            <VBox.margin><Insets top="8"/></VBox.margin>
+        </Button>
+    </VBox>
+</StackPane>
+
+</StackPane>

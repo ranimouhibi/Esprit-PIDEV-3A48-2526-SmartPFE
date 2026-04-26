@@ -33,10 +33,14 @@ public class EstablishmentDashboardController implements Initializable {
     @FXML private BorderPane contentArea;
     @FXML private VBox homePane;
 
+
+
     @FXML private TextArea aiSuggestionsArea;
     @FXML private VBox estChatMessages;
     @FXML private TextField estChatInput;
     @FXML private ScrollPane estChatScroll;
+    @FXML private VBox estChatPanel;
+    @FXML private Button estChatFab;
 
     private final UserDAO userDAO = new UserDAO();
     private final ProjectDAO projectDAO = new ProjectDAO();
@@ -49,10 +53,19 @@ public class EstablishmentDashboardController implements Initializable {
         User user = SessionManager.getCurrentUser();
         if (user != null) welcomeLabel.setText("WELCOME " + user.getName().toUpperCase());
         loadStats();
-        if (estChatMessages != null) {
+    }
+
+    @FXML public void handleEstChatToggle() {
+        if (estChatPanel == null) return;
+        boolean show = !estChatPanel.isVisible();
+        estChatPanel.setVisible(show);
+        estChatPanel.setManaged(show);
+        if (estChatFab != null) estChatFab.setText(show ? "✕" : "🤖");
+        if (show && estChatMessages != null && estChatMessages.getChildren().isEmpty()) {
             addBotMessage("Hi! I'm your SmartPFE assistant. Ask me anything or pick a suggestion below.");
             Platform.runLater(this::showEstSuggestedQuestions);
         }
+        if (show && estChatScroll != null) Platform.runLater(() -> estChatScroll.setVvalue(1.0));
     }
 
     private void loadStats() {
@@ -223,13 +236,20 @@ public class EstablishmentDashboardController implements Initializable {
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
         contentArea.setCenter(null);
         Pane pane = NavigationUtil.loadPane(fxml);
-        if (pane != null) { contentArea.setCenter(pane); pane.setVisible(true); }
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
     }
 
     @FXML public void showHome() {
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
-        contentArea.setCenter(null);
         javafx.scene.Node node = homePane.getParent() instanceof ScrollPane sp ? sp : homePane;
+        // Reset prefHeight before re-attaching to prevent JavaFX from freezing it
+        if (node instanceof ScrollPane sp) {
+            sp.setPrefHeight(javafx.scene.layout.Region.USE_COMPUTED_SIZE);
+            sp.setMaxHeight(Double.MAX_VALUE);
+        }
         contentArea.setCenter(node);
         if (node != null) node.setVisible(true);
         loadStats();

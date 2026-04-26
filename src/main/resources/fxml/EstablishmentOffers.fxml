@@ -49,7 +49,7 @@
     </HBox>
 
     <!-- Scrollable body: form + offers grid -->
-    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" hbarPolicy="NEVER"
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
                 style="-fx-background-color: transparent; -fx-border-color: transparent;">
         <VBox spacing="0">
 
