@@ -140,7 +140,7 @@ public class SupervisorDashboardController implements Initializable {
         setActiveNav(navProfile);
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
         contentArea.setCenter(null);
-        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Users.fxml");
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("UserProfile.fxml");
         if (pane != null) {
             contentArea.setCenter(pane);
             pane.setVisible(true);

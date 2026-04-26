@@ -161,7 +161,7 @@ public class StudentDashboardController implements Initializable {
         setActiveNav(navProfile);
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
         contentArea.setCenter(null);
-        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Users.fxml");
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("StudentProfile.fxml");
         if (pane != null) {
             contentArea.setCenter(pane);
             pane.setVisible(true);

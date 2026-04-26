@@ -46,6 +46,7 @@ public class DashboardController implements Initializable {
     @FXML private Button btnMeetings;
     @FXML private Button btnCandidatures;
     @FXML private Button btnUsers;
+    @FXML private Button btnAuditLog;
 
     private static final String STYLE_INACTIVE = "-fx-background-color: transparent; -fx-text-fill: #ccc; -fx-alignment: CENTER-LEFT; -fx-cursor: hand; -fx-font-size: 13px; -fx-background-radius: 8; -fx-padding: 9 12;";
     private static final String STYLE_ACTIVE   = "-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-alignment: CENTER-LEFT; -fx-cursor: hand; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 9 12;";
@@ -79,7 +80,7 @@ public class DashboardController implements Initializable {
     }
 
     private void setActiveButton(Button active) {
-        Button[] all = {btnProjects, btnComments, btnDocuments, btnSprints, btnTasks, btnMeetings, btnCandidatures, btnUsers};
+        Button[] all = {btnProjects, btnComments, btnDocuments, btnSprints, btnTasks, btnMeetings, btnCandidatures, btnUsers, btnAuditLog};
         for (Button b : all) {
             b.setStyle(STYLE_INACTIVE);
         }
@@ -87,8 +88,7 @@ public class DashboardController implements Initializable {
     }
 
     @FXML public void showDashboard() {
-        // Reset all buttons
-        Button[] all = {btnProjects, btnComments, btnDocuments, btnSprints, btnTasks, btnMeetings, btnCandidatures, btnUsers};
+        Button[] all = {btnProjects, btnComments, btnDocuments, btnSprints, btnTasks, btnMeetings, btnCandidatures, btnUsers, btnAuditLog};
         for (Button b : all) b.setStyle(STYLE_INACTIVE);
         contentArea.setCenter(statsPane);
         loadStats();
@@ -102,6 +102,7 @@ public class DashboardController implements Initializable {
     @FXML public void showMeetings()     { setActiveButton(btnMeetings);     loadContent("Meetings.fxml"); }
     @FXML public void showCandidatures() { setActiveButton(btnCandidatures); loadContent("Candidatures.fxml"); }
     @FXML public void showUsers()        { setActiveButton(btnUsers);        loadContent("Users.fxml"); }
+    @FXML public void showAuditLog()     { setActiveButton(btnAuditLog);     loadContent("AuditLog.fxml"); }
 
     private void loadContent(String fxml) {
         // Clear old content completely

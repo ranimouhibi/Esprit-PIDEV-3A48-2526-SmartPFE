@@ -66,6 +66,8 @@
                 <padding><Insets bottom="4"/></padding>
                 <Button fx:id="btnUsers" text="Users" onAction="#showUsers" maxWidth="Infinity"
                         style="-fx-background-color: transparent; -fx-text-fill: #ccc; -fx-alignment: CENTER-LEFT; -fx-cursor: hand; -fx-font-size: 13px; -fx-background-radius: 8; -fx-padding: 9 12;"/>
+                <Button fx:id="btnAuditLog" text="Audit Log" onAction="#showAuditLog" maxWidth="Infinity"
+                        style="-fx-background-color: transparent; -fx-text-fill: #ccc; -fx-alignment: CENTER-LEFT; -fx-cursor: hand; -fx-font-size: 13px; -fx-background-radius: 8; -fx-padding: 9 12;"/>
             </VBox>
 
             <VBox VBox.vgrow="ALWAYS"/>

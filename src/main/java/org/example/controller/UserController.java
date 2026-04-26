@@ -15,7 +15,6 @@ import java.util.ResourceBundle;
 public class UserController implements Initializable {
 
     @FXML private TableView<User> userTable;
-    @FXML private TableColumn<User, Integer> colId;
     @FXML private TableColumn<User, String> colName;
     @FXML private TableColumn<User, String> colEmail;
     @FXML private TableColumn<User, String> colRole;
@@ -36,7 +35,6 @@ public class UserController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
         colRole.setCellValueFactory(new PropertyValueFactory<>("role"));
