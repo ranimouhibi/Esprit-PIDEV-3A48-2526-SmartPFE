@@ -16,6 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import org.example.util.ModernAlert;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.scene.paint.Color;
@@ -174,7 +175,7 @@ public class CandidatureDetailController {
             lblStatus.setText(statusCombo.getValue());
             // Send email notification
             emailService.sendStatusChange(currentCandidature.getId(), statusCombo.getValue(), feedbackArea.getText());
-            new Alert(Alert.AlertType.INFORMATION, "Status updated. Email notification sent.").showAndWait();
+            ModernAlert.show(ModernAlert.Type.INFO, "Information", "Status updated. Email notification sent.");
         } catch (Exception e) {
             new Alert(Alert.AlertType.ERROR, "Error: " + e.getMessage()).showAndWait();
         }

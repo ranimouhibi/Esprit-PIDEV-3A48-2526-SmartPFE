@@ -14,6 +14,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import org.example.util.ModernAlert;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 
@@ -469,10 +470,9 @@ public class StudentOffersController implements Initializable {
     }
 
     private void showAlert(String title, String msg, Alert.AlertType type) {
-        Alert a = new Alert(type);
-        a.setTitle(title);
-        a.setHeaderText(null);
-        a.setContentText(msg);
-        a.showAndWait();
+        ModernAlert.Type mType = (type == Alert.AlertType.ERROR) ? ModernAlert.Type.ERROR :
+                                 (type == Alert.AlertType.WARNING) ? ModernAlert.Type.WARNING :
+                                 ModernAlert.Type.SUCCESS;
+        ModernAlert.show(mType, title, msg);
     }
 }

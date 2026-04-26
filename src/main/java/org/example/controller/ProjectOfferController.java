@@ -14,6 +14,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import org.example.util.ModernAlert;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -146,18 +147,15 @@ public class ProjectOfferController implements Initializable {
     @FXML
     public void handleDelete() {
         if (selectedOffer == null) { showMessage("Select an offer first.", true); return; }
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Delete this offer?", ButtonType.YES, ButtonType.NO);
-        confirm.showAndWait().ifPresent(btn -> {
-            if (btn == ButtonType.YES) {
-                try {
-                    offerDAO.delete(selectedOffer.getId());
-                    showMessage("Offer deleted.", false);
-                    handleClear();
-                    loadOffers();
-                    loadStats();
-                } catch (Exception e) { showMessage("Error: " + e.getMessage(), true); }
-            }
-        });
+        if (ModernAlert.confirmDelete(selectedOffer.getTitle())) {
+            try {
+                offerDAO.delete(selectedOffer.getId());
+                showMessage("Offer deleted.", false);
+                handleClear();
+                loadOffers();
+                loadStats();
+            } catch (Exception e) { showMessage("Error: " + e.getMessage(), true); }
+        }
     }
 
     @FXML

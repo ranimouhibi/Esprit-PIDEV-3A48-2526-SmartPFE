@@ -8,6 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import org.example.util.ModernAlert;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
@@ -105,17 +106,14 @@ public class SprintController implements Initializable {
     @FXML
     public void handleDelete() {
         if (selectedSprint == null) { showMessage("Sélectionnez un sprint.", true); return; }
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer ce sprint?", ButtonType.YES, ButtonType.NO);
-        confirm.showAndWait().ifPresent(btn -> {
-            if (btn == ButtonType.YES) {
-                try {
-                    sprintDAO.delete(selectedSprint.getId());
-                    showMessage("Sprint supprimé.", false);
-                    handleClear();
-                    loadSprints();
-                } catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
-            }
-        });
+        if (ModernAlert.confirmDelete(selectedSprint.getName())) {
+            try {
+                sprintDAO.delete(selectedSprint.getId());
+                showMessage("Sprint supprimé.", false);
+                handleClear();
+                loadSprints();
+            } catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
+        }
     }
 
     @FXML

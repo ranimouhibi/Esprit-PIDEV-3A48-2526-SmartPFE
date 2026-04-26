@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import org.example.util.ModernAlert;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -60,7 +61,7 @@ public class CandidaturesByOfferController {
     public void handleCompare() {
         List<Candidature> selected = candidatureTable.getSelectionModel().getSelectedItems();
         if (selected.size() < 2) {
-            new Alert(Alert.AlertType.INFORMATION, "Select 2 or 3 candidatures to compare (hold Ctrl).").showAndWait();
+            ModernAlert.show(ModernAlert.Type.INFO, "Information", "Select 2 or 3 candidatures to compare (hold Ctrl).");
             return;
         }
         try {

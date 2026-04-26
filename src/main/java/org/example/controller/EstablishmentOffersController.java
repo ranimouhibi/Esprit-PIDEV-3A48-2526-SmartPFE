@@ -11,6 +11,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import org.example.util.ModernAlert;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
@@ -338,18 +339,12 @@ public class EstablishmentOffersController implements Initializable {
     }
 
     private void handleDelete(Offer offer) {
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Delete Offer");
-        confirm.setHeaderText("Delete \"" + offer.getTitle() + "\"?");
-        confirm.setContentText("All related candidatures will also be deleted.");
-        Optional<ButtonType> result = confirm.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            try {
-                offerDAO.delete(offer.getId());
-                loadOffers();
-            } catch (Exception e) {
-                showAlert("Error", "Failed to delete: " + e.getMessage(), Alert.AlertType.ERROR);
-            }
+        if (!ModernAlert.confirmDelete(offer.getTitle())) return;
+        try {
+            offerDAO.delete(offer.getId());
+            loadOffers();
+        } catch (Exception e) {
+            showAlert("Error", "Failed to delete: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
@@ -382,10 +377,9 @@ public class EstablishmentOffersController implements Initializable {
     }
 
     private void showAlert(String title, String msg, Alert.AlertType type) {
-        Alert a = new Alert(type);
-        a.setTitle(title);
-        a.setHeaderText(null);
-        a.setContentText(msg);
-        a.showAndWait();
+        ModernAlert.Type mType = (type == Alert.AlertType.ERROR) ? ModernAlert.Type.ERROR :
+                                 (type == Alert.AlertType.WARNING) ? ModernAlert.Type.WARNING :
+                                 ModernAlert.Type.INFO;
+        ModernAlert.show(mType, title, msg);
     }
 }

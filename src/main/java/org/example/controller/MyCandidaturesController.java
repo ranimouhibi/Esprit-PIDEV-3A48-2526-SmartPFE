@@ -14,6 +14,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import org.example.util.ModernAlert;
 import javafx.scene.layout.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -300,18 +301,12 @@ public class MyCandidaturesController implements Initializable {
     }
 
     private void handleDelete(Candidature c) {
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Withdraw Application");
-        confirm.setHeaderText("Withdraw your application for \"" + c.getOfferTitle() + "\"?");
-        confirm.setContentText("This action cannot be undone.");
-        Optional<ButtonType> result = confirm.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            try {
-                candidatureDAO.delete(c.getId());
-                loadCandidatures();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (!ModernAlert.confirmDelete(c.getOfferTitle())) return;
+        try {
+            candidatureDAO.delete(c.getId());
+            loadCandidatures();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
