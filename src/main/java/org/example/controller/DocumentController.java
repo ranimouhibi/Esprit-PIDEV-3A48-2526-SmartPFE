@@ -2,6 +2,7 @@ package org.example.controller;
 
 import org.example.dao.DocumentDAO;
 import org.example.model.Document;
+import org.example.service.DocumentService;
 import org.example.util.PDFExporter;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -34,6 +35,7 @@ public class DocumentController implements Initializable {
     @FXML private Label statPresentations;
 
     private final DocumentDAO documentDAO = new DocumentDAO();
+    private final DocumentService documentService = new DocumentService();
     private List<Document> allDocs = new ArrayList<>();
     private List<Document> filteredDocs = new ArrayList<>();
 
@@ -251,12 +253,21 @@ public class DocumentController implements Initializable {
             info.getChildren().add(desc);
         }
 
+        // 🆕 Bouton AI Résumé
+        VBox actions = new VBox(8);
+        
+        Button aiSummaryBtn = new Button("📝 AI Summary");
+        aiSummaryBtn.setStyle("-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-font-size: 10px; -fx-background-radius: 6; -fx-padding: 6 12; -fx-cursor: hand;");
+        aiSummaryBtn.setOnAction(e -> handleGenerateAISummary(doc));
+
         // Delete button (admin)
         Button deleteBtn = new Button("Delete");
         deleteBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-size: 10px; -fx-background-radius: 6; -fx-padding: 6 12; -fx-cursor: hand;");
         deleteBtn.setOnAction(e -> handleDelete(doc));
 
-        card.getChildren().addAll(icon, info, deleteBtn);
+        actions.getChildren().addAll(aiSummaryBtn, deleteBtn);
+
+        card.getChildren().addAll(icon, info, actions);
         return card;
     }
 
@@ -286,6 +297,68 @@ public class DocumentController implements Initializable {
                 e.printStackTrace();
                 Alert err = new Alert(Alert.AlertType.ERROR);
                 err.setContentText("Failed to delete: " + e.getMessage());
+                err.showAndWait();
+            }
+        }
+    }
+
+    /**
+     * Générer un résumé AI pour un document
+     */
+    private void handleGenerateAISummary(Document doc) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("AI Summary");
+        confirm.setHeaderText("Generate AI Summary");
+        confirm.setContentText("This will analyze the document content and generate an AI-powered summary. Continue?");
+        
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                // Afficher un indicateur de chargement
+                Alert loading = new Alert(Alert.AlertType.INFORMATION);
+                loading.setTitle("Processing");
+                loading.setHeaderText("Generating AI Summary...");
+                loading.setContentText("Please wait while the AI analyzes the document.");
+                loading.show();
+                
+                // Générer le résumé
+                String summary = documentService.generateAISummary(doc.getId());
+                
+                loading.close();
+                
+                // Afficher le résumé
+                Alert summaryAlert = new Alert(Alert.AlertType.INFORMATION);
+                summaryAlert.setTitle("AI Summary");
+                summaryAlert.setHeaderText("Summary for: " + doc.getFilename());
+                
+                TextArea textArea = new TextArea(summary);
+                textArea.setWrapText(true);
+                textArea.setEditable(false);
+                textArea.setPrefRowCount(12);
+                
+                VBox vbox = new VBox(10);
+                vbox.setPadding(new Insets(10));
+                vbox.getChildren().addAll(
+                    new Label("AI-Generated Summary:"),
+                    textArea,
+                    new Label("This summary has been saved to the document description.")
+                );
+                
+                summaryAlert.getDialogPane().setContent(vbox);
+                summaryAlert.showAndWait();
+                
+                // Recharger les documents pour afficher le résumé mis à jour
+                loadDocuments();
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+                Alert err = new Alert(Alert.AlertType.ERROR);
+                err.setTitle("Error");
+                err.setHeaderText("Failed to generate AI summary");
+                err.setContentText("Error: " + e.getMessage() + "\n\nMake sure:\n" +
+                    "1. The document file exists\n" +
+                    "2. OpenAI API key is configured in AIUtil.java\n" +
+                    "3. The document contains readable text content");
                 err.showAndWait();
             }
         }

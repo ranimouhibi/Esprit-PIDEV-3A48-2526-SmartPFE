@@ -75,6 +75,32 @@ public class DocumentDAO {
         }
     }
 
+    public Document findById(int id) throws SQLException {
+        String sql = SELECT_BASE + "WHERE d.id = ?";
+        try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapRow(rs);
+            }
+        }
+        return null;
+    }
+
+    public void update(Document d) throws SQLException {
+        String sql = "UPDATE documents SET filename=?, file_path=?, file_type=?, category=?, description=?, version=? WHERE id=?";
+        try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
+            ps.setString(1, d.getFilename());
+            ps.setString(2, d.getFilePath());
+            ps.setString(3, d.getFileType());
+            ps.setString(4, d.getCategory());
+            ps.setString(5, d.getDescription());
+            ps.setInt(6, d.getVersion());
+            ps.setInt(7, d.getId());
+            ps.executeUpdate();
+        }
+    }
+
     private Document mapRow(ResultSet rs) throws SQLException {
         Document d = new Document();
         d.setId(rs.getInt("id"));
