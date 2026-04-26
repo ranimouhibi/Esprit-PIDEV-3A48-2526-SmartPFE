@@ -37,3 +37,12 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Sensitive files - credentials ###
+# Configuration file with passwords and API keys
+src/main/resources/config.properties
+
+# Generated files
+charts/
+qrcodes/
+thumbnails/

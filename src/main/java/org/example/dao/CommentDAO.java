@@ -65,6 +65,30 @@ public class CommentDAO {
         }
     }
 
+    /**
+     * Check if a comment with the same subject, content and author already exists on the same day
+     * Used for uniqueness validation before saving
+     */
+    public boolean existsDuplicate(String subject, String content, int authorId, int commentableId, int excludeId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM comments " +
+                     "WHERE LOWER(TRIM(subject)) = LOWER(TRIM(?)) " +
+                     "AND LOWER(TRIM(content)) = LOWER(TRIM(?)) " +
+                     "AND author_id = ? " +
+                     "AND commentable_id = ? " +
+                     "AND DATE(created_at) = CURDATE() " +
+                     "AND id != ?";
+        try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
+            ps.setString(1, subject != null ? subject : "");
+            ps.setString(2, content);
+            ps.setInt(3, authorId);
+            ps.setInt(4, commentableId);
+            ps.setInt(5, excludeId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1) > 0;
+        }
+        return false;
+    }
+
     public void update(Comment c) throws SQLException {
         String sql = "UPDATE comments SET content=?, subject=?, comment_type=?, target=?, importance=? WHERE id=?";
         try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
