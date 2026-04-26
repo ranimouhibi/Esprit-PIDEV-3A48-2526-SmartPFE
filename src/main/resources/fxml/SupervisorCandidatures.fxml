@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.controller.SupervisorCandidaturesController"
+            style="-fx-background-color: #f4f6fb;">
+    <padding><Insets top="20" left="24" right="24" bottom="20"/></padding>
+
+    <top>
+        <VBox spacing="10">
+            <Label text="Candidatures Review" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+            <Label text="Review candidatures for offers assigned to you as supervisor."
+                   style="-fx-text-fill: #888; -fx-font-size: 12px;"/>
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <ComboBox fx:id="offerFilter" promptText="Filter by offer" prefWidth="240"/>
+                <ComboBox fx:id="statusFilter" prefWidth="140"/>
+                <TextField fx:id="searchField" promptText="Search student..." prefWidth="200"/>
+                <Button text="🔄 Refresh" onAction="#handleRefresh"
+                        style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 7 14;"/>
+            </HBox>
+            <padding><Insets bottom="4"/></padding>
+        </VBox>
+    </top>
+
+    <center>
+        <TableView fx:id="candidatureTable">
+            <columns>
+                <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                <TableColumn fx:id="colStudent" text="Student" prefWidth="160"/>
+                <TableColumn fx:id="colOffer" text="Offer" prefWidth="200"/>
+                <TableColumn fx:id="colStatus" text="Status" prefWidth="100"/>
+                <TableColumn fx:id="colScore" text="AI Score" prefWidth="90"/>
+                <TableColumn fx:id="colLevel" text="Level" prefWidth="90"/>
+                <TableColumn fx:id="colDate" text="Applied" prefWidth="110"/>
+            </columns>
+            <placeholder><Label text="No candidatures assigned to you"/></placeholder>
+        </TableView>
+    </center>
+
+    <bottom>
+        <HBox spacing="10">
+            <padding><Insets top="10"/></padding>
+            <Button text="👁 View Detail" onAction="#handleViewDetail"
+                    style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 8 16;"/>
+            <Button text="🤖 Calculate AI Score" onAction="#handleCalculateScore"
+                    style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 8 16;"/>
+            <Button text="⚖ Compare" onAction="#handleCompare"
+                    style="-fx-background-color: #06D6A0; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 8 16;"/>
+            <Label fx:id="statusLabel" text="" style="-fx-text-fill: #666; -fx-font-size: 12px;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

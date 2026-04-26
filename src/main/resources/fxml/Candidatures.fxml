@@ -35,22 +35,13 @@
                     <Label fx:id="offerLabel" style="-fx-font-weight: bold;"/>
 
                     <Label text="Status"/>
-                    <ComboBox fx:id="statusCombo" maxWidth="Infinity"/>
+                    <Label fx:id="statusLabel" style="-fx-font-weight: bold;"/>
 
                     <Label text="Cover letter"/>
                     <TextArea fx:id="motivationField" prefRowCount="4" editable="false" wrapText="true"/>
 
                     <Label text="Feedback"/>
-                    <TextArea fx:id="feedbackField" prefRowCount="3" promptText="Your feedback..."/>
-
-                    <Label fx:id="messageLabel" text="" wrapText="true"/>
-
-                    <HBox spacing="10">
-                        <Button text="💾 Update" onAction="#handleUpdate" maxWidth="Infinity" HBox.hgrow="ALWAYS"
-                                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                        <Button text="🗑 Delete" onAction="#handleDelete" maxWidth="Infinity" HBox.hgrow="ALWAYS"
-                                style="-fx-background-color: #FF6B6B; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                    </HBox>
+                    <TextArea fx:id="feedbackField" prefRowCount="3" editable="false" wrapText="true"/>
                 </VBox>
             </ScrollPane>
         </SplitPane>

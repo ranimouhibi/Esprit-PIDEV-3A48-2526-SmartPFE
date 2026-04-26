@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.controller.StudentOffersController"
+      spacing="0" style="-fx-background-color: #f4f6fb;">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+        <padding><Insets top="16" bottom="16" left="30" right="30"/></padding>
+        <VBox spacing="4" HBox.hgrow="ALWAYS">
+            <Label text="Available Offers" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+            <Label text="Browse and apply for PFE and internship offers" style="-fx-font-size: 12px; -fx-text-fill: #888;"/>
+        </VBox>
+        <!-- View tabs -->
+        <HBox spacing="6" alignment="CENTER">
+            <Button text="📋 List" onAction="#showListView"
+                    style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 7 16; -fx-cursor: hand; -fx-font-size: 12px;"/>
+            <Button text="📅 Calendar" onAction="#showCalendarView"
+                    style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 7 16; -fx-cursor: hand; -fx-font-size: 12px;"/>
+            <Button text="📊 Statistics" onAction="#showStatsView"
+                    style="-fx-background-color: #06D6A0; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 7 16; -fx-cursor: hand; -fx-font-size: 12px;"/>
+        </HBox>
+    </HBox>
+
+    <!-- Search & Sort bar -->
+    <HBox spacing="12" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+        <padding><Insets top="12" bottom="12" left="30" right="30"/></padding>
+        <TextField fx:id="searchField" promptText="Search offers..." prefWidth="280"
+                   style="-fx-pref-height: 36px; -fx-background-radius: 18; -fx-border-radius: 18; -fx-border-color: #ddd; -fx-border-width: 1.5; -fx-padding: 0 14;"/>
+        <Label text="Sort:" style="-fx-font-size: 12px; -fx-text-fill: #666;"/>
+        <ComboBox fx:id="sortCombo" prefWidth="130" style="-fx-pref-height: 36px;"/>
+        <Button text="Reset" onAction="#handleReset"
+                style="-fx-background-color: #6b7280; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 8 18; -fx-cursor: hand;"/>
+    </HBox>
+
+    <!-- Apply Form (shared across views) -->
+    <VBox fx:id="applyFormContainer" spacing="14" visible="false" managed="false"
+          style="-fx-background-color: #f0fff4; -fx-border-color: #22c55e; -fx-border-width: 0 0 0 4;">
+        <padding><Insets top="18" bottom="18" left="30" right="30"/></padding>
+        <Label fx:id="applyOfferTitle" text="" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+        <VBox spacing="5">
+            <Label text="Motivation Letter *" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+            <TextArea fx:id="motivationField" promptText="Write your motivation letter (min. 50 characters)..." prefRowCount="4"
+                      style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd; -fx-border-width: 1;"/>
+            <Label fx:id="motivationError" text="" style="-fx-text-fill: #ef4444; -fx-font-size: 11px;"/>
+        </VBox>
+        <HBox spacing="16">
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="CV *" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                <HBox spacing="8">
+                    <TextField fx:id="cvPathField" promptText="No file selected..." HBox.hgrow="ALWAYS"
+                               editable="false" style="-fx-pref-height: 34px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
+                    <Button text="Browse..." onAction="#handleBrowseCV"
+                            style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 7 14; -fx-cursor: hand;"/>
+                </HBox>
+                <Label fx:id="cvError" text="" style="-fx-text-fill: #ef4444; -fx-font-size: 11px;"/>
+            </VBox>
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Portfolio URL (optional)" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                <TextField fx:id="portfolioField" promptText="https://your-portfolio.com"
+                           style="-fx-pref-height: 34px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
+            </VBox>
+        </HBox>
+        <VBox spacing="5" prefWidth="400">
+            <Label text="GitHub URL (optional)" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+            <TextField fx:id="githubField" promptText="https://github.com/username"
+                       style="-fx-pref-height: 34px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
+        </VBox>
+        <HBox spacing="12" alignment="CENTER_RIGHT">
+            <Button text="Cancel" onAction="#handleCancelApply"
+                    style="-fx-background-color: transparent; -fx-text-fill: #666; -fx-cursor: hand;"/>
+            <Button text="Submit Application" onAction="#handleSubmitApply"
+                    style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 22; -fx-cursor: hand;"/>
+        </HBox>
+    </VBox>
+
+    <!-- ═══ LIST VIEW ═══ -->
+    <VBox fx:id="listView" VBox.vgrow="ALWAYS">
+        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                    style="-fx-background-color: transparent; -fx-border-color: transparent;">
+            <VBox spacing="20">
+                <padding><Insets top="20" bottom="20" left="30" right="30"/></padding>
+                <FlowPane fx:id="offersContainer" hgap="20" vgap="20" prefWrapLength="1000"/>
+            </VBox>
+        </ScrollPane>
+    </VBox>
+
+    <!-- ═══ CALENDAR VIEW ═══ -->
+    <VBox fx:id="calendarView" visible="false" managed="false" VBox.vgrow="ALWAYS"
+          style="-fx-background-color: white; -fx-padding: 20;">
+        <!-- Nav -->
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <padding><Insets bottom="12"/></padding>
+            <Button text="◀" onAction="#calPrev"
+                    style="-fx-background-color: #f0f0f0; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 6 12; -fx-cursor: hand;"/>
+            <Label fx:id="calMonthLabel" text="" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e; -fx-min-width: 180; -fx-alignment: CENTER;"/>
+            <Button text="▶" onAction="#calNext"
+                    style="-fx-background-color: #f0f0f0; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 6 12; -fx-cursor: hand;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <!-- Legend -->
+            <HBox spacing="14" alignment="CENTER">
+                <HBox spacing="4" alignment="CENTER_LEFT">
+                    <Label text="■" style="-fx-text-fill: #8b5cf6; -fx-font-size: 13px;"/>
+                    <Label text="Deadline" style="-fx-font-size: 11px; -fx-text-fill: #555;"/>
+                </HBox>
+                <HBox spacing="4" alignment="CENTER_LEFT">
+                    <Label text="■" style="-fx-text-fill: #ec4899; -fx-font-size: 13px;"/>
+                    <Label text="Pending" style="-fx-font-size: 11px; -fx-text-fill: #555;"/>
+                </HBox>
+                <HBox spacing="4" alignment="CENTER_LEFT">
+                    <Label text="■" style="-fx-text-fill: #28a745; -fx-font-size: 13px;"/>
+                    <Label text="Accepted" style="-fx-font-size: 11px; -fx-text-fill: #555;"/>
+                </HBox>
+                <HBox spacing="4" alignment="CENTER_LEFT">
+                    <Label text="■" style="-fx-text-fill: #dc3545; -fx-font-size: 13px;"/>
+                    <Label text="Rejected" style="-fx-font-size: 11px; -fx-text-fill: #555;"/>
+                </HBox>
+            </HBox>
+        </HBox>
+        <GridPane fx:id="calGrid" hgap="0" vgap="0" VBox.vgrow="ALWAYS"
+                  style="-fx-border-color: #eee; -fx-border-width: 1;">
+            <columnConstraints>
+                <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
+                <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
+                <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
+                <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
+                <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
+                <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
+                <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
+            </columnConstraints>
+        </GridPane>
+    </VBox>
+
+    <!-- ═══ STATS VIEW ═══ -->
+    <VBox fx:id="statsView" visible="false" managed="false" VBox.vgrow="ALWAYS">
+        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" hbarPolicy="NEVER"
+                    style="-fx-background-color: transparent; -fx-border-color: transparent;">
+            <VBox fx:id="statsContainer" spacing="16">
+                <padding><Insets top="20" bottom="20" left="30" right="30"/></padding>
+                <Label text="My Offers &amp; Candidatures Statistics"
+                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+            </VBox>
+        </ScrollPane>
+    </VBox>
+
+</VBox>

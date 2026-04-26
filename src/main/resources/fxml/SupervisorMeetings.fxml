@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.controller.SupervisorMeetingsController"
+            style="-fx-background-color: #f4f6fb;">
+    <padding><Insets top="16" left="16" right="16" bottom="16"/></padding>
+
+    <top>
+        <Label text="Meetings — Jitsi &amp; AI Reports" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+    </top>
+
+    <center>
+        <SplitPane dividerPositions="0.38">
+
+            <!-- Left: meeting list + calendar -->
+            <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 14;">
+                <Label text="Scheduled Meetings" style="-fx-font-weight: bold; -fx-font-size: 13px;"/>
+                <ScrollPane fitToWidth="true" prefHeight="220" hbarPolicy="NEVER"
+                            style="-fx-background-color: transparent; -fx-border-color: transparent;">
+                    <VBox fx:id="meetingsContainer" spacing="6"/>
+                </ScrollPane>
+                <Separator/>
+                <!-- Calendar -->
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Button text="◀" onAction="#calPrev" style="-fx-background-color: #f0f0f0; -fx-background-radius: 4; -fx-padding: 4 10; -fx-cursor: hand;"/>
+                    <Label fx:id="calMonthLabel" text="" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-min-width: 140; -fx-alignment: CENTER;"/>
+                    <Button text="▶" onAction="#calNext" style="-fx-background-color: #f0f0f0; -fx-background-radius: 4; -fx-padding: 4 10; -fx-cursor: hand;"/>
+                </HBox>
+                <GridPane fx:id="calGrid" hgap="0" vgap="0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
+                    </columnConstraints>
+                </GridPane>
+            </VBox>
+
+            <!-- Right: schedule + Jitsi + AI report -->
+            <ScrollPane fitToWidth="true" style="-fx-background-color: #f4f6fb; -fx-background: #f4f6fb; -fx-border-color: transparent;">
+                <VBox spacing="14">
+                    <padding><Insets top="8" left="8" right="8" bottom="8"/></padding>
+
+                    <!-- Schedule form -->
+                    <VBox spacing="10" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 14; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.06),8,0,0,2);">
+                        <Label text="Schedule Meeting" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                        <HBox spacing="10">
+                            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                <Label text="Project" style="-fx-font-size: 11px;"/>
+                                <ComboBox fx:id="projectCombo" maxWidth="Infinity"/>
+                            </VBox>
+                            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                <Label text="Type" style="-fx-font-size: 11px;"/>
+                                <ComboBox fx:id="typeCombo" maxWidth="Infinity"/>
+                            </VBox>
+                        </HBox>
+                        <HBox spacing="10">
+                            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                <Label text="Status" style="-fx-font-size: 11px;"/>
+                                <ComboBox fx:id="statusCombo" maxWidth="Infinity"/>
+                            </VBox>
+                            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                <Label text="Date" style="-fx-font-size: 11px;"/>
+                                <DatePicker fx:id="datePicker" maxWidth="Infinity"/>
+                            </VBox>
+                        </HBox>
+                        <Label text="Location" style="-fx-font-size: 11px;"/>
+                        <TextField fx:id="locationField" promptText="Room / Online"/>
+                        <Label text="Agenda" style="-fx-font-size: 11px;"/>
+                        <TextArea fx:id="agendaField" prefRowCount="2"/>
+
+                        <!-- Jitsi -->
+                        <HBox spacing="8" alignment="CENTER_LEFT">
+                            <Button text="🎥 Generate Jitsi Link" onAction="#handleGenerateJitsi"
+                                    style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 7 14; -fx-cursor: hand;"/>
+                            <Button text="Open" onAction="#handleOpenJitsi"
+                                    style="-fx-background-color: #06D6A0; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 7 14; -fx-cursor: hand;"/>
+                        </HBox>
+                        <Label fx:id="jitsiLinkLabel" text="" wrapText="true"
+                               style="-fx-text-fill: #667eea; -fx-font-size: 11px;"/>
+
+                        <Label fx:id="messageLabel" text="" wrapText="true"/>
+                        <Button text="💾 Save Meeting" onAction="#handleSaveMeeting"
+                                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 8 20; -fx-cursor: hand; -fx-font-weight: bold;"/>
+                    </VBox>
+
+                    <!-- AI Report -->
+                    <VBox spacing="10" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 14; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.06),8,0,0,2);">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label text="🤖 AI Meeting Report" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                            <Button text="Generate Report" onAction="#handleGenerateReport"
+                                    style="-fx-background-color: #06D6A0; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;"/>
+                            <Label fx:id="reportStatusLabel" text="" style="-fx-text-fill: #888; -fx-font-size: 11px;"/>
+                        </HBox>
+                        <Label text="Paste raw meeting notes:" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
+                        <TextArea fx:id="rawNotesArea" prefRowCount="4"
+                                  promptText="Paste your raw meeting notes here... (participants, decisions, action items, blockers)"/>
+                        <Label text="Generated Report:" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
+                        <TextArea fx:id="reportArea" prefRowCount="8" editable="false"
+                                  style="-fx-background-color: #f8f9ff; -fx-font-family: monospace; -fx-font-size: 11px;"/>
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+        </SplitPane>
+    </center>
+</BorderPane>

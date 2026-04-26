@@ -26,10 +26,9 @@ public class CandidatureController implements Initializable {
 
     @FXML private Label studentLabel;
     @FXML private Label offerLabel;
-    @FXML private ComboBox<String> statusCombo;
+    @FXML private Label statusLabel;
     @FXML private TextArea motivationField;
     @FXML private TextArea feedbackField;
-    @FXML private Label messageLabel;
 
     private Candidature selectedCandidature;
 
@@ -41,8 +40,6 @@ public class CandidatureController implements Initializable {
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         colDate.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
 
-        statusCombo.setItems(FXCollections.observableArrayList("pending", "accepted", "rejected", "interview"));
-
         loadCandidatures();
 
         candidatureTable.getSelectionModel().selectedItemProperty().addListener((obs, old, sel) -> {
@@ -50,7 +47,7 @@ public class CandidatureController implements Initializable {
                 selectedCandidature = sel;
                 studentLabel.setText(sel.getStudentName());
                 offerLabel.setText(sel.getOfferTitle());
-                statusCombo.setValue(sel.getStatus());
+                statusLabel.setText(sel.getStatus() != null ? sel.getStatus().toUpperCase() : "");
                 motivationField.setText(sel.getMotivationLetter());
                 feedbackField.setText(sel.getFeedback());
             }
@@ -81,45 +78,8 @@ public class CandidatureController implements Initializable {
                 list.add(c);
             }
             candidatureTable.setItems(FXCollections.observableArrayList(list));
-        } catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
-    }
-
-    @FXML
-    public void handleUpdate() {
-        if (selectedCandidature == null) { showMessage("Sélectionnez une candidature.", true); return; }
-        try {
-            String sql = "UPDATE candidatures SET status=?, feedback=?, updated_at=? WHERE id=?";
-            PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql);
-            ps.setString(1, statusCombo.getValue());
-            ps.setString(2, feedbackField.getText());
-            ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
-            ps.setInt(4, selectedCandidature.getId());
-            ps.executeUpdate();
-            showMessage("Candidature mise à jour.", false);
-            loadCandidatures();
-        } catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
-    }
-
-    @FXML
-    public void handleDelete() {
-        if (selectedCandidature == null) { showMessage("Sélectionnez une candidature.", true); return; }
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer cette candidature?", ButtonType.YES, ButtonType.NO);
-        confirm.showAndWait().ifPresent(btn -> {
-            if (btn == ButtonType.YES) {
-                try {
-                    PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement("DELETE FROM candidatures WHERE id=?");
-                    ps.setInt(1, selectedCandidature.getId());
-                    ps.executeUpdate();
-                    showMessage("Candidature supprimée.", false);
-                    selectedCandidature = null;
-                    loadCandidatures();
-                } catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
-            }
-        });
-    }
-
-    private void showMessage(String msg, boolean isError) {
-        messageLabel.setText(msg);
-        messageLabel.setStyle(isError ? "-fx-text-fill: red;" : "-fx-text-fill: green;");
+        } catch (Exception e) { 
+            e.printStackTrace();
+        }
     }
 }
