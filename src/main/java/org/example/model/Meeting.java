@@ -1,6 +1,7 @@
 package org.example.model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Meeting {
     private int id;
@@ -11,9 +12,10 @@ public class Meeting {
     private String meetingLink;
     private String status;
     private String agenda;
-    private String notes;
     private int duration;
-    private boolean isOnline;
+    private int rescheduleCount;
+    private String rawContent;
+    private String aiSummary;
     private LocalDateTime scheduledDate;
     private LocalDateTime createdAt;
 
@@ -43,14 +45,17 @@ public class Meeting {
     public String getAgenda() { return agenda; }
     public void setAgenda(String agenda) { this.agenda = agenda; }
 
-    public String getNotes() { return notes; }
-    public void setNotes(String notes) { this.notes = notes; }
-
     public int getDuration() { return duration; }
     public void setDuration(int duration) { this.duration = duration; }
 
-    public boolean isOnline() { return isOnline; }
-    public void setOnline(boolean online) { isOnline = online; }
+    public int getRescheduleCount() { return rescheduleCount; }
+    public void setRescheduleCount(int rescheduleCount) { this.rescheduleCount = rescheduleCount; }
+
+    public String getRawContent() { return rawContent; }
+    public void setRawContent(String rawContent) { this.rawContent = rawContent; }
+
+    public String getAiSummary() { return aiSummary; }
+    public void setAiSummary(String aiSummary) { this.aiSummary = aiSummary; }
 
     public LocalDateTime getScheduledDate() { return scheduledDate; }
     public void setScheduledDate(LocalDateTime scheduledDate) { this.scheduledDate = scheduledDate; }
@@ -59,5 +64,8 @@ public class Meeting {
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
     @Override
-    public String toString() { return meetingType + " - " + (scheduledDate != null ? scheduledDate.toLocalDate() : ""); }
+    public String toString() {
+        String dateStr = scheduledDate != null ? scheduledDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "";
+        return meetingType + " - " + dateStr;
+    }
 }

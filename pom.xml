@@ -62,6 +62,21 @@
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.36</version>
         </dependency>
+
+        <!-- JavaMail for email notifications -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+
+        <!-- JavaFX Web (WebView for Calendar and Distance) -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
     </dependencies>
 
 
@@ -75,6 +90,7 @@
                     <mainClass>org.example.Main</mainClass>
                     <options>
                         <option>--add-opens=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED</option>
+                        <option>--add-opens=javafx.web/com.sun.webkit=ALL-UNNAMED</option>
                     </options>
                 </configuration>
             </plugin>

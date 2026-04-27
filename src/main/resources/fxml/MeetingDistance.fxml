@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.controller.MeetingDistanceController"
+      spacing="0" style="-fx-background-color:#1e1e2e;" prefWidth="460" prefHeight="520">
+
+    <!-- Header -->
+    <VBox style="-fx-background-color:#2a2a3e;" spacing="4">
+        <padding><Insets top="16" bottom="16" left="20" right="20"/></padding>
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <Label text="Distance Calculator" style="-fx-font-size:16px;-fx-font-weight:bold;-fx-text-fill:white;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="closeBtn" text="X" onAction="#handleClose"
+                    style="-fx-background-color:#e74c3c;-fx-text-fill:white;-fx-background-radius:6;-fx-cursor:hand;-fx-padding:4 10;"/>
+        </HBox>
+        <Label fx:id="meetingLocationLabel" text="" style="-fx-font-size:12px;-fx-text-fill:#8b8fa8;"/>
+    </VBox>
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                style="-fx-background-color:transparent;-fx-background:transparent;-fx-border-color:transparent;">
+        <VBox spacing="14">
+            <padding><Insets top="20" bottom="20" left="20" right="20"/></padding>
+
+            <!-- Origin input -->
+            <VBox spacing="6">
+                <Label text="Your starting address:" style="-fx-text-fill:#ccc;-fx-font-size:13px;"/>
+                <TextField fx:id="originField"
+                           promptText="e.g. Rades, Tunisia"
+                           style="-fx-background-color:#2a2a3e;-fx-text-fill:white;-fx-prompt-text-fill:#666;
+                                  -fx-background-radius:8;-fx-border-color:#444;-fx-border-radius:8;-fx-padding:10 14;"/>
+                <Label text="💡 Tunisian cities are auto-detected. Add country only if abroad (e.g. &quot;Paris, France&quot;)"
+                       style="-fx-text-fill:#666;-fx-font-size:11px;" wrapText="true"/>
+            </VBox>
+
+            <!-- Status -->
+            <Label fx:id="statusLabel" text="" style="-fx-font-size:12px;-fx-text-fill:#aaa;"/>
+
+            <!-- Calculate button -->
+            <Button fx:id="calculateBtn" text="Calculate Distance" onAction="#handleCalculate"
+                    maxWidth="Infinity"
+                    style="-fx-background-color:linear-gradient(to right,#a12c2f,#FF6B6B);
+                           -fx-text-fill:white;-fx-font-weight:bold;-fx-font-size:14px;
+                           -fx-background-radius:8;-fx-cursor:hand;-fx-padding:12 0;"/>
+
+            <!-- Results -->
+            <VBox fx:id="resultsContainer" spacing="10"/>
+
+        </VBox>
+    </ScrollPane>
+</VBox>
