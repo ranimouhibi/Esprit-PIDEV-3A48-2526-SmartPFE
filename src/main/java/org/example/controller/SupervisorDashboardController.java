@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import org.example.dao.ProjectDAO;
+import org.example.dao.SprintDAO;
 import org.example.dao.TaskDAO;
 import org.example.model.Project;
 import org.example.model.User;
@@ -22,6 +23,7 @@ public class SupervisorDashboardController implements Initializable {
     @FXML private Label welcomeLabel;
     @FXML private Label projectCountLabel;
     @FXML private Label taskCountLabel;
+    @FXML private Label sprintCountLabel;
     @FXML private Label meetingCountLabel;
     @FXML private BorderPane contentArea;
     @FXML private VBox homePane;
@@ -39,6 +41,7 @@ public class SupervisorDashboardController implements Initializable {
 
     private final ProjectDAO projectDAO = new ProjectDAO();
     private final TaskDAO taskDAO = new TaskDAO();
+    private final SprintDAO sprintDAO = new SprintDAO();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -55,6 +58,7 @@ public class SupervisorDashboardController implements Initializable {
             List<Project> projects = projectDAO.findBySupervisor(user.getId());
             projectCountLabel.setText(String.valueOf(projects.size()));
             taskCountLabel.setText(String.valueOf(taskDAO.findAll().size()));
+            sprintCountLabel.setText(String.valueOf(sprintDAO.findAll().size()));
             meetingCountLabel.setText("0");
         } catch (Exception e) {
             e.printStackTrace();
@@ -68,8 +72,8 @@ public class SupervisorDashboardController implements Initializable {
         navComments.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
         navDocuments.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
         navTasks.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
+        navSprints.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
         navProfile.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        
         activeLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #a12c2f; -fx-cursor: hand;");
     }
 

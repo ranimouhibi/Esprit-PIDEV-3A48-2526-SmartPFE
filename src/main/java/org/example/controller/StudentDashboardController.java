@@ -68,13 +68,10 @@ public class StudentDashboardController implements Initializable {
 
     private void setActiveNav(Label activeLabel) {
         // Reset all
-        navHome.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navMeetings.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navOffers.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navProjects.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navDocuments.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navProfile.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        
+        for (Label l : new Label[]{navHome, navMeetings, navOffers, navProjects,
+                                    navSprints, navTasks, navDocuments, navProfile}) {
+            l.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand; -fx-font-weight: normal;");
+        }
         // Set active
         activeLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #a12c2f; -fx-cursor: hand;");
     }
@@ -140,6 +137,7 @@ public class StudentDashboardController implements Initializable {
     }
     
     @FXML public void showTasks() { 
+        setActiveNav(navTasks);
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
         contentArea.setCenter(null);
         javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Tasks.fxml");
@@ -150,6 +148,7 @@ public class StudentDashboardController implements Initializable {
     }
     
     @FXML public void showSprints() { 
+        setActiveNav(navSprints);
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
         contentArea.setCenter(null);
         javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Sprints.fxml");

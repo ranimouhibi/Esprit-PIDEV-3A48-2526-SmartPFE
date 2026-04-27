@@ -14,14 +14,10 @@
             <Label text="Tasks" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
             <HBox spacing="10" alignment="CENTER_LEFT"
                   style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 12 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
-                <Button text="New Task" onAction="#handleAddDialog"  minWidth="100"
+                <Button text="New Task" onAction="#handleAddDialog" minWidth="100"
                         style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 9 18; -fx-font-weight: bold; -fx-cursor: hand;"/>
-                <Button text="Edit"     onAction="#handleEditDialog" minWidth="80"
-                        style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 9 18; -fx-font-weight: bold; -fx-cursor: hand;"/>
-                <Button text="Delete"   onAction="#handleDelete"     minWidth="80"
-                        style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 9 18; -fx-font-weight: bold; -fx-cursor: hand;"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <TextField fx:id="searchField" promptText="Search tasks (title, status, student...)" prefWidth="300"
+                <TextField fx:id="searchField" promptText="Search tasks..." prefWidth="280"
                            style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e5e7eb; -fx-padding: 8 12; -fx-background-color: #f9fafb;"/>
                 <Label fx:id="messageLabel" text="" wrapText="true" style="-fx-font-size: 12px;"/>
             </HBox>
@@ -29,22 +25,10 @@
     </top>
 
     <center>
-        <VBox style="-fx-background-color: white; -fx-background-radius: 14; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 10, 0, 0, 3);">
-            <padding><Insets top="6" left="6" right="6" bottom="6"/></padding>
-            <TableView fx:id="taskTable" VBox.vgrow="ALWAYS"
-                       style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-table-cell-border-color: transparent;">
-                <columns>
-                    <TableColumn fx:id="colId"       text="ID"          prefWidth="60"/>
-                    <TableColumn fx:id="colTitle"    text="Title"       prefWidth="230"/>
-                    <TableColumn fx:id="colStatus"   text="Status"      prefWidth="110"/>
-                    <TableColumn fx:id="colPriority" text="Priority"    prefWidth="100"/>
-                    <TableColumn fx:id="colProject"  text="Project"     prefWidth="200"/>
-                    <TableColumn fx:id="colAssigned" text="Assigned To" prefWidth="200"/>
-                </columns>
-                <placeholder>
-                    <Label text="No tasks found." style="-fx-text-fill: #9ca3af; -fx-font-size: 14px;"/>
-                </placeholder>
-            </TableView>
-        </VBox>
+        <ScrollPane fx:id="scrollPane" fitToWidth="true"
+                    style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 8;">
+            <FlowPane fx:id="cardPane" hgap="16" vgap="16" prefWrapLength="900"
+                      style="-fx-background-color: transparent; -fx-padding: 12;"/>
+        </ScrollPane>
     </center>
 </BorderPane>

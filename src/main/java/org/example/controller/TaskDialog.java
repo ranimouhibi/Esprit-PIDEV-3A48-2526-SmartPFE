@@ -17,10 +17,12 @@ import org.example.model.Project;
 import org.example.model.Sprint;
 import org.example.model.Task;
 import org.example.model.User;
+import org.example.util.AIAssignmentDialog;
 import org.example.util.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class TaskDialog {
 
@@ -28,7 +30,10 @@ public class TaskDialog {
     private static final int TITLE_MAX = 100;
     private static final int DESC_MAX  = 500;
 
-    private static final User ALL_TEAM = new User(0, "", "all", "Entire Team");
+    // Sentinel for "AI Recommendation" option (shown when 2 students)
+    private static final User AI_RECOMMEND = new User(0, "", "ai", "🤖 AI Recommendation");
+    // Sentinel for "Entire Team" option (shown when 1 student or fallback)
+    private static final User ALL_TEAM     = new User(0, "", "all", "Entire Team");
 
     private final Stage stage;
     private final Task  task;
@@ -49,9 +54,15 @@ public class TaskDialog {
     private final Label errGeneral  = errLabel();
 
     private List<Project> userProjects = new ArrayList<>();
+    private Sprint preselectedSprint = null;
 
     public TaskDialog(Window owner, Task existing) {
+        this(owner, existing, null);
+    }
+
+    public TaskDialog(Window owner, Task existing, Sprint defaultSprint) {
         this.task = existing != null ? existing : new Task();
+        this.preselectedSprint = defaultSprint;
         stage = new Stage();
         stage.initOwner(owner);
         stage.initModality(Modality.APPLICATION_MODAL);
@@ -123,6 +134,15 @@ public class TaskDialog {
                 sprints = new SprintDAO().findAll();
             }
             sprintCombo.setItems(FXCollections.observableArrayList(sprints));
+            // Pre-select sprint if provided (from calendar)
+            if (preselectedSprint != null) {
+                sprintCombo.getItems().stream()
+                    .filter(s -> s.getId() == preselectedSprint.getId())
+                    .findFirst().ifPresent(s -> {
+                        sprintCombo.setValue(s);
+                        refreshAssignees();
+                    });
+            }
         } catch (Exception e) {
             showErr(errGeneral, "Unable to load sprints.");
             confirmBtn.setDisable(true);
@@ -151,10 +171,18 @@ public class TaskDialog {
                         refreshAssignees();
                         if (task.getAssignedToId() != null) {
                             assigneeCombo.getItems().stream()
-                                .filter(u -> u.getId() == task.getAssignedToId())
+                                .filter(u -> u != ALL_TEAM && u != AI_RECOMMEND && u.getId() == task.getAssignedToId())
                                 .findFirst().ifPresent(assigneeCombo::setValue);
                         }
                     });
+            }
+            // Lock assignee — once set it cannot be changed
+            if (task.getAssignedToId() != null) {
+                assigneeCombo.setDisable(true);
+                assigneeCombo.setStyle(assigneeCombo.getStyle()
+                    + "; -fx-opacity: 0.7; -fx-cursor: default;");
+                Tooltip tip = new Tooltip("Assigned student cannot be changed after assignment.");
+                Tooltip.install(assigneeCombo, tip);
             }
         }
 
@@ -166,12 +194,23 @@ public class TaskDialog {
 
         VBox form = new VBox(4);
         form.setPadding(new Insets(20));
+
+        // Hide sprint selector when sprint is preselected from calendar
+        Label sprintLabel = fieldLabel("Sprint *");
+        boolean sprintFixed = preselectedSprint != null;
+        sprintLabel.setVisible(!sprintFixed);
+        sprintLabel.setManaged(!sprintFixed);
+        sprintCombo.setVisible(!sprintFixed);
+        sprintCombo.setManaged(!sprintFixed);
+        errSprint.setVisible(false);
+        errSprint.setManaged(false);
+
         form.getChildren().addAll(
             fieldLabel("Title *  (" + TITLE_MIN + "-" + TITLE_MAX + " chars)"), titleField,       errTitle,
             fieldLabel("Description  (max " + DESC_MAX + " chars)"),            descriptionField, errDesc,
             fieldLabel("Priority *"),                                            priorityCombo,    errPriority,
             fieldLabel("Status *"),                                              statusCombo,      errStatus,
-            fieldLabel("Sprint *"),                                              sprintCombo,      errSprint,
+            sprintLabel,                                                         sprintCombo,      errSprint,
             assignLabel,                                                         assigneeCombo,
             errGeneral
         );
@@ -207,8 +246,19 @@ public class TaskDialog {
                 }
             }
             if (members.isEmpty()) members.addAll(new UserDAO().findByRole("student"));
+
+            List<User> students = members.stream()
+                .filter(u -> "student".equals(u.getRole())).toList();
+
             List<User> options = new ArrayList<>();
-            options.add(ALL_TEAM);
+            if (students.size() == 2) {
+                // 2 students → show AI Recommendation + Entire Team + individual students
+                options.add(AI_RECOMMEND);
+                options.add(ALL_TEAM);
+            } else {
+                // 1 student → show Entire Team only
+                options.add(ALL_TEAM);
+            }
             options.addAll(members);
             assigneeCombo.setItems(FXCollections.observableArrayList(options));
         } catch (Exception e) {
@@ -239,7 +289,7 @@ public class TaskDialog {
         if (!validateDesc(descriptionField.getText())) ok = false;
         if (priorityCombo.getValue() == null) { showErr(errPriority, "Priority is required."); markInvalid(priorityCombo); ok = false; }
         if (statusCombo.getValue() == null)   { showErr(errStatus,   "Status is required.");   markInvalid(statusCombo);   ok = false; }
-        if (sprintCombo.getValue() == null)   { showErr(errSprint,   "Sprint is required.");   markInvalid(sprintCombo);   ok = false; }
+        if (sprintCombo.getValue() == null && preselectedSprint == null) { showErr(errSprint, "Sprint is required."); markInvalid(sprintCombo); ok = false; }
         return ok;
     }
 
@@ -247,41 +297,141 @@ public class TaskDialog {
         clearErr(errGeneral);
         if (!validateAll()) return;
 
-        Sprint sprint = sprintCombo.getValue();
+        Sprint sprint = sprintCombo.getValue() != null ? sprintCombo.getValue() : preselectedSprint;
         User assignee = assigneeCombo.getValue();
 
         task.setTitle(titleField.getText().trim());
         task.setDescription(descriptionField.getText().trim());
         task.setPriority(priorityCombo.getValue());
         task.setStatus(statusCombo.getValue());
-        task.setSprintId(sprint.getId());
-        task.setProjectId(sprint.getProjectId());
+        if (sprint != null) {
+            task.setSprintId(sprint.getId());
+            task.setProjectId(sprint.getProjectId());
+        }
 
         try {
             TaskDAO dao = new TaskDAO();
-            boolean isStudent = SessionManager.getCurrentUser() != null &&
-                "student".equals(SessionManager.getCurrentUser().getRole());
-            // Students always assign to entire team; supervisors use the combo selection
-            boolean assignAll = isStudent || (assignee == null || assignee == ALL_TEAM);
+            User current = SessionManager.getCurrentUser();
+            boolean isStudent = current != null && "student".equals(current.getRole());
+            String sprintName = sprint != null && sprint.getName() != null ? sprint.getName() : "—";
+            String action = task.getId() != 0 ? "updated" : "created";
 
             if (task.getId() != 0) {
-                if (!assignAll) task.setAssignedToId(assignee.getId());
-                dao.update(task);
-            } else if (assignAll && assigneeCombo.getItems().size() > 1) {
-                for (User member : assigneeCombo.getItems()) {
-                    if (member == ALL_TEAM) continue;
-                    Task t = cloneTask();
-                    t.setAssignedToId(member.getId());
-                    dao.save(t);
+                // ── EDIT ──────────────────────────────────────────────────────
+                if (!isStudent && assignee != null && assignee != ALL_TEAM) {
+                    task.setAssignedToId(assignee.getId());
                 }
-            } else {
-                if (!assignAll) task.setAssignedToId(assignee.getId());
+                dao.update(task);
+                sendTaskNotification(action, task, sprintName, current);
+
+            } else if (isStudent) {
+                // ── STUDENT creates task → save without assignee ──────────────
                 dao.save(task);
+                sendTaskNotification(action, task, sprintName, current);
+
+            } else {
+                // ── SUPERVISOR creates task ───────────────────────────────────
+                List<User> students = assigneeCombo.getItems().stream()
+                    .filter(u -> u != ALL_TEAM && "student".equals(u.getRole()))
+                    .toList();
+
+                if (students.size() == 1) {
+                    // 1 student → auto-assign
+                    task.setAssignedToId(students.get(0).getId());
+                    dao.save(task);
+                    sendTaskNotification(action, task, sprintName, current);
+
+                } else if (students.size() == 2 && (assignee == null || assignee == AI_RECOMMEND)) {
+                    // 2 students + AI Recommendation selected → run AI
+                    Optional<User> aiPick = AIAssignmentDialog.run(
+                        stage.getOwner(), sprint.getProjectId(), task.getTitle(), task.getDescription());
+
+                    if (aiPick.isPresent()) {
+                        task.setAssignedToId(aiPick.get().getId());
+                        dao.save(task);
+                        sendTaskNotification(action, task, sprintName, current);
+                    } else {
+                        // No skills detected or user chose Entire Team from AI dialog
+                        task.setAssignedToId(null);
+                        dao.save(task);
+                        System.out.println("[TASK] Saved as Entire Team, id=" + task.getId() + " projectId=" + task.getProjectId());
+                        for (User student : students) {
+                            Task copy = cloneTask();
+                            copy.setId(task.getId());
+                            copy.setAssignedToId(student.getId());
+                            sendTaskNotification(action, copy, sprintName, current);
+                        }
+                    }
+
+                } else if (assignee == ALL_TEAM) {
+                    // Supervisor explicitly chose Entire Team → save with null assignee
+                    task.setAssignedToId(null);
+                    dao.save(task);
+                    System.out.println("[TASK] Entire Team selected, id=" + task.getId() + " projectId=" + task.getProjectId());
+                    for (User student : students) {
+                        Task copy = cloneTask();
+                        copy.setId(task.getId());
+                        copy.setAssignedToId(student.getId());
+                        sendTaskNotification(action, copy, sprintName, current);
+                    }
+
+                } else if (assignee != null && assignee != ALL_TEAM) {
+                    // Supervisor picked a specific student
+                    task.setAssignedToId(assignee.getId());
+                    dao.save(task);
+                    sendTaskNotification(action, task, sprintName, current);
+
+                } else {
+                    // Fallback: save as entire team (no assignee)
+                    task.setAssignedToId(null);
+                    dao.save(task);
+                    System.out.println("[TASK] Fallback Entire Team save, id=" + task.getId() + " projectId=" + task.getProjectId() + " students in combo=" + students.size());
+                }
             }
+
             confirmed = true;
             stage.close();
         } catch (Exception ex) {
             showErr(errGeneral, "Error: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+    private void sendTaskNotification(String action, Task task, String sprintName, User current) {
+        try {
+            String role = current != null ? current.getRole() : "";
+            String priority = task.getPriority() != null ? task.getPriority() : "—";
+
+            if ("student".equals(role)) {
+                // Student → email supervisor
+                int projectId = task.getProjectId();
+                if (projectId == 0) { System.err.println("[TASK NOTIFY] No projectId on task"); return; }
+                org.example.model.Project project = new ProjectDAO().findById(projectId);
+                if (project == null || project.getSupervisorId() <= 0) { System.err.println("[TASK NOTIFY] No supervisor for project"); return; }
+                User supervisor = new UserDAO().findById(project.getSupervisorId());
+                if (supervisor == null || supervisor.getEmail() == null) { System.err.println("[TASK NOTIFY] Supervisor has no email"); return; }
+                String creatorName = current.getName() != null ? current.getName() : current.getEmail();
+                String html = org.example.util.EmailService.taskSupervisorTemplate(
+                    action, task.getTitle(), sprintName, priority, creatorName,
+                    supervisor.getName() != null ? supervisor.getName() : supervisor.getEmail());
+                org.example.util.EmailService.sendAsync(supervisor.getEmail(),
+                    "Task " + action + " by student: " + task.getTitle(), html);
+                System.out.println("[TASK NOTIFY] → supervisor: " + supervisor.getEmail());
+            } else {
+                // Supervisor → email the assigned student
+                if (task.getAssignedToId() == null) { System.err.println("[TASK NOTIFY] No assignee on task: " + task.getTitle()); return; }
+                User student = new UserDAO().findById(task.getAssignedToId());
+                if (student == null || student.getEmail() == null) { System.err.println("[TASK NOTIFY] Assigned student has no email"); return; }
+                String html = org.example.util.EmailService.taskTemplate(
+                    action, task.getTitle(), sprintName, priority,
+                    student.getName() != null ? student.getName() : student.getEmail());
+                org.example.util.EmailService.sendAsync(student.getEmail(),
+                    "Task " + action + ": " + task.getTitle(), html);
+                System.out.println("[TASK NOTIFY] → student: " + student.getEmail());
+            }
+        } catch (Exception e) {
+            System.err.println("[TASK NOTIFY] Error: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

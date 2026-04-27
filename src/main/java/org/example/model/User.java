@@ -9,6 +9,7 @@ public class User {
     private String role; // student, supervisor, establishment, admin
     private String name;
     private String phone;
+    private String skills;
     private boolean isActive;
     private LocalDateTime createdAt;
 
@@ -39,6 +40,9 @@ public class User {
 
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
+
+    public String getSkills() { return skills; }
+    public void setSkills(String skills) { this.skills = skills; }
 
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { isActive = active; }

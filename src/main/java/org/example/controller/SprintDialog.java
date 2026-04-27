@@ -11,8 +11,10 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.example.dao.ProjectDAO;
 import org.example.dao.SprintDAO;
+import org.example.dao.TaskDAO;
 import org.example.model.Project;
 import org.example.model.Sprint;
+import org.example.model.Task;
 import org.example.util.SessionManager;
 
 import java.time.LocalDate;
@@ -86,6 +88,17 @@ public class SprintDialog {
         goalField.setPrefRowCount(3); goalField.setWrapText(true); goalField.setStyle(inputStyle);
         startPicker.setMaxWidth(Double.MAX_VALUE); startPicker.setStyle(inputStyle);
         endPicker.setMaxWidth(Double.MAX_VALUE);   endPicker.setStyle(inputStyle);
+
+        // Disable past dates in the calendar popup
+        javafx.util.Callback<javafx.scene.control.DatePicker, javafx.scene.control.DateCell> pastDayFactory =
+            dp -> new javafx.scene.control.DateCell() {
+                @Override public void updateItem(LocalDate date, boolean empty) {
+                    super.updateItem(date, empty);
+                    if (date.isBefore(LocalDate.now())) { setDisable(true); setStyle("-fx-background-color: #f3f4f6;"); }
+                }
+            };
+        startPicker.setDayCellFactory(pastDayFactory);
+        endPicker.setDayCellFactory(pastDayFactory);
         statusCombo.setMaxWidth(Double.MAX_VALUE); statusCombo.setStyle(inputStyle);
 
         Button confirmBtn = new Button("Confirm");
@@ -174,14 +187,29 @@ public class SprintDialog {
     }
 
     private boolean validateDates() {
+        LocalDate today = LocalDate.now();
         LocalDate start = startPicker.getValue();
         LocalDate end   = endPicker.getValue();
         boolean ok = true;
-        if (start == null) { showErr(errStart, "Start date is required.");                     markInvalid(startPicker); ok = false; }
-        if (end == null)   { showErr(errEnd,   "End date is required.");                       markInvalid(endPicker);   ok = false; }
-        if (start != null && end != null && !end.isAfter(start)) {
-            showErr(errEnd, "End date must be after the start date."); markInvalid(endPicker); ok = false;
+
+        if (start == null) {
+            showErr(errStart, "Start date is required."); markInvalid(startPicker); ok = false;
+        } else if (start.isBefore(today)) {
+            showErr(errStart, "Start date cannot be in the past."); markInvalid(startPicker); ok = false;
+        } else {
+            clearErr(errStart); markValid(startPicker);
         }
+
+        if (end == null) {
+            showErr(errEnd, "End date is required."); markInvalid(endPicker); ok = false;
+        } else if (end.isBefore(today)) {
+            showErr(errEnd, "End date cannot be in the past."); markInvalid(endPicker); ok = false;
+        } else if (start != null && end != null && !end.isAfter(start)) {
+            showErr(errEnd, "End date must be after the start date."); markInvalid(endPicker); ok = false;
+        } else {
+            clearErr(errEnd); markValid(endPicker);
+        }
+
         return ok;
     }
 
@@ -206,8 +234,23 @@ public class SprintDialog {
         sprint.setStatus(statusCombo.getValue());
         try {
             SprintDAO dao = new SprintDAO();
+            if (dao.hasOverlap(sprint.getProjectId(), sprint.getStartDate(), sprint.getEndDate(), sprint.getId())) {
+                showErr(errEnd, "These dates overlap with an existing sprint in this project.");
+                markInvalid(startPicker); markInvalid(endPicker);
+                return;
+            }
             if (sprint.getId() == 0) dao.save(sprint);
             else dao.update(sprint);
+            // When a sprint is closed, mark all its tasks as done
+            if ("closed".equals(sprint.getStatus())) {
+                TaskDAO taskDAO = new TaskDAO();
+                for (Task t : taskDAO.findBySprint(sprint.getId())) {
+                    if (!"done".equals(t.getStatus())) {
+                        t.setStatus("done");
+                        taskDAO.update(t);
+                    }
+                }
+            }
             confirmed = true;
             stage.close();
         } catch (Exception ex) {
