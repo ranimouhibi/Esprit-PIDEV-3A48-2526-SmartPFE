@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class GeminiService {
 
     private static final String GEMINI_API_KEY = System.getenv("GEMINI_API_KEY") != null
-        ? System.getenv("GEMINI_API_KEY") : "";
+        ? System.getenv("GEMINI_API_KEY") : "AIzaSyDmPFtJy-HmlqRM9GOFQyQwvQvwPQ3Uk-E";
     private static final String GEMINI_URL =
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=";
 

@@ -21,9 +21,9 @@ public class EmailNotificationService {
 
     private static final String SMTP_HOST = getEnv("SMTP_HOST", "smtp.gmail.com");
     private static final String SMTP_PORT = getEnv("SMTP_PORT", "587");
-    private static final String SMTP_USER = getEnv("SMTP_USER", "");
-    private static final String SMTP_PASS = getEnv("SMTP_PASS", "");
-    private static final String SMTP_FROM = getEnv("SMTP_FROM", SMTP_USER);
+    private static final String SMTP_USER = getEnv("SMTP_USER", "knanimalek18@gmail.com");
+    private static final String SMTP_PASS = getEnv("SMTP_PASS", "ebdojcvlcpkcuucf");
+    private static final String SMTP_FROM = getEnv("SMTP_FROM", "knanimalek18@gmail.com");
     private static final String APP_NAME  = "SmartPFE";
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
@@ -33,6 +33,53 @@ public class EmailNotificationService {
     });
 
     // ── Public API ────────────────────────────────────────────────────────────
+
+    /** Notify all students of an establishment when a new offer is published */
+    public void sendNewOfferToStudents(int offerId) {
+        executor.submit(() -> {
+            try {
+                // Students linked to the same establishment as the offer creator
+                String sql = "SELECT u.email, u.name, o.title, o.description, o.deadline, " +
+                             "est.name as est_name " +
+                             "FROM project_offers o " +
+                             "JOIN users est ON est.id = o.establishment_id " +
+                             "JOIN users u ON u.establishment_id = est.establishment_id AND u.role = 'student' " +
+                             "WHERE o.id = ? AND u.email IS NOT NULL AND u.email != '' " +
+                             "UNION " +
+                             // Also try direct match: students whose establishment_id = offer's establishment_id
+                             "SELECT u.email, u.name, o.title, o.description, o.deadline, " +
+                             "est.name as est_name " +
+                             "FROM project_offers o " +
+                             "JOIN users est ON est.id = o.establishment_id " +
+                             "JOIN users u ON u.establishment_id = o.establishment_id AND u.role = 'student' " +
+                             "WHERE o.id = ? AND u.email IS NOT NULL AND u.email != ''";
+                try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
+                    ps.setInt(1, offerId);
+                    ps.setInt(2, offerId);
+                    ResultSet rs = ps.executeQuery();
+                    while (rs.next()) {
+                        String email    = rs.getString("email");
+                        String name     = rs.getString("name");
+                        String title    = rs.getString("title");
+                        String desc     = rs.getString("description");
+                        String estName  = rs.getString("est_name");
+                        java.sql.Date dl = rs.getDate("deadline");
+                        String deadlineStr = dl != null ? "Deadline: <strong>" + dl + "</strong>" : "";
+
+                        String subject = "[" + APP_NAME + "] New Offer Available: " + title;
+                        String body = buildHtml(
+                            "New Offer Available",
+                            "Dear " + name + ",",
+                            "<strong>" + estName + "</strong> has published a new offer: <strong>" + title + "</strong>",
+                            (desc != null ? "<p>" + desc + "</p>" : "") + "<p style='color:#e53e3e;'>" + deadlineStr + "</p>",
+                            "Log in to SmartPFE to view and apply."
+                        );
+                        send(email, subject, body);
+                    }
+                }
+            } catch (Exception e) { e.printStackTrace(); }
+        });
+    }
 
     /** Send confirmation email to student after applying */
     public void sendCandidatureConfirmation(int candidatureId) {
@@ -157,7 +204,7 @@ public class EmailNotificationService {
         }
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.ssl.enable", "true");
         props.put("mail.smtp.host", SMTP_HOST);
         props.put("mail.smtp.port", SMTP_PORT);
         props.put("mail.smtp.ssl.trust", SMTP_HOST);

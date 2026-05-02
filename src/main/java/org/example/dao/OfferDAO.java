@@ -45,6 +45,17 @@ public class OfferDAO {
         return list;
     }
 
+    public boolean existsByTitle(String title, int excludeId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM project_offers WHERE LOWER(TRIM(title)) = LOWER(TRIM(?)) AND id != ?";
+        try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
+            ps.setString(1, title);
+            ps.setInt(2, excludeId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1) > 0;
+        }
+        return false;
+    }
+
     public void save(Offer o) throws SQLException {
         String sql = "INSERT INTO project_offers (establishment_id, title, description, objectives, required_skills, max_candidates, deadline, status, created_at) VALUES (?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {

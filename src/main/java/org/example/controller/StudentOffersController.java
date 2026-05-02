@@ -6,8 +6,8 @@ import org.example.model.Candidature;
 import org.example.model.Offer;
 import org.example.model.User;
 import org.example.service.EmailNotificationService;
+import org.example.util.DialogUtil;
 import org.example.util.SessionManager;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -16,9 +16,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import org.example.util.ModernAlert;
 import javafx.scene.layout.*;
-import javafx.stage.FileChooser;
 
-import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -41,22 +39,10 @@ public class StudentOffersController implements Initializable {
     // Stats
     @FXML private VBox statsContainer;
 
-    // Apply form
-    @FXML private VBox applyFormContainer;
-    @FXML private Label applyOfferTitle;
-    @FXML private TextArea motivationField;
-    @FXML private TextField cvPathField;
-    @FXML private TextField portfolioField;
-    @FXML private TextField githubField;
-    @FXML private Label motivationError;
-    @FXML private Label cvError;
-
     private final OfferDAO offerDAO = new OfferDAO();
     private final CandidatureDAO candidatureDAO = new CandidatureDAO();
     private final EmailNotificationService emailService = new EmailNotificationService();
     private List<Offer> allOffers = new ArrayList<>();
-    private Offer applyingOffer = null;
-    private File selectedCvFile = null;
     private YearMonth calendarMonth = YearMonth.now();
 
     @Override
@@ -67,26 +53,9 @@ public class StudentOffersController implements Initializable {
             sortCombo.valueProperty().addListener((obs, o, v) -> applyFilter());
         }
         searchField.textProperty().addListener((obs, o, v) -> applyFilter());
-
-        // Input restrictions
-        motivationField.textProperty().addListener((obs, old, val) -> {
-            if (val != null && val.length() > 2000) motivationField.setText(old);
-            if (val != null && !val.isEmpty() && !val.matches("[a-zA-Z0-9\\s\\p{Punct}\u00C0-\u017F\\n\\r]*"))
-                motivationField.setText(old);
-        });
-        portfolioField.textProperty().addListener((obs, old, val) -> {
-            if (val != null && val.length() > 255) portfolioField.setText(old);
-            if (val != null && !val.isEmpty() && !val.matches("[a-zA-Z0-9\\s:/\\-._~!$&'()*+,;=@%#?]*"))
-                portfolioField.setText(old);
-        });
-        githubField.textProperty().addListener((obs, old, val) -> {
-            if (val != null && val.length() > 255) githubField.setText(old);
-            if (val != null && !val.isEmpty() && !val.matches("[a-zA-Z0-9\\s:/\\-._~!$&'()*+,;=@%#?]*"))
-                githubField.setText(old);
-        });
-
         loadOffers();
     }
+
 
     private void loadOffers() {
         try {
@@ -142,7 +111,7 @@ public class StudentOffersController implements Initializable {
         // Header
         HBox header = new HBox(8);
         header.setAlignment(Pos.CENTER_LEFT);
-        String statusColor = "open".equals(offer.getStatus()) || offer.getStatus() == null ? "#22c55e" : "#888";
+        String statusColor = "open".equals(offer.getStatus()) || offer.getStatus() == null ? "#22c55e" : "#888888";
         Label statusLabel = new Label(offer.getStatus() != null ? offer.getStatus().toUpperCase() : "OPEN");
         statusLabel.setStyle("-fx-background-color: " + statusColor + "22; -fx-text-fill: " + statusColor + "; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 4 10;");
         Region spacer = new Region();
@@ -202,80 +171,17 @@ public class StudentOffersController implements Initializable {
         return card;
     }
 
-    // ── Apply Form ────────────────────────────────────────────────────────────
+    // ── Apply Form (now opens as popup dialog) ────────────────────────────────
 
     private void openApplyForm(Offer offer) {
-        applyingOffer = offer;
-        applyOfferTitle.setText("Apply for: " + offer.getTitle());
-        motivationField.clear();
-        cvPathField.clear();
-        portfolioField.clear();
-        githubField.clear();
-        motivationError.setText("");
-        cvError.setText("");
-        selectedCvFile = null;
-        applyFormContainer.setVisible(true);
-        applyFormContainer.setManaged(true);
+        DialogUtil.openApplyDialog(offer,
+            offersContainer.getScene() != null ? offersContainer.getScene().getWindow() : null,
+            this::loadOffers);
     }
 
-    @FXML public void handleBrowseCV() {
-        FileChooser fc = new FileChooser();
-        fc.setTitle("Select CV");
-        fc.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("PDF Files", "*.pdf"),
-            new FileChooser.ExtensionFilter("Word Files", "*.doc", "*.docx"),
-            new FileChooser.ExtensionFilter("All Files", "*.*")
-        );
-        File file = fc.showOpenDialog(offersContainer.getScene().getWindow());
-        if (file != null) {
-            selectedCvFile = file;
-            cvPathField.setText(file.getName()); // store only filename
-            cvError.setText("");
-        }
-    }
-
-    @FXML public void handleCancelApply() {
-        applyFormContainer.setVisible(false);
-        applyFormContainer.setManaged(false);
-        applyingOffer = null;
-        selectedCvFile = null;
-    }
-
-    @FXML public void handleSubmitApply() {
-        boolean valid = true;
-
-        if (motivationField.getText() == null || motivationField.getText().trim().isEmpty()) {
-            motivationError.setText("Motivation letter is required"); valid = false;
-        } else if (motivationField.getText().trim().length() < 50) {
-            motivationError.setText("Minimum 50 characters"); valid = false;
-        } else { motivationError.setText(""); }
-
-        if (selectedCvFile == null) {
-            cvError.setText("CV is required"); valid = false;
-        } else { cvError.setText(""); }
-
-        if (!valid) return;
-
-        try {
-            User user = SessionManager.getCurrentUser();
-            Candidature c = new Candidature();
-            c.setOfferId(applyingOffer.getId());
-            c.setStudentId(user.getId());
-            c.setMotivationLetter(motivationField.getText().trim());
-            c.setCvPath(selectedCvFile.getName()); // filename only
-            c.setPortfolioUrl(portfolioField.getText().trim());
-            c.setGithubUrl(githubField.getText().trim());
-            candidatureDAO.save(c);
-            // Send confirmation email async
-            emailService.sendCandidatureConfirmation(c.getId());
-            handleCancelApply();
-            loadOffers(); // refresh to show "Already Applied"
-            showAlert("Success", "Your application has been submitted!", Alert.AlertType.INFORMATION);
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Error", "Failed to submit: " + e.getMessage(), Alert.AlertType.ERROR);
-        }
-    }
+    @FXML public void handleBrowseCV() { /* no-op, kept for FXML compatibility */ }
+    @FXML public void handleCancelApply() { /* no-op, kept for FXML compatibility */ }
+    @FXML public void handleSubmitApply() { /* no-op, kept for FXML compatibility */ }
 
     @FXML public void handleReset() {
         searchField.clear();

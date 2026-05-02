@@ -4,6 +4,7 @@ import org.example.dao.CandidatureDAO;
 import org.example.dao.OfferDAO;
 import org.example.model.Offer;
 import org.example.model.User;
+import org.example.util.DialogUtil;
 import org.example.util.SessionManager;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -16,11 +17,9 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class EstablishmentOffersController implements Initializable {
@@ -31,19 +30,6 @@ public class EstablishmentOffersController implements Initializable {
     @FXML private Label statTotal;
     @FXML private Label statOpen;
     @FXML private Label statClosed;
-
-    // Form
-    @FXML private VBox formContainer;
-    @FXML private Label formTitle;
-    @FXML private TextField titleField;
-    @FXML private TextArea descriptionField;
-    @FXML private TextArea objectivesField;
-    @FXML private TextArea skillsField;
-    @FXML private TextField maxCandidatesField;
-    @FXML private TextField deadlineField;
-    @FXML private ComboBox<String> statusCombo;
-    @FXML private Label titleError;
-    @FXML private Label descError;
     @FXML private Button addBtn;
 
     private final OfferDAO offerDAO = new OfferDAO();
@@ -57,38 +43,6 @@ public class EstablishmentOffersController implements Initializable {
         filterStatus.setValue("All");
         filterStatus.valueProperty().addListener((obs, o, v) -> applyFilter());
         searchField.textProperty().addListener((obs, o, v) -> applyFilter());
-
-        statusCombo.setItems(FXCollections.observableArrayList("open", "closed", "draft"));
-
-        // Input restrictions
-        titleField.textProperty().addListener((obs, old, val) -> {
-            if (val != null && val.length() > 150) titleField.setText(old);
-            if (val != null && !val.isEmpty() && !val.matches("[a-zA-Z0-9\\s\\p{Punct}\u00C0-\u017F]*"))
-                titleField.setText(old);
-        });
-        maxCandidatesField.textProperty().addListener((obs, old, val) -> {
-            if (val != null && !val.matches("\\d*")) maxCandidatesField.setText(old);
-            if (val != null && val.length() > 3) maxCandidatesField.setText(old);
-        });
-        deadlineField.textProperty().addListener((obs, old, val) -> {
-            if (val != null && val.length() > 10) deadlineField.setText(old);
-            if (val != null && !val.isEmpty() && !val.matches("[0-9/]*")) deadlineField.setText(old);
-        });
-        descriptionField.textProperty().addListener((obs, old, val) -> {
-            if (val != null && val.length() > 1000) descriptionField.setText(old);
-            if (val != null && !val.isEmpty() && !val.matches("[a-zA-Z0-9\\s\\p{Punct}\u00C0-\u017F\\n\\r]*"))
-                descriptionField.setText(old);
-        });
-        objectivesField.textProperty().addListener((obs, old, val) -> {
-            if (val != null && val.length() > 1000) objectivesField.setText(old);
-            if (val != null && !val.isEmpty() && !val.matches("[a-zA-Z0-9\\s\\p{Punct}\u00C0-\u017F\\n\\r]*"))
-                objectivesField.setText(old);
-        });
-        skillsField.textProperty().addListener((obs, old, val) -> {
-            if (val != null && val.length() > 500) skillsField.setText(old);
-            if (val != null && !val.isEmpty() && !val.matches("[a-zA-Z0-9\\s\\p{Punct}\u00C0-\u017F\\n\\r]*"))
-                skillsField.setText(old);
-        });
 
         loadOffers();
     }
@@ -166,7 +120,7 @@ public class EstablishmentOffersController implements Initializable {
         // Header
         HBox header = new HBox(8);
         header.setAlignment(Pos.CENTER_LEFT);
-        String statusColor = "open".equals(offer.getStatus()) || offer.getStatus() == null ? "#22c55e" : "#888";
+        String statusColor = "open".equals(offer.getStatus()) || offer.getStatus() == null ? "#22c55e" : "#888888";
         Label statusLabel = new Label(offer.getStatus() != null ? offer.getStatus().toUpperCase() : "OPEN");
         statusLabel.setStyle("-fx-background-color: " + statusColor + "22; -fx-text-fill: " + statusColor + "; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 4 10;");
         Region spacer = new Region();
@@ -226,117 +180,22 @@ public class EstablishmentOffersController implements Initializable {
         return card;
     }
 
-    // ── Form ─────────────────────────────────────────────────────────────────
+    // ── Form (now opens as popup dialog) ─────────────────────────────────────
 
     @FXML public void handleToggleForm() {
-        boolean visible = formContainer.isVisible();
-        if (!visible) {
-            editingOffer = null;
-            clearForm();
-            formTitle.setText("New Offer");
-            formContainer.setVisible(true);
-            formContainer.setManaged(true);
-            addBtn.setText("Cancel");
-        } else {
-            hideForm();
-        }
+        DialogUtil.openOfferFormDialog(null,
+            offersContainer.getScene() != null ? offersContainer.getScene().getWindow() : null,
+            this::loadOffers);
     }
 
     private void handleEdit(Offer offer) {
-        editingOffer = offer;
-        formTitle.setText("Edit Offer");
-        titleField.setText(offer.getTitle() != null ? offer.getTitle() : "");
-        descriptionField.setText(offer.getDescription() != null ? offer.getDescription() : "");
-        objectivesField.setText(offer.getObjectives() != null ? offer.getObjectives() : "");
-        skillsField.setText(offer.getRequiredSkills() != null ? offer.getRequiredSkills() : "");
-        maxCandidatesField.setText(String.valueOf(offer.getMaxCandidates()));
-        deadlineField.setText(offer.getDeadline() != null ? offer.getDeadline().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "");
-        statusCombo.setValue(offer.getStatus() != null ? offer.getStatus() : "open");
-        formContainer.setVisible(true);
-        formContainer.setManaged(true);
-        addBtn.setText("Cancel");
+        DialogUtil.openOfferFormDialog(offer,
+            offersContainer.getScene() != null ? offersContainer.getScene().getWindow() : null,
+            this::loadOffers);
     }
 
-    @FXML public void handleCancelForm() { hideForm(); }
-
-    private void hideForm() {
-        formContainer.setVisible(false);
-        formContainer.setManaged(false);
-        addBtn.setText("+ Add Offer");
-        editingOffer = null;
-        clearForm();
-    }
-
-    private void clearForm() {
-        titleField.clear();
-        descriptionField.clear();
-        objectivesField.clear();
-        skillsField.clear();
-        maxCandidatesField.setText("10");
-        deadlineField.clear();
-        statusCombo.setValue("open");
-        titleError.setText("");
-        descError.setText("");
-    }
-
-    @FXML public void handleSave() {
-        boolean valid = true;
-
-        if (titleField.getText() == null || titleField.getText().trim().length() < 3) {
-            titleError.setText("Title required (min 3 characters)"); valid = false;
-        } else { titleError.setText(""); }
-
-        if (descriptionField.getText() == null || descriptionField.getText().trim().length() < 5) {
-            descError.setText("Description required (min 5 characters)"); valid = false;
-        } else { descError.setText(""); }
-
-        if (!valid) return;
-
-        try {
-            User user = SessionManager.getCurrentUser();
-            int estId = user.getEstablishmentId();
-            if (estId == 0) estId = resolveEstablishmentId(user.getId());
-            int maxC = 10;
-            try { maxC = Integer.parseInt(maxCandidatesField.getText().trim()); } catch (Exception ignored) {}
-
-            LocalDate deadline = null;
-            if (!deadlineField.getText().trim().isEmpty()) {
-                try {
-                    deadline = LocalDate.parse(deadlineField.getText().trim(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                } catch (Exception e) {
-                    titleError.setText("Deadline format: dd/MM/yyyy");
-                    return;
-                }
-            }
-
-            if (editingOffer == null) {
-                Offer o = new Offer();
-                o.setEstablishmentId(estId);
-                o.setTitle(titleField.getText().trim());
-                o.setDescription(descriptionField.getText().trim());
-                o.setObjectives(objectivesField.getText().trim());
-                o.setRequiredSkills(skillsField.getText().trim());
-                o.setMaxCandidates(maxC);
-                o.setDeadline(deadline);
-                o.setStatus(statusCombo.getValue() != null ? statusCombo.getValue() : "open");
-                offerDAO.save(o);
-            } else {
-                editingOffer.setTitle(titleField.getText().trim());
-                editingOffer.setDescription(descriptionField.getText().trim());
-                editingOffer.setObjectives(objectivesField.getText().trim());
-                editingOffer.setRequiredSkills(skillsField.getText().trim());
-                editingOffer.setMaxCandidates(maxC);
-                editingOffer.setDeadline(deadline);
-                editingOffer.setStatus(statusCombo.getValue() != null ? statusCombo.getValue() : "open");
-                offerDAO.update(editingOffer);
-            }
-            hideForm();
-            loadOffers();
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Error", "Failed to save: " + e.getMessage(), Alert.AlertType.ERROR);
-        }
-    }
+    @FXML public void handleCancelForm() { /* no-op, kept for FXML compatibility */ }
+    @FXML public void handleSave() { /* no-op, kept for FXML compatibility */ }
 
     private void handleDelete(Offer offer) {
         if (!ModernAlert.confirmDelete(offer.getTitle())) return;

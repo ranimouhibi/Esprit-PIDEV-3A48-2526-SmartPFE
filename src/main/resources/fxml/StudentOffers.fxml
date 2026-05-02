@@ -36,47 +36,6 @@
                 style="-fx-background-color: #6b7280; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 8 18; -fx-cursor: hand;"/>
     </HBox>
 
-    <!-- Apply Form (shared across views) -->
-    <VBox fx:id="applyFormContainer" spacing="14" visible="false" managed="false"
-          style="-fx-background-color: #f0fff4; -fx-border-color: #22c55e; -fx-border-width: 0 0 0 4;">
-        <padding><Insets top="18" bottom="18" left="30" right="30"/></padding>
-        <Label fx:id="applyOfferTitle" text="" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
-        <VBox spacing="5">
-            <Label text="Motivation Letter *" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
-            <TextArea fx:id="motivationField" promptText="Write your motivation letter (min. 50 characters)..." prefRowCount="4"
-                      style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd; -fx-border-width: 1;"/>
-            <Label fx:id="motivationError" text="" style="-fx-text-fill: #ef4444; -fx-font-size: 11px;"/>
-        </VBox>
-        <HBox spacing="16">
-            <VBox spacing="5" HBox.hgrow="ALWAYS">
-                <Label text="CV *" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
-                <HBox spacing="8">
-                    <TextField fx:id="cvPathField" promptText="No file selected..." HBox.hgrow="ALWAYS"
-                               editable="false" style="-fx-pref-height: 34px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
-                    <Button text="Browse..." onAction="#handleBrowseCV"
-                            style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 7 14; -fx-cursor: hand;"/>
-                </HBox>
-                <Label fx:id="cvError" text="" style="-fx-text-fill: #ef4444; -fx-font-size: 11px;"/>
-            </VBox>
-            <VBox spacing="5" HBox.hgrow="ALWAYS">
-                <Label text="Portfolio URL (optional)" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
-                <TextField fx:id="portfolioField" promptText="https://your-portfolio.com"
-                           style="-fx-pref-height: 34px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
-            </VBox>
-        </HBox>
-        <VBox spacing="5" prefWidth="400">
-            <Label text="GitHub URL (optional)" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
-            <TextField fx:id="githubField" promptText="https://github.com/username"
-                       style="-fx-pref-height: 34px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
-        </VBox>
-        <HBox spacing="12" alignment="CENTER_RIGHT">
-            <Button text="Cancel" onAction="#handleCancelApply"
-                    style="-fx-background-color: transparent; -fx-text-fill: #666; -fx-cursor: hand;"/>
-            <Button text="Submit Application" onAction="#handleSubmitApply"
-                    style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 22; -fx-cursor: hand;"/>
-        </HBox>
-    </VBox>
-
     <!-- ═══ LIST VIEW ═══ -->
     <VBox fx:id="listView" VBox.vgrow="ALWAYS">
         <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
