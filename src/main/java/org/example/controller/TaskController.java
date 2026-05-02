@@ -12,6 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import org.example.util.ModernAlert;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
@@ -141,17 +142,14 @@ public class TaskController implements Initializable {
     @FXML
     public void handleDelete() {
         if (selectedTask == null) { showMessage("Sélectionnez une tâche.", true); return; }
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer cette tâche?", ButtonType.YES, ButtonType.NO);
-        confirm.showAndWait().ifPresent(btn -> {
-            if (btn == ButtonType.YES) {
-                try {
-                    taskDAO.delete(selectedTask.getId());
-                    showMessage("Tâche supprimée.", false);
-                    handleClear();
-                    loadTasks();
-                } catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
-            }
-        });
+        if (ModernAlert.confirmDelete("this task")) {
+            try {
+                taskDAO.delete(selectedTask.getId());
+                showMessage("Tâche supprimée.", false);
+                handleClear();
+                loadTasks();
+            } catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
+        }
     }
 
     @FXML

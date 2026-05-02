@@ -8,6 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import org.example.util.ModernAlert;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
@@ -148,19 +149,16 @@ public class MeetingController implements Initializable {
     @FXML
     public void handleDelete() {
         if (selectedMeeting == null) { showMessage("Sélectionnez un meeting.", true); return; }
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer ce meeting?", ButtonType.YES, ButtonType.NO);
-        confirm.showAndWait().ifPresent(btn -> {
-            if (btn == ButtonType.YES) {
-                try {
-                    PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement("DELETE FROM meetings WHERE id=?");
-                    ps.setInt(1, selectedMeeting.getId());
-                    ps.executeUpdate();
-                    showMessage("Meeting supprimé.", false);
-                    handleClear();
-                    loadMeetings();
-                } catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
-            }
-        });
+        if (ModernAlert.confirmDelete("this meeting")) {
+            try {
+                PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement("DELETE FROM meetings WHERE id=?");
+                ps.setInt(1, selectedMeeting.getId());
+                ps.executeUpdate();
+                showMessage("Meeting supprimé.", false);
+                handleClear();
+                loadMeetings();
+            } catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
+        }
     }
 
     @FXML

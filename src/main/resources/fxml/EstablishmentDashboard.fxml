@@ -3,9 +3,10 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.example.controller.EstablishmentDashboardController"
-      spacing="0" style="-fx-background-color: #f4f6fb;">
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="org.example.controller.EstablishmentDashboardController">
+
+<VBox spacing="0" style="-fx-background-color: #f4f6fb;">
 
     <!-- NAVBAR -->
     <HBox alignment="CENTER_LEFT"
@@ -21,7 +22,11 @@
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label text="PROJECTS" onMouseClicked="#showProjects"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
+            <Label text="OFFERS" onMouseClicked="#showOffers"
+                   style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label text="APPLICATIONS" onMouseClicked="#showApplications"
+                   style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
+            <Label text="📅 CALENDAR" onMouseClicked="#showCalendar"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label text="PROFILE" onMouseClicked="#showProfile"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
@@ -33,7 +38,8 @@
     <!-- CONTENT AREA -->
     <BorderPane fx:id="contentArea" VBox.vgrow="ALWAYS">
         <center>
-            <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                        VBox.vgrow="ALWAYS"
                         style="-fx-background-color: transparent; -fx-border-color: transparent;">
                 <VBox fx:id="homePane" spacing="0">
 
@@ -47,13 +53,13 @@
                             <Label fx:id="welcomeLabel" text="WELCOME BACK"
                                    style="-fx-font-size: 38px; -fx-font-weight: bold; -fx-text-fill: white; -fx-wrap-text: true;"
                                    wrapText="true" maxWidth="460"/>
-                            <Label text="Manage your institution's users, projects and applications. Validate submissions and generate institutional reports with ease."
+                            <Label text="Manage your institution's offers, applications and projects. Review candidatures, track AI matching scores and make informed decisions."
                                    style="-fx-font-size: 13px; -fx-text-fill: #b0b0b0; -fx-line-spacing: 3;"
                                    wrapText="true" maxWidth="440"/>
                             <HBox spacing="14">
-                                <Button text="MANAGE USERS" onAction="#showUsers"
+                                <Button text="VIEW OFFERS" onAction="#showOffers"
                                         style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 24; -fx-padding: 12 26; -fx-cursor: hand; -fx-font-size: 13px; -fx-effect: dropshadow(gaussian, rgba(161,44,47,0.4), 10, 0, 0, 3);"/>
-                                <Button text="ALL PROJECTS" onAction="#showProjects"
+                                <Button text="APPLICATIONS" onAction="#showApplications"
                                         style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 24; -fx-padding: 12 26; -fx-cursor: hand; -fx-font-size: 13px; -fx-border-color: rgba(255,255,255,0.4); -fx-border-radius: 24; -fx-border-width: 1.5;"/>
                             </HBox>
                         </VBox>
@@ -63,33 +69,34 @@
                             <padding><Insets left="40"/></padding>
                             <HBox spacing="14">
                                 <VBox spacing="8" alignment="CENTER"
-                                      style="-fx-background-color: #a12c2f; -fx-background-radius: 14;" prefWidth="160" prefHeight="110">
-                                    <Label text="👥" style="-fx-font-size: 28px;"/>
-                                    <Label text="Total Users" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
-                                    <Label fx:id="userCountLabel" text="0"
-                                           style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                                      style="-fx-background-color: #3a3a3a; -fx-background-radius: 14;" prefWidth="160" prefHeight="110">
+                                    <Label text="🎯" style="-fx-font-size: 28px;"/>
+                                    <Label text="Active Offers" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                                    <Label fx:id="offerCountLabel" text="0"
+                                           style="-fx-text-fill: #a12c2f; -fx-font-size: 22px; -fx-font-weight: bold;"/>
                                 </VBox>
                                 <VBox spacing="8" alignment="CENTER"
                                       style="-fx-background-color: #3a3a3a; -fx-background-radius: 14;" prefWidth="160" prefHeight="110">
-                                    <Label text="📁" style="-fx-font-size: 28px;"/>
-                                    <Label text="Projects" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
-                                    <Label fx:id="projectCountLabel" text="0"
-                                           style="-fx-text-fill: #a12c2f; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                                    <Label text="📋" style="-fx-font-size: 28px;"/>
+                                    <Label text="Pending Apps" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                                    <Label fx:id="applicationCountLabel" text="0"
+                                           style="-fx-text-fill: #ffc107; -fx-font-size: 22px; -fx-font-weight: bold;"/>
                                 </VBox>
                             </HBox>
                             <HBox spacing="14">
                                 <VBox spacing="8" alignment="CENTER"
                                       style="-fx-background-color: #3a3a3a; -fx-background-radius: 14;" prefWidth="160" prefHeight="110">
-                                    <Label text="📋" style="-fx-font-size: 28px;"/>
-                                    <Label text="Applications" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
-                                    <Label fx:id="applicationCountLabel" text="0"
-                                           style="-fx-text-fill: #a12c2f; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                                    <Label text="👥" style="-fx-font-size: 28px;"/>
+                                    <Label text="Total Users" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                                    <Label fx:id="userCountLabel" text="0"
+                                           style="-fx-text-fill: #28a745; -fx-font-size: 22px; -fx-font-weight: bold;"/>
                                 </VBox>
                                 <VBox spacing="8" alignment="CENTER"
-                                      style="-fx-background-color: #3a3a3a; -fx-background-radius: 14;" prefWidth="160" prefHeight="110">
-                                    <Label text="🏛️" style="-fx-font-size: 28px;"/>
-                                    <Label text="Institution" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
-                                    <Label text="Active" style="-fx-text-fill: #22c55e; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                                      style="-fx-background-color: #a12c2f; -fx-background-radius: 14;" prefWidth="160" prefHeight="110">
+                                    <Label text="📁" style="-fx-font-size: 28px;"/>
+                                    <Label text="Projects" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                                    <Label fx:id="projectCountLabel" text="0"
+                                           style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
                                 </VBox>
                             </HBox>
                         </VBox>
@@ -100,29 +107,19 @@
                         <padding><Insets top="40" bottom="40" left="60" right="60"/></padding>
                         <Label text="QUICK ACTIONS"
                                style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #a12c2f; -fx-letter-spacing: 3;"/>
-                        <Label text="Manage your institution"
+                        <Label text="What would you like to do today?"
                                style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
 
                         <HBox spacing="18">
                             <VBox spacing="12" HBox.hgrow="ALWAYS" alignment="TOP_LEFT"
                                   style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 12, 0, 0, 3); -fx-cursor: hand;"
-                                  onMouseClicked="#showUsers">
+                                  onMouseClicked="#showOffers">
                                 <padding><Insets top="24" bottom="24" left="24" right="24"/></padding>
-                                <Label text="👥" style="-fx-font-size: 32px; -fx-background-color: #a12c2f15; -fx-background-radius: 12; -fx-padding: 10 12;"/>
-                                <Label text="Manage Users" style="-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e1e1e;"/>
-                                <Label text="Add, edit and manage students, supervisors and staff"
+                                <Label text="🎯" style="-fx-font-size: 32px; -fx-background-color: #a12c2f15; -fx-background-radius: 12; -fx-padding: 10 12;"/>
+                                <Label text="My Offers" style="-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e1e1e;"/>
+                                <Label text="Create and manage your internship and PFE offers"
                                        style="-fx-text-fill: #888; -fx-font-size: 12px;" wrapText="true"/>
                                 <Label text="Open →" style="-fx-text-fill: #a12c2f; -fx-font-weight: bold; -fx-font-size: 12px;"/>
-                            </VBox>
-                            <VBox spacing="12" HBox.hgrow="ALWAYS" alignment="TOP_LEFT"
-                                  style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 12, 0, 0, 3); -fx-cursor: hand;"
-                                  onMouseClicked="#showProjects">
-                                <padding><Insets top="24" bottom="24" left="24" right="24"/></padding>
-                                <Label text="📁" style="-fx-font-size: 32px; -fx-background-color: #3b82f615; -fx-background-radius: 12; -fx-padding: 10 12;"/>
-                                <Label text="All Projects" style="-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e1e1e;"/>
-                                <Label text="View and oversee all institutional academic projects"
-                                       style="-fx-text-fill: #888; -fx-font-size: 12px;" wrapText="true"/>
-                                <Label text="Open →" style="-fx-text-fill: #3b82f6; -fx-font-weight: bold; -fx-font-size: 12px;"/>
                             </VBox>
                             <VBox spacing="12" HBox.hgrow="ALWAYS" alignment="TOP_LEFT"
                                   style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 12, 0, 0, 3); -fx-cursor: hand;"
@@ -130,30 +127,99 @@
                                 <padding><Insets top="24" bottom="24" left="24" right="24"/></padding>
                                 <Label text="📋" style="-fx-font-size: 32px; -fx-background-color: #f59e0b15; -fx-background-radius: 12; -fx-padding: 10 12;"/>
                                 <Label text="Applications" style="-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e1e1e;"/>
-                                <Label text="Review and validate student project applications"
+                                <Label text="Review candidatures with AI matching scores and make decisions"
                                        style="-fx-text-fill: #888; -fx-font-size: 12px;" wrapText="true"/>
                                 <Label text="Open →" style="-fx-text-fill: #f59e0b; -fx-font-weight: bold; -fx-font-size: 12px;"/>
+                            </VBox>
+                            <VBox spacing="12" HBox.hgrow="ALWAYS" alignment="TOP_LEFT"
+                                  style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 12, 0, 0, 3); -fx-cursor: hand;"
+                                  onMouseClicked="#showCalendar">
+                                <padding><Insets top="24" bottom="24" left="24" right="24"/></padding>
+                                <Label text="📅" style="-fx-font-size: 32px; -fx-background-color: #667eea15; -fx-background-radius: 12; -fx-padding: 10 12;"/>
+                                <Label text="Calendar" style="-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e1e1e;"/>
+                                <Label text="View offer deadlines and interview dates on a calendar"
+                                       style="-fx-text-fill: #888; -fx-font-size: 12px;" wrapText="true"/>
+                                <Label text="Open →" style="-fx-text-fill: #667eea; -fx-font-weight: bold; -fx-font-size: 12px;"/>
+                            </VBox>
+                            <VBox spacing="12" HBox.hgrow="ALWAYS" alignment="TOP_LEFT"
+                                  style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 12, 0, 0, 3); -fx-cursor: hand;"
+                                  onMouseClicked="#showProjects">
+                                <padding><Insets top="24" bottom="24" left="24" right="24"/></padding>
+                                <Label text="📁" style="-fx-font-size: 32px; -fx-background-color: #22c55e15; -fx-background-radius: 12; -fx-padding: 10 12;"/>
+                                <Label text="Projects" style="-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e1e1e;"/>
+                                <Label text="View and oversee all institutional academic projects"
+                                       style="-fx-text-fill: #888; -fx-font-size: 12px;" wrapText="true"/>
+                                <Label text="Open →" style="-fx-text-fill: #22c55e; -fx-font-weight: bold; -fx-font-size: 12px;"/>
                             </VBox>
                         </HBox>
                     </VBox>
 
                     <!-- BANNER -->
                     <HBox alignment="CENTER_LEFT" spacing="24"
-                          style="-fx-background-color: #2d2d2d;" prefHeight="90">
+                          style="-fx-background-color: #a12c2f;" prefHeight="90">
                         <padding><Insets left="60" right="60"/></padding>
-                        <Label text="📊" style="-fx-font-size: 28px;"/>
+                        <Label text="💡" style="-fx-font-size: 28px;"/>
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
-                            <Label text="Institution Overview"
+                            <Label text="Pro Tip — Review pending applications!"
                                    style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 14px;"/>
-                            <Label text="Keep your institution's data up to date and validate pending applications regularly."
-                                   style="-fx-text-fill: #aaa; -fx-font-size: 12px;" wrapText="true"/>
+                            <Label text="Use AI Matching scores to quickly identify the best candidates for your offers."
+                                   style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 12px;" wrapText="true"/>
                         </VBox>
                         <Button text="View Applications" onAction="#showApplications"
-                                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 22; -fx-cursor: hand;"/>
+                                style="-fx-background-color: white; -fx-text-fill: #a12c2f; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 22; -fx-cursor: hand;"/>
                     </HBox>
+
+                    <!-- AI SUGGESTIONS REMOVED -->
 
                 </VBox>
             </ScrollPane>
         </center>
     </BorderPane>
 </VBox>
+
+<!-- ── FLOATING CHATBOT ── -->
+<StackPane alignment="BOTTOM_RIGHT" pickOnBounds="false">
+    <padding><Insets bottom="24" right="24"/></padding>
+    <VBox spacing="0" alignment="BOTTOM_RIGHT" pickOnBounds="false">
+        <!-- Chat popup panel -->
+        <VBox fx:id="estChatPanel" spacing="0" visible="false" managed="false"
+              style="-fx-background-color: white; -fx-background-radius: 16;
+                     -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.22),20,0,0,6);
+                     -fx-border-color: #e0e0e0; -fx-border-radius: 16; -fx-border-width: 1;"
+              prefWidth="340" maxHeight="460">
+            <HBox alignment="CENTER_LEFT" spacing="10"
+                  style="-fx-background-color: #a12c2f; -fx-background-radius: 16 16 0 0; -fx-padding: 12 16;">
+                <Label text="🤖" style="-fx-font-size: 18px;"/>
+                <VBox spacing="1" HBox.hgrow="ALWAYS">
+                    <Label text="SmartPFE Assistant" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: white;"/>
+                    <Label text="Ask about offers &amp; applications" style="-fx-font-size: 10px; -fx-text-fill: rgba(255,255,255,0.75);"/>
+                </VBox>
+                <Button text="✕" onAction="#handleEstChatToggle"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-cursor: hand; -fx-padding: 0 4;"/>
+            </HBox>
+            <ScrollPane fx:id="estChatScroll" fitToWidth="true" prefHeight="300" hbarPolicy="NEVER"
+                        style="-fx-background-color: #f8f8f8; -fx-background: #f8f8f8; -fx-border-color: transparent;">
+                <VBox fx:id="estChatMessages" spacing="5">
+                    <padding><Insets top="10" bottom="10" left="10" right="10"/></padding>
+                </VBox>
+            </ScrollPane>
+            <HBox spacing="8" alignment="CENTER_LEFT"
+                  style="-fx-background-color: white; -fx-background-radius: 0 0 16 16; -fx-padding: 10 12; -fx-border-color: #eee; -fx-border-width: 1 0 0 0;">
+                <TextField fx:id="estChatInput" promptText="Ask a question..." HBox.hgrow="ALWAYS"
+                           style="-fx-pref-height: 34px; -fx-background-radius: 17; -fx-border-radius: 17; -fx-border-color: #ddd; -fx-padding: 0 12;"
+                           onAction="#handleEstChatSend"/>
+                <Button text="➤" onAction="#handleEstChatSend"
+                        style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 17; -fx-padding: 7 14; -fx-cursor: hand; -fx-font-weight: bold;"/>
+            </HBox>
+        </VBox>
+        <!-- FAB -->
+        <Button fx:id="estChatFab" text="🤖" onAction="#handleEstChatToggle"
+                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-size: 22px;
+                       -fx-background-radius: 30; -fx-min-width: 58; -fx-min-height: 58;
+                       -fx-cursor: hand; -fx-effect: dropshadow(gaussian,rgba(161,44,47,0.5),14,0,0,4);">
+            <VBox.margin><Insets top="8"/></VBox.margin>
+        </Button>
+    </VBox>
+</StackPane>
+
+</StackPane>
