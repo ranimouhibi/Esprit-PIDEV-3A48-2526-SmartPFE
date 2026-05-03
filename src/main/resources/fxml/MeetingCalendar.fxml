@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.controller.MeetingCalendarController"
+      spacing="0" style="-fx-background-color: #f0f2f5;">
+
+    <!-- Header -->
+    <VBox style="-fx-background-color: #1e1e2e;" spacing="4">
+        <padding><Insets top="16" bottom="16" left="24" right="24"/></padding>
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <Label text="📅 Meeting Calendar" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="🔄 Refresh" onAction="#handleRefresh"
+                    style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 5 12;"/>
+            <Button fx:id="closeBtn" text="✕ Close" onAction="#handleClose"
+                    style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 5 12;"/>
+        </HBox>
+    </VBox>
+
+    <!-- Calendar WebView -->
+    <WebView fx:id="calendarWebView" VBox.vgrow="ALWAYS"/>
+</VBox>

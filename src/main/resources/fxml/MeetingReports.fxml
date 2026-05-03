@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.controller.MeetingReportController"
+      style="-fx-background-color: #f0f2f5;" spacing="0">
+
+    <!-- Header -->
+    <VBox style="-fx-background-color: #1e1e2e;" spacing="4">
+        <padding><Insets top="20" bottom="20" left="28" right="28"/></padding>
+        <Label text="Meeting Reports" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+        <Label fx:id="meetingInfoLabel" text="" style="-fx-font-size: 12px; -fx-text-fill: #8b8fa8;"/>
+    </VBox>
+
+    <!-- Stats -->
+    <HBox spacing="16" style="-fx-background-color: #2a2a3e;">
+        <padding><Insets top="14" bottom="14" left="28" right="28"/></padding>
+        <VBox alignment="CENTER" spacing="2" HBox.hgrow="ALWAYS">
+            <Label text="TOTAL" style="-fx-font-size: 10px; -fx-text-fill: #8b8fa8;"/>
+            <Label fx:id="statTotal" text="0" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+        </VBox>
+        <VBox alignment="CENTER" spacing="2" HBox.hgrow="ALWAYS">
+            <Label text="DRAFT" style="-fx-font-size: 10px; -fx-text-fill: #8b8fa8;"/>
+            <Label fx:id="statDraft" text="0" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #f39c12;"/>
+        </VBox>
+        <VBox alignment="CENTER" spacing="2" HBox.hgrow="ALWAYS">
+            <Label text="SUBMITTED" style="-fx-font-size: 10px; -fx-text-fill: #8b8fa8;"/>
+            <Label fx:id="statSubmitted" text="0" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2980b9;"/>
+        </VBox>
+        <VBox alignment="CENTER" spacing="2" HBox.hgrow="ALWAYS">
+            <Label text="APPROVED" style="-fx-font-size: 10px; -fx-text-fill: #8b8fa8;"/>
+            <Label fx:id="statApproved" text="0" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
+        </VBox>
+    </HBox>
+
+    <!-- Toolbar -->
+    <HBox spacing="10" style="-fx-background-color: white; -fx-border-color: #e5e7eb; -fx-border-width: 0 0 1 0;" alignment="CENTER_LEFT">
+        <padding><Insets top="12" bottom="12" left="20" right="20"/></padding>
+        <TextField fx:id="searchField" promptText="🔍  Rechercher..." prefWidth="200"
+                   style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #d1d5db; -fx-padding: 7 12;"/>
+        <Button text="Rechercher" onAction="#handleSearch"
+                style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 7 14;"/>
+        <ComboBox fx:id="filterStatus" prefWidth="130"/>
+        <ComboBox fx:id="sortDirCombo" prefWidth="90"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="➕ Nouveau Report" onAction="#handleNewReport"
+                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 7 14;"/>
+        <Button text="✏️ Modifier" onAction="#handleEdit"
+                style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 7 14;"/>
+        <Button text="🗑️ Supprimer" onAction="#handleDelete"
+                style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 7 14;"/>
+        <Button text="📄 Export PDF" onAction="#handleExportPdf"
+                style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 7 14;"/>
+        <Button text="👁 Détails" onAction="#handleViewDetail"
+                style="-fx-background-color: #8e44ad; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 7 14;"/>
+    </HBox>
+
+    <!-- Table -->
+    <TableView fx:id="reportTable" VBox.vgrow="ALWAYS"
+               style="-fx-background-color: white; -fx-border-color: transparent;">
+        <columns>
+            <TableColumn fx:id="colProject" text="Projet" prefWidth="200"/>
+            <TableColumn fx:id="colType" text="Type Meeting" prefWidth="130"/>
+            <TableColumn fx:id="colStatus" text="Statut" prefWidth="110"/>
+            <TableColumn fx:id="colCreatedBy" text="Créé par" prefWidth="150"/>
+            <TableColumn fx:id="colDate" text="Date" prefWidth="110"/>
+        </columns>
+        <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+    </TableView>
+</VBox>
