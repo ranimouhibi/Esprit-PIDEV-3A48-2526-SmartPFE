@@ -1,67 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.web.WebView?>
 <?import javafx.geometry.Insets?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.example.controller.OfferCalendarController"
-            style="-fx-background-color: #f4f6fb;">
-    <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.controller.OfferCalendarController"
+      spacing="0" style="-fx-background-color: #f4f6fb;">
 
-    <top>
-        <VBox spacing="12">
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="12"
+          style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+        <padding><Insets top="16" bottom="16" left="24" right="24"/></padding>
+        <VBox spacing="3" HBox.hgrow="ALWAYS">
             <Label text="Offers &amp; Candidatures Calendar"
-                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
-            <!-- Navigation -->
-            <HBox spacing="12" alignment="CENTER_LEFT">
-                <Button text="◀" onAction="#prevMonth"
-                        style="-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;"/>
-                <Label fx:id="monthLabel" text=""
-                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e; -fx-min-width: 180; -fx-alignment: CENTER;"/>
-                <Button text="▶" onAction="#nextMonth"
-                        style="-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;"/>
-            </HBox>
-            <!-- Legend -->
-            <HBox fx:id="legendBox" spacing="16" alignment="CENTER_LEFT">
-                <HBox spacing="6" alignment="CENTER_LEFT">
-                    <Label text="■" style="-fx-text-fill: #a12c2f; -fx-font-size: 14px;"/>
-                    <Label text="Offer Deadline" style="-fx-font-size: 12px; -fx-text-fill: #555;"/>
-                </HBox>
-                <HBox spacing="6" alignment="CENTER_LEFT">
-                    <Label text="■" style="-fx-text-fill: #667eea; -fx-font-size: 14px;"/>
-                    <Label text="Interview" style="-fx-font-size: 12px; -fx-text-fill: #555;"/>
-                </HBox>
-            </HBox>
-            <padding><Insets bottom="8"/></padding>
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+            <Label text="Deadlines, applications and interviews"
+                   style="-fx-font-size: 12px; -fx-text-fill: #888;"/>
         </VBox>
-    </top>
-
-    <center>
-        <HBox spacing="16">
-            <!-- Calendar grid -->
-            <VBox style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.07),10,0,0,3);"
-                  HBox.hgrow="ALWAYS">
-                <GridPane fx:id="calendarGrid" hgap="0" vgap="0" maxWidth="Infinity" VBox.vgrow="ALWAYS">
-                    <columnConstraints>
-                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
-                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
-                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
-                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
-                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
-                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
-                        <ColumnConstraints hgrow="ALWAYS" percentWidth="14.28"/>
-                    </columnConstraints>
-                </GridPane>
-            </VBox>
-
-            <!-- Sidebar: upcoming events -->
-            <VBox prefWidth="220" spacing="8"
-                  style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.07),10,0,0,3);">
-                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
-                            style="-fx-background-color: transparent; -fx-border-color: transparent;">
-                    <VBox fx:id="eventList" spacing="6"/>
-                </ScrollPane>
-            </VBox>
+        <!-- Legend -->
+        <HBox spacing="16" alignment="CENTER">
+            <HBox spacing="5" alignment="CENTER_LEFT">
+                <Label text="●" style="-fx-text-fill: #a12c2f; -fx-font-size: 14px;"/>
+                <Label text="Deadline" style="-fx-font-size: 11px; -fx-text-fill: #555;"/>
+            </HBox>
+            <HBox spacing="5" alignment="CENTER_LEFT">
+                <Label text="●" style="-fx-text-fill: #667eea; -fx-font-size: 14px;"/>
+                <Label text="Application" style="-fx-font-size: 11px; -fx-text-fill: #555;"/>
+            </HBox>
+            <HBox spacing="5" alignment="CENTER_LEFT">
+                <Label text="●" style="-fx-text-fill: #22c55e; -fx-font-size: 14px;"/>
+                <Label text="Accepted" style="-fx-font-size: 11px; -fx-text-fill: #555;"/>
+            </HBox>
+            <HBox spacing="5" alignment="CENTER_LEFT">
+                <Label text="●" style="-fx-text-fill: #8b5cf6; -fx-font-size: 14px;"/>
+                <Label text="Interview" style="-fx-font-size: 11px; -fx-text-fill: #555;"/>
+            </HBox>
+            <Button text="↻ Refresh" onAction="#handleRefresh"
+                    style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 7 16; -fx-cursor: hand; -fx-font-size: 11px;"/>
         </HBox>
-    </center>
-</BorderPane>
+    </HBox>
+
+    <!-- FullCalendar WebView -->
+    <WebView fx:id="calendarWebView" VBox.vgrow="ALWAYS"/>
+
+</VBox>

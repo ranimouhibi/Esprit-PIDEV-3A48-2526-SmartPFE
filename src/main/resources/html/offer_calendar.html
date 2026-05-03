@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Offer Calendar</title>
+
+<!-- FullCalendar 6 via CDN -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f4f6fb;
+    padding: 16px;
+    height: 100vh;
+  }
+  #calendar {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    height: calc(100vh - 32px);
+  }
+  /* FullCalendar overrides */
+  .fc-toolbar-title {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: #1a1a2e !important;
+  }
+  .fc-button-primary {
+    background-color: #a12c2f !important;
+    border-color: #a12c2f !important;
+    border-radius: 8px !important;
+    font-size: 12px !important;
+  }
+  .fc-button-primary:hover {
+    background-color: #8a2427 !important;
+    border-color: #8a2427 !important;
+  }
+  .fc-button-active {
+    background-color: #6b1c1f !important;
+    border-color: #6b1c1f !important;
+  }
+  .fc-day-today {
+    background-color: #fff3f3 !important;
+  }
+  .fc-event {
+    border-radius: 4px !important;
+    font-size: 11px !important;
+    padding: 2px 4px !important;
+    cursor: pointer !important;
+  }
+  .fc-daygrid-event-dot { display: none; }
+  .fc-col-header-cell {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #555;
+    font-size: 12px;
+  }
+  /* Tooltip */
+  #tooltip {
+    position: fixed;
+    background: #1a1a2e;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    pointer-events: none;
+    display: none;
+    z-index: 9999;
+    max-width: 260px;
+    line-height: 1.5;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+</style>
+</head>
+<body>
+<div id="calendar"></div>
+<div id="tooltip"></div>
+
+<script>
+var calendar;
+var allEvents = [];
+
+document.addEventListener('DOMContentLoaded', function() {
+  var calEl = document.getElementById('calendar');
+  calendar = new FullCalendar.Calendar(calEl, {
+    initialView: 'dayGridMonth',
+    headerToolbar: {
+      left:   'prev,next today',
+      center: 'title',
+      right:  'dayGridMonth,timeGridWeek,listMonth'
+    },
+    height: '100%',
+    events: [],
+    eventMouseEnter: function(info) {
+      var tooltip = document.getElementById('tooltip');
+      tooltip.innerHTML =
+        '<strong>' + info.event.title + '</strong><br/>' +
+        (info.event.extendedProps.description || '');
+      tooltip.style.display = 'block';
+    },
+    eventMouseLeave: function() {
+      document.getElementById('tooltip').style.display = 'none';
+    },
+    eventClick: function(info) {
+      if (window.javaConnector) {
+        window.javaConnector.onEventClick(
+          info.event.extendedProps.id || '',
+          info.event.extendedProps.type || ''
+        );
+      }
+    },
+    eventDidMount: function(info) {
+      info.el.title = info.event.extendedProps.description || info.event.title;
+    }
+  });
+  calendar.render();
+});
+
+// Called from Java to load events
+function loadEvents(eventsJson) {
+  try {
+    allEvents = JSON.parse(eventsJson);
+    if (calendar) {
+      calendar.removeAllEvents();
+      allEvents.forEach(function(ev) {
+        calendar.addEvent(ev);
+      });
+    }
+  } catch(e) {
+    console.error('loadEvents error:', e);
+  }
+}
+
+// Called from Java to navigate to a specific date
+function goToDate(dateStr) {
+  if (calendar) calendar.gotoDate(dateStr);
+}
+
+// Mouse move for tooltip positioning
+document.addEventListener('mousemove', function(e) {
+  var tooltip = document.getElementById('tooltip');
+  if (tooltip.style.display === 'block') {
+    tooltip.style.left = (e.clientX + 14) + 'px';
+    tooltip.style.top  = (e.clientY - 10) + 'px';
+  }
+});
+</script>
+</body>
+</html>
