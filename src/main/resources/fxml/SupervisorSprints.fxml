@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.controller.SupervisorSprintsController"
+            style="-fx-background-color: #f4f6fb;">
+    <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+
+    <top>
+        <VBox spacing="10">
+            <Label text="Sprint Management &amp; AI Assignment" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Label text="Project:" style="-fx-font-size: 12px;"/>
+                <ComboBox fx:id="projectCombo" prefWidth="260"/>
+            </HBox>
+            <padding><Insets bottom="6"/></padding>
+        </VBox>
+    </top>
+
+    <center>
+        <SplitPane dividerPositions="0.45">
+            <!-- Sprint list -->
+            <VBox spacing="8" style="-fx-background-color: white; -fx-padding: 14; -fx-background-radius: 10;">
+                <Label text="Sprints" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                <TableView fx:id="sprintTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colNum" text="#" prefWidth="40"/>
+                        <TableColumn fx:id="colName" text="Name" prefWidth="140"/>
+                        <TableColumn fx:id="colStatus" text="Status" prefWidth="80"/>
+                        <TableColumn fx:id="colDates" text="Dates" prefWidth="160"/>
+                    </columns>
+                    <placeholder><Label text="Select a project"/></placeholder>
+                </TableView>
+            </VBox>
+
+            <!-- AI Panel -->
+            <VBox fx:id="aiPanel" spacing="12" style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 10;">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="🤖 AI Sprint Assignment" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+                    <Button text="Get AI Recommendations" onAction="#handleAIAssign"
+                            style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 7 16; -fx-cursor: hand;"/>
+                </HBox>
+                <Label fx:id="aiSprintLabel" text="Select a sprint to get recommendations"
+                       style="-fx-text-fill: #888; -fx-font-size: 12px;"/>
+                <Label fx:id="aiStatusLabel" text="" style="-fx-text-fill: #666; -fx-font-size: 11px;"/>
+                <Separator/>
+                <Label text="Top 3 Recommended Students:" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" hbarPolicy="NEVER"
+                            style="-fx-background-color: transparent; -fx-border-color: transparent;">
+                    <VBox fx:id="aiRecommendationsBox" spacing="8"/>
+                </ScrollPane>
+            </VBox>
+        </SplitPane>
+    </center>
+</BorderPane>

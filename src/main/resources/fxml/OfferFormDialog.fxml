@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="org.example.controller.OfferFormDialogController"
+           style="-fx-background-color: rgba(0,0,0,0.45);">
+
+    <VBox alignment="CENTER">
+        <!-- Dialog Card -->
+        <VBox fx:id="dialogCard" spacing="0"
+              style="-fx-background-color: white; -fx-background-radius: 18;
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.28), 32, 0, 0, 8);"
+              maxWidth="640" minWidth="580">
+
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="12"
+                  style="-fx-background-color: linear-gradient(to right, #667eea, #764ba2);
+                         -fx-background-radius: 18 18 0 0; -fx-padding: 20 24;">
+                <Label fx:id="headerIcon" text="➕" style="-fx-font-size: 22px;"/>
+                <VBox spacing="2" HBox.hgrow="ALWAYS">
+                    <Label fx:id="dialogTitleLabel" text="New Offer"
+                           style="-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                    <Label fx:id="dialogSubtitle" text="Fill in the details below"
+                           style="-fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.75);"/>
+                </VBox>
+                <Button text="✕" onAction="#handleClose"
+                        style="-fx-background-color: rgba(255,255,255,0.18); -fx-text-fill: white;
+                               -fx-background-radius: 20; -fx-font-size: 13px; -fx-cursor: hand;
+                               -fx-padding: 4 9; -fx-font-weight: bold;"/>
+            </HBox>
+
+            <!-- Body -->
+            <ScrollPane fitToWidth="true" maxHeight="520" hbarPolicy="NEVER"
+                        style="-fx-background-color: transparent; -fx-border-color: transparent;">
+                <VBox spacing="16" style="-fx-padding: 24 28;">
+
+                    <!-- Title + Status row -->
+                    <HBox spacing="16">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <HBox alignment="CENTER_LEFT" spacing="4">
+                                <Label text="Offer Title" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #333;"/>
+                                <Label text="*" style="-fx-text-fill: #a12c2f; -fx-font-weight: bold;"/>
+                            </HBox>
+                            <TextField fx:id="titleField" promptText="e.g. Full-Stack Developer Internship"
+                                       style="-fx-pref-height: 38px; -fx-background-radius: 10;
+                                              -fx-border-radius: 10; -fx-border-color: #e0e0e0;
+                                              -fx-border-width: 1.5; -fx-font-size: 13px;"/>
+                            <Label fx:id="titleError" text="" style="-fx-text-fill: #e53e3e; -fx-font-size: 11px;"/>
+                        </VBox>
+                        <VBox spacing="6" prefWidth="160">
+                            <Label text="Status" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #333;"/>
+                            <ComboBox fx:id="statusCombo" prefWidth="160"
+                                      style="-fx-pref-height: 38px; -fx-background-radius: 10;"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Description -->
+                    <VBox spacing="6">
+                        <HBox alignment="CENTER_LEFT" spacing="4">
+                            <Label text="Description" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #333;"/>
+                            <Label text="*" style="-fx-text-fill: #a12c2f; -fx-font-weight: bold;"/>
+                        </HBox>
+                        <TextArea fx:id="descriptionField" promptText="Describe the project and role..."
+                                  prefRowCount="3" wrapText="true"
+                                  style="-fx-background-radius: 10; -fx-border-radius: 10;
+                                         -fx-border-color: #e0e0e0; -fx-border-width: 1.5;
+                                         -fx-font-size: 12px; -fx-padding: 10;"/>
+                        <Label fx:id="descError" text="" style="-fx-text-fill: #e53e3e; -fx-font-size: 11px;"/>
+                    </VBox>
+
+                    <!-- Objectives + Skills row -->
+                    <HBox spacing="16">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Objectives" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #333;"/>
+                            <TextArea fx:id="objectivesField" promptText="Learning goals, deliverables..."
+                                      prefRowCount="2" wrapText="true"
+                                      style="-fx-background-radius: 10; -fx-border-radius: 10;
+                                             -fx-border-color: #e0e0e0; -fx-border-width: 1.5;
+                                             -fx-font-size: 12px; -fx-padding: 10;"/>
+                        </VBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Required Skills" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #333;"/>
+                            <TextArea fx:id="skillsField" promptText="Java, Spring Boot, MySQL, React..."
+                                      prefRowCount="2" wrapText="true"
+                                      style="-fx-background-radius: 10; -fx-border-radius: 10;
+                                             -fx-border-color: #e0e0e0; -fx-border-width: 1.5;
+                                             -fx-font-size: 12px; -fx-padding: 10;"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Max Candidates + Deadline row -->
+                    <HBox spacing="16">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Max Candidates" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #333;"/>
+                            <TextField fx:id="maxCandidatesField" text="10" promptText="10"
+                                       style="-fx-pref-height: 38px; -fx-background-radius: 10;
+                                              -fx-border-radius: 10; -fx-border-color: #e0e0e0;
+                                              -fx-border-width: 1.5; -fx-font-size: 13px;"/>
+                        </VBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Deadline" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #333;"/>
+                            <DatePicker fx:id="deadlinePicker" promptText="Select deadline"
+                                        style="-fx-pref-height: 38px; -fx-background-radius: 10;" prefWidth="200"/>
+                            <Label fx:id="deadlineError" text="" style="-fx-text-fill: #e53e3e; -fx-font-size: 11px;"/>
+                        </VBox>
+                    </HBox>
+
+                </VBox>
+            </ScrollPane>
+
+            <!-- Footer -->
+            <HBox alignment="CENTER_RIGHT" spacing="12"
+                  style="-fx-background-color: #f9f9f9; -fx-background-radius: 0 0 18 18;
+                         -fx-border-color: #f0f0f0; -fx-border-width: 1 0 0 0; -fx-padding: 16 24;">
+                <Button text="Cancel" onAction="#handleClose"
+                        style="-fx-background-color: transparent; -fx-text-fill: #666;
+                               -fx-font-size: 12px; -fx-cursor: hand; -fx-padding: 9 20;
+                               -fx-border-color: #ddd; -fx-border-radius: 8; -fx-background-radius: 8;"/>
+                <Button fx:id="saveBtn" text="Save Offer" onAction="#handleSave"
+                        style="-fx-background-color: linear-gradient(to right, #667eea, #764ba2);
+                               -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;
+                               -fx-background-radius: 10; -fx-padding: 10 28; -fx-cursor: hand;"/>
+            </HBox>
+
+        </VBox>
+    </VBox>
+</StackPane>
