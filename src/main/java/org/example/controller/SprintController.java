@@ -27,6 +27,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import org.example.util.ModernAlert;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.io.File;
 import java.net.URL;
@@ -416,6 +418,17 @@ public class SprintController implements Initializable {
                 } catch (Exception e) { showMessage("Error: " + e.getMessage(), true); }
             }
         });
+    @FXML
+    public void handleDelete() {
+        if (selectedSprint == null) { showMessage("Sélectionnez un sprint.", true); return; }
+        if (ModernAlert.confirmDelete(selectedSprint.getName())) {
+            try {
+                sprintDAO.delete(selectedSprint.getId());
+                showMessage("Sprint supprimé.", false);
+                handleClear();
+                loadSprints();
+            } catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
+        }
     }
 
     // ── Filters ───────────────────────────────────────────────────────────────

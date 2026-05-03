@@ -19,6 +19,8 @@ public class Project {
     // Noms pour affichage
     private String ownerName;
     private String supervisorName;
+    private String supervisorEmail;  // needed for email notifications
+    private String ownerEmail;       // needed for email notifications
 
     public Project() {}
 
@@ -64,6 +66,12 @@ public class Project {
 
     public String getSupervisorName() { return supervisorName; }
     public void setSupervisorName(String supervisorName) { this.supervisorName = supervisorName; }
+
+    public String getSupervisorEmail() { return supervisorEmail; }
+    public void setSupervisorEmail(String supervisorEmail) { this.supervisorEmail = supervisorEmail; }
+
+    public String getOwnerEmail() { return ownerEmail; }
+    public void setOwnerEmail(String ownerEmail) { this.ownerEmail = ownerEmail; }
 
     @Override
     public String toString() { return title; }

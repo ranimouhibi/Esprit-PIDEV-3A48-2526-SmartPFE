@@ -4,8 +4,12 @@ import org.example.dao.CommentDAO;
 import org.example.dao.ProjectDAO;
 import org.example.model.Project;
 import org.example.model.User;
+import org.example.service.ProjectService;
 import org.example.util.PDFExporter;
 import org.example.util.SessionManager;
+import org.example.util.QRCodeUtil;
+import org.example.util.ExcelExporter;
+import org.example.util.ChartUtil;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,12 +17,14 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import org.example.util.ModernAlert;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
@@ -42,6 +48,7 @@ public class StudentProjectsController implements Initializable {
 
     private final ProjectDAO projectDAO = new ProjectDAO();
     private final CommentDAO commentDAO = new CommentDAO();
+    private final ProjectService projectService = new ProjectService();
     private List<Project> allProjects;
     private List<Project> filteredProjects;
 
@@ -210,13 +217,49 @@ public class StudentProjectsController implements Initializable {
         deleteBtn.setOnAction(e -> handleDeleteProject(project));
         
         actions.getChildren().addAll(commentsBtn, docsBtn, editBtn, deleteBtn);
+        
+        // 🆕 Deuxième ligne d'actions (AI & Historique)
+        HBox aiActions = new HBox(8);
+        aiActions.setAlignment(javafx.geometry.Pos.CENTER);
+        
+        Button aiBtn = new Button("💡 AI Suggestions");
+        aiBtn.setStyle("-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;");
+        aiBtn.setOnAction(e -> handleAISuggestions(project));
+        
+        Button historyBtn = new Button("📜 History");
+        historyBtn.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;");
+        historyBtn.setOnAction(e -> handleViewHistory(project));
+        
+        aiActions.getChildren().addAll(aiBtn, historyBtn);
+
+        // 🆕 Troisième ligne d'actions (QR Code & Excel)
+        HBox exportActions = new HBox(8);
+        exportActions.setAlignment(javafx.geometry.Pos.CENTER);
+        
+        // QR Code button (only for team projects)
+        if ("team".equalsIgnoreCase(project.getProjectType())) {
+            Button qrBtn = new Button("🔐 QR Code");
+            qrBtn.setStyle("-fx-background-color: #06D6A0; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;");
+            qrBtn.setOnAction(e -> handleGenerateQRCode(project));
+            exportActions.getChildren().add(qrBtn);
+        }
+        
+        Button excelBtn = new Button("📊 Export Excel");
+        excelBtn.setStyle("-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;");
+        excelBtn.setOnAction(e -> handleExportProjectExcel(project));
+        
+        Button chartBtn = new Button("📈 Charts");
+        chartBtn.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;");
+        chartBtn.setOnAction(e -> handleGenerateCharts(project));
+        
+        exportActions.getChildren().addAll(excelBtn, chartBtn);
 
         // Add all elements to card
         card.getChildren().addAll(header, title, description);
         if (joinCodeBox != null) {
             card.getChildren().add(joinCodeBox);
         }
-        card.getChildren().addAll(supervisorBox, dateLabel, sep, actions);
+        card.getChildren().addAll(supervisorBox, dateLabel, sep, actions, aiActions, exportActions);
         
         return card;
     }
@@ -388,6 +431,42 @@ public class StudentProjectsController implements Initializable {
     }
 
     @FXML
+    public void handleExportExcel() {
+        List<Project> toExport = filteredProjects != null && !filteredProjects.isEmpty() ? filteredProjects : allProjects;
+        
+        if (toExport.isEmpty()) {
+            showAlert("Warning", "Aucun projet à exporter", Alert.AlertType.WARNING);
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Exporter en Excel");
+        fileChooser.setInitialFileName("mes_projets.xlsx");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+        
+        File file = fileChooser.showSaveDialog(projectsContainer.getScene().getWindow());
+        if (file != null) {
+            try {
+                ExcelExporter.exportProjects(toExport, file);
+                
+                // Ouvrir le fichier Excel
+                if (Desktop.isDesktopSupported()) {
+                    Desktop.getDesktop().open(file);
+                }
+                
+                showAlert("Succès", 
+                    "✅ Export Excel réussi!\n\n" +
+                    "Fichier: " + file.getName() + "\n" +
+                    "Projets exportés: " + toExport.size(), 
+                    Alert.AlertType.INFORMATION);
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert("Erreur", "Échec de l'export Excel: " + e.getMessage(), Alert.AlertType.ERROR);
+            }
+        }
+    }
+
+    @FXML
     public void handleJoinProject() {
         String code = joinCodeInput.getText().trim().toUpperCase();
         
@@ -440,5 +519,306 @@ public class StudentProjectsController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // 🆕 MÉTIERS - AI SUGGESTIONS & HISTORY
+    // ═══════════════════════════════════════════════════════════════════════
+
+    /**
+     * Show AI suggestions for a project
+     */
+    private void handleAISuggestions(Project project) {
+        try {
+            String suggestions = projectService.getAISuggestions(
+                project.getTitle(),
+                project.getDescription() != null ? project.getDescription() : ""
+            );
+            
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("💡 AI Suggestions");
+            alert.setHeaderText("Suggestions to improve: " + project.getTitle());
+            
+            TextArea textArea = new TextArea(suggestions);
+            textArea.setWrapText(true);
+            textArea.setEditable(false);
+            textArea.setPrefRowCount(10);
+            textArea.setPrefColumnCount(50);
+            
+            alert.getDialogPane().setContent(textArea);
+            alert.showAndWait();
+            
+        } catch (Exception e) {
+            Alert error = new Alert(Alert.AlertType.ERROR);
+            error.setTitle("Error");
+            error.setHeaderText("Unable to generate suggestions");
+            error.setContentText(e.getMessage());
+            error.showAndWait();
+        }
+    }
+
+    /**
+     * Show full project history with comments
+     */
+    private void handleViewHistory(Project project) {
+        try {
+            StringBuilder historyText = new StringBuilder();
+            historyText.append("📜 Full History: ").append(project.getTitle()).append("\n\n");
+            
+            historyText.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+            historyText.append("📅 PROJECT CREATION\n");
+            historyText.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+            
+            if (project.getCreatedAt() != null) {
+                historyText.append("📅 Date: ").append(project.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))).append("\n");
+                historyText.append("👤 Created by: ").append(project.getOwnerName() != null ? project.getOwnerName() : "Owner").append("\n");
+                historyText.append("📌 Title: ").append(project.getTitle()).append("\n");
+                historyText.append("📂 Type: ").append(project.getProjectType() != null ? project.getProjectType() : "N/A").append("\n");
+                historyText.append("🎯 Initial status: ").append(project.getStatus() != null ? project.getStatus() : "created").append("\n");
+                
+                if (project.getDescription() != null && !project.getDescription().isEmpty()) {
+                    historyText.append("📝 Description: ").append(project.getDescription()).append("\n");
+                }
+                historyText.append("\n");
+            }
+            
+            // Load and display comments
+            try {
+                List<org.example.model.Comment> comments = commentDAO.findByProject(project.getId());
+                
+                if (!comments.isEmpty()) {
+                    historyText.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+                    historyText.append("💬 COMMENTS & ACTIVITY (").append(comments.size()).append(")\n");
+                    historyText.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+                    
+                    comments.sort((a, b) -> {
+                        if (a.getCreatedAt() == null) return 1;
+                        if (b.getCreatedAt() == null) return -1;
+                        return b.getCreatedAt().compareTo(a.getCreatedAt());
+                    });
+                    
+                    int count = 1;
+                    for (org.example.model.Comment comment : comments) {
+                        historyText.append(count++).append(". ");
+                        
+                        if (comment.getCreatedAt() != null) {
+                            historyText.append("📅 ").append(comment.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+                        }
+                        historyText.append(" - 👤 ").append(comment.getAuthorName() != null ? comment.getAuthorName() : "User").append("\n");
+                        
+                        historyText.append("   🏷️ Type: ").append(comment.getCommentType() != null ? comment.getCommentType().toUpperCase() : "COMMENT");
+                        if (comment.getImportance() != null) {
+                            String emoji = comment.getImportance().equals("urgent") ? "🔴" :
+                                          comment.getImportance().equals("medium") ? "🟡" : "🟢";
+                            historyText.append(" | ").append(emoji).append(" ").append(comment.getImportance().toUpperCase());
+                        }
+                        if (comment.getTarget() != null) {
+                            historyText.append(" | 🎯 ").append(comment.getTarget());
+                        }
+                        historyText.append("\n");
+                        
+                        if (comment.getSubject() != null && !comment.getSubject().isEmpty()) {
+                            historyText.append("   📌 ").append(comment.getSubject()).append("\n");
+                        }
+                        
+                        if (comment.getContent() != null && !comment.getContent().isEmpty()) {
+                            String content = comment.getContent();
+                            if (content.length() > 150) content = content.substring(0, 150) + "...";
+                            historyText.append("   💬 ").append(content).append("\n");
+                        }
+                        
+                        historyText.append("\n");
+                    }
+                } else {
+                    historyText.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+                    historyText.append("💬 COMMENTS & ACTIVITY\n");
+                    historyText.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+                    historyText.append("No comments yet for this project.\n\n");
+                }
+            } catch (Exception e) {
+                historyText.append("\n⚠️ Unable to load comments\n\n");
+            }
+            
+            // Last modification
+            if (project.getUpdatedAt() != null && !project.getUpdatedAt().equals(project.getCreatedAt())) {
+                historyText.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+                historyText.append("🔄 LAST MODIFICATION\n");
+                historyText.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+                historyText.append("📅 Date: ").append(project.getUpdatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))).append("\n");
+                historyText.append("🎯 Current status: ").append(project.getStatus() != null ? project.getStatus() : "N/A").append("\n");
+                if (project.getSupervisorName() != null) {
+                    historyText.append("👨‍🏫 Supervisor: ").append(project.getSupervisorName()).append("\n");
+                }
+                historyText.append("\n");
+            }
+            
+            // Current state
+            historyText.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+            historyText.append("📊 CURRENT PROJECT STATE\n");
+            historyText.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+            historyText.append("📌 Title: ").append(project.getTitle()).append("\n");
+            historyText.append("📂 Type: ").append(project.getProjectType() != null ? project.getProjectType() : "N/A").append("\n");
+            historyText.append("🎯 Status: ").append(project.getStatus() != null ? project.getStatus() : "N/A").append("\n");
+            if (project.getSupervisorName() != null) {
+                historyText.append("👨‍🏫 Supervisor: ").append(project.getSupervisorName()).append("\n");
+            }
+            if (project.getJoinCode() != null && "team".equalsIgnoreCase(project.getProjectType())) {
+                historyText.append("🔑 Join Code: ").append(project.getJoinCode()).append("\n");
+            }
+            if (project.getAiSuggestions() != null && !project.getAiSuggestions().trim().isEmpty()) {
+                historyText.append("\n💡 Saved AI Suggestions:\n");
+                String suggestions = project.getAiSuggestions();
+                if (suggestions.length() > 200) suggestions = suggestions.substring(0, 200) + "...";
+                historyText.append(suggestions).append("\n");
+            }
+            
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("📜 Project History");
+            alert.setHeaderText("Project: " + project.getTitle());
+            
+            TextArea textArea = new TextArea(historyText.toString());
+            textArea.setWrapText(true);
+            textArea.setEditable(false);
+            textArea.setPrefRowCount(25);
+            textArea.setPrefColumnCount(70);
+            textArea.setStyle("-fx-font-family: 'Consolas', 'Monaco', monospace; -fx-font-size: 11px;");
+            
+            alert.getDialogPane().setContent(textArea);
+            alert.getDialogPane().setPrefWidth(800);
+            alert.showAndWait();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alert error = new Alert(Alert.AlertType.ERROR);
+            error.setTitle("Error");
+            error.setHeaderText("Unable to load history");
+            error.setContentText(e.getMessage());
+            error.showAndWait();
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // 🆕 NOUVELLES APIs - QR CODE, EXCEL, CHARTS
+    // ═══════════════════════════════════════════════════════════════════════
+
+    /**
+     * Générer un QR Code pour un projet team
+     */
+    private void handleGenerateQRCode(Project project) {
+        try {
+            String qrPath = QRCodeUtil.generateProjectQRCode(project.getId(), project.getTitle());
+            
+            if (qrPath != null) {
+                File qrFile = new File(qrPath);
+                if (qrFile.exists()) {
+                    // Ouvrir le QR code généré
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop.getDesktop().open(qrFile);
+                    }
+                    
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("QR Code généré");
+                    alert.setHeaderText("QR Code pour : " + project.getTitle());
+                    alert.setContentText(
+                        "✅ QR Code généré avec succès!\n\n" +
+                        "Fichier: " + qrPath + "\n\n" +
+                        "Join Code: " + project.getJoinCode() + "\n\n" +
+                        "Scannez ce QR code avec votre smartphone pour partager le projet!"
+                    );
+                    alert.showAndWait();
+                } else {
+                    showAlert("Erreur", "Le fichier QR code n'a pas été créé", Alert.AlertType.ERROR);
+                }
+            } else {
+                showAlert("Erreur", "Échec de la génération du QR code", Alert.AlertType.ERROR);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Erreur lors de la génération du QR Code:\n" + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    /**
+     * Exporter un projet en Excel avec ses commentaires
+     */
+    private void handleExportProjectExcel(Project project) {
+        try {
+            List<org.example.model.Comment> comments = commentDAO.findByProject(project.getId());
+            List<org.example.model.Document> documents = new org.example.dao.DocumentDAO().findByProject(project.getId());
+            
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Exporter en Excel");
+            fileChooser.setInitialFileName("project_" + project.getId() + "_" + project.getTitle().replaceAll("[^a-zA-Z0-9]", "_") + ".xlsx");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+            
+            File file = fileChooser.showSaveDialog(projectsContainer.getScene().getWindow());
+            if (file != null) {
+                ExcelExporter.exportProjectStatistics(project, comments, documents, file);
+                
+                // Ouvrir le fichier Excel
+                if (Desktop.isDesktopSupported()) {
+                    Desktop.getDesktop().open(file);
+                }
+                
+                showAlert("Succès", 
+                    "✅ Export Excel réussi!\n\n" +
+                    "Fichier: " + file.getName() + "\n\n" +
+                    "Contenu:\n" +
+                    "• Informations du projet\n" +
+                    "• Statistiques\n" +
+                    "• " + comments.size() + " commentaires\n" +
+                    "• " + documents.size() + " documents", 
+                    Alert.AlertType.INFORMATION);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Erreur lors de l'export Excel:\n" + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    /**
+     * Générer des graphiques pour un projet
+     */
+    private void handleGenerateCharts(Project project) {
+        try {
+            List<org.example.model.Comment> comments = commentDAO.findByProject(project.getId());
+            
+            if (comments.isEmpty()) {
+                showAlert("Information", 
+                    "Aucun commentaire disponible pour générer des graphiques.\n\n" +
+                    "Ajoutez des commentaires au projet pour voir les statistiques.", 
+                    Alert.AlertType.INFORMATION);
+                return;
+            }
+            
+            // Générer les graphiques
+            String typeChartPath = ChartUtil.generateCommentsTypeChart(comments, 
+                "Commentaires par Type - " + project.getTitle());
+            String importanceChartPath = ChartUtil.generateCommentsImportanceChart(comments, 
+                "Commentaires par Importance - " + project.getTitle());
+            
+            if (typeChartPath != null && new File(typeChartPath).exists()) {
+                // Ouvrir le graphique
+                if (Desktop.isDesktopSupported()) {
+                    Desktop.getDesktop().open(new File(typeChartPath));
+                }
+                
+                showAlert("Graphiques générés", 
+                    "✅ Graphiques générés avec succès!\n\n" +
+                    "Fichiers créés:\n" +
+                    "• " + typeChartPath + "\n" +
+                    "• " + importanceChartPath + "\n\n" +
+                    "Les graphiques ont été ouverts dans votre navigateur.", 
+                    Alert.AlertType.INFORMATION);
+            } else {
+                showAlert("Erreur", "Échec de la génération des graphiques", Alert.AlertType.ERROR);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Erreur lors de la génération des graphiques:\n" + e.getMessage(), Alert.AlertType.ERROR);
+        }
     }
 }

@@ -23,7 +23,6 @@
         <SplitPane dividerPositions="0.6">
             <TableView fx:id="userTable">
                 <columns>
-                    <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
                     <TableColumn fx:id="colName" text="Name" prefWidth="150"/>
                     <TableColumn fx:id="colEmail" text="Email" prefWidth="200"/>
                     <TableColumn fx:id="colRole" text="Role" prefWidth="100"/>

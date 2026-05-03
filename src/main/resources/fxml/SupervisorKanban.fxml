@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.controller.SupervisorKanbanController"
+            style="-fx-background-color: #f4f6fb;">
+    <padding><Insets top="16" left="16" right="16" bottom="16"/></padding>
+
+    <top>
+        <VBox spacing="10">
+            <Label text="Kanban Board" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Label text="Project:" style="-fx-font-size: 12px;"/>
+                <ComboBox fx:id="projectCombo" prefWidth="260"/>
+                <Label fx:id="statusLabel" text="" style="-fx-text-fill: #888; -fx-font-size: 11px;"/>
+            </HBox>
+            <padding><Insets bottom="4"/></padding>
+        </VBox>
+    </top>
+
+    <center>
+        <HBox spacing="12">
+            <!-- TODO -->
+            <VBox spacing="0" HBox.hgrow="ALWAYS">
+                <HBox style="-fx-background-color: #6c757d; -fx-background-radius: 10 10 0 0; -fx-padding: 10 14;" alignment="CENTER_LEFT" spacing="8">
+                    <Label text="📋 TODO" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                    <Label fx:id="todoCount" text="0" style="-fx-background-color: rgba(255,255,255,0.3); -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 1 8; -fx-font-size: 11px;"/>
+                </HBox>
+                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" hbarPolicy="NEVER"
+                            style="-fx-background-color: #f8f9fa; -fx-background: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-width: 0 1 1 1;">
+                    <VBox fx:id="todoCol" spacing="0">
+                        <padding><Insets top="8" bottom="8" left="8" right="8"/></padding>
+                    </VBox>
+                </ScrollPane>
+            </VBox>
+
+            <!-- IN PROGRESS -->
+            <VBox spacing="0" HBox.hgrow="ALWAYS">
+                <HBox style="-fx-background-color: #ffc107; -fx-background-radius: 10 10 0 0; -fx-padding: 10 14;" alignment="CENTER_LEFT" spacing="8">
+                    <Label text="⚡ IN PROGRESS" style="-fx-text-fill: #333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                    <Label fx:id="inProgressCount" text="0" style="-fx-background-color: rgba(0,0,0,0.15); -fx-text-fill: #333; -fx-background-radius: 10; -fx-padding: 1 8; -fx-font-size: 11px;"/>
+                </HBox>
+                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" hbarPolicy="NEVER"
+                            style="-fx-background-color: #fffdf0; -fx-background: #fffdf0; -fx-border-color: #dee2e6; -fx-border-width: 0 1 1 1;">
+                    <VBox fx:id="inProgressCol" spacing="0">
+                        <padding><Insets top="8" bottom="8" left="8" right="8"/></padding>
+                    </VBox>
+                </ScrollPane>
+            </VBox>
+
+            <!-- REVIEW -->
+            <VBox spacing="0" HBox.hgrow="ALWAYS">
+                <HBox style="-fx-background-color: #667eea; -fx-background-radius: 10 10 0 0; -fx-padding: 10 14;" alignment="CENTER_LEFT" spacing="8">
+                    <Label text="🔍 REVIEW" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                    <Label fx:id="reviewCount" text="0" style="-fx-background-color: rgba(255,255,255,0.3); -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 1 8; -fx-font-size: 11px;"/>
+                </HBox>
+                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" hbarPolicy="NEVER"
+                            style="-fx-background-color: #f0f4ff; -fx-background: #f0f4ff; -fx-border-color: #dee2e6; -fx-border-width: 0 1 1 1;">
+                    <VBox fx:id="reviewCol" spacing="0">
+                        <padding><Insets top="8" bottom="8" left="8" right="8"/></padding>
+                    </VBox>
+                </ScrollPane>
+            </VBox>
+
+            <!-- DONE -->
+            <VBox spacing="0" HBox.hgrow="ALWAYS">
+                <HBox style="-fx-background-color: #28a745; -fx-background-radius: 10 10 0 0; -fx-padding: 10 14;" alignment="CENTER_LEFT" spacing="8">
+                    <Label text="✅ DONE" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                    <Label fx:id="doneCount" text="0" style="-fx-background-color: rgba(255,255,255,0.3); -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 1 8; -fx-font-size: 11px;"/>
+                </HBox>
+                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" hbarPolicy="NEVER"
+                            style="-fx-background-color: #f0fff4; -fx-background: #f0fff4; -fx-border-color: #dee2e6; -fx-border-width: 0 1 1 1;">
+                    <VBox fx:id="doneCol" spacing="0">
+                        <padding><Insets top="8" bottom="8" left="8" right="8"/></padding>
+                    </VBox>
+                </ScrollPane>
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>

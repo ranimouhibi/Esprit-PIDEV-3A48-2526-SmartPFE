@@ -3,9 +3,10 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.example.controller.SupervisorDashboardController"
-      spacing="0" style="-fx-background-color: #f4f6fb;">
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="org.example.controller.SupervisorDashboardController">
+
+<VBox spacing="0" style="-fx-background-color: #f4f6fb;">
 
     <!-- NAVBAR -->
     <HBox alignment="CENTER_LEFT"
@@ -29,6 +30,10 @@
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label fx:id="navComments" text="COMMENTS" onMouseClicked="#showComments"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
+            <Label fx:id="navCandidatures" text="CANDIDATURES" onMouseClicked="#showCandidatures"
+                   style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
+            <Label fx:id="navSprints" text="SPRINTS" onMouseClicked="#showSprints"
+                   style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label fx:id="navProfile" text="PROFILE" onMouseClicked="#showProfile"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Button text="LOGOUT" onAction="#handleLogout"
@@ -39,7 +44,8 @@
     <!-- CONTENT AREA -->
     <BorderPane fx:id="contentArea" VBox.vgrow="ALWAYS">
         <center>
-            <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                        VBox.vgrow="ALWAYS"
                         style="-fx-background-color: transparent; -fx-border-color: transparent;">
                 <VBox fx:id="homePane" spacing="0">
 
@@ -98,6 +104,12 @@
                                     <Label text="Meetings" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
                                     <Label fx:id="meetingCountLabel" text="0"
                                            style="-fx-text-fill: #a12c2f; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                                </VBox>
+                                <VBox spacing="8" alignment="CENTER"
+                                      style="-fx-background-color: #a12c2f; -fx-background-radius: 14;" prefWidth="160" prefHeight="110">
+                                    <Label text="👨‍🎓" style="-fx-font-size: 28px;"/>
+                                    <Label text="Pending Requests" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11px;"/>
+                                    <Label fx:id="pendingRequestsLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
                                 </VBox>
                             </HBox>
                         </VBox>
@@ -170,8 +182,55 @@
                                 style="-fx-background-color: white; -fx-text-fill: #a12c2f; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 22; -fx-cursor: hand;"/>
                     </HBox>
 
+                    <!-- CHATBOT WIDGET removed — now floating FAB -->
+
                 </VBox>
             </ScrollPane>
         </center>
     </BorderPane>
 </VBox>
+
+<!-- ── FLOATING CHATBOT ── -->
+<StackPane alignment="BOTTOM_RIGHT" pickOnBounds="false">
+    <padding><Insets bottom="24" right="24"/></padding>
+    <VBox spacing="0" alignment="BOTTOM_RIGHT" pickOnBounds="false">
+        <VBox fx:id="supChatPanel" spacing="0" visible="false" managed="false"
+              style="-fx-background-color: white; -fx-background-radius: 16;
+                     -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.22),20,0,0,6);
+                     -fx-border-color: #e0e0e0; -fx-border-radius: 16; -fx-border-width: 1;"
+              prefWidth="340" maxHeight="460">
+            <HBox alignment="CENTER_LEFT" spacing="10"
+                  style="-fx-background-color: #a12c2f; -fx-background-radius: 16 16 0 0; -fx-padding: 12 16;">
+                <Label text="🤖" style="-fx-font-size: 18px;"/>
+                <VBox spacing="1" HBox.hgrow="ALWAYS">
+                    <Label text="SmartPFE Assistant" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: white;"/>
+                    <Label text="Ask about candidatures &amp; AI scores" style="-fx-font-size: 10px; -fx-text-fill: rgba(255,255,255,0.75);"/>
+                </VBox>
+                <Button text="✕" onAction="#handleSupChatToggle"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-cursor: hand; -fx-padding: 0 4;"/>
+            </HBox>
+            <ScrollPane fx:id="supChatScroll" fitToWidth="true" prefHeight="300" hbarPolicy="NEVER"
+                        style="-fx-background-color: #f8f8f8; -fx-background: #f8f8f8; -fx-border-color: transparent;">
+                <VBox fx:id="supChatMessages" spacing="5">
+                    <padding><Insets top="10" bottom="10" left="10" right="10"/></padding>
+                </VBox>
+            </ScrollPane>
+            <HBox spacing="8" alignment="CENTER_LEFT"
+                  style="-fx-background-color: white; -fx-background-radius: 0 0 16 16; -fx-padding: 10 12; -fx-border-color: #eee; -fx-border-width: 1 0 0 0;">
+                <TextField fx:id="supChatInput" promptText="Ask a question..." HBox.hgrow="ALWAYS"
+                           style="-fx-pref-height: 34px; -fx-background-radius: 17; -fx-border-radius: 17; -fx-border-color: #ddd; -fx-padding: 0 12;"
+                           onAction="#handleSupChatSend"/>
+                <Button text="➤" onAction="#handleSupChatSend"
+                        style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 17; -fx-padding: 7 14; -fx-cursor: hand; -fx-font-weight: bold;"/>
+            </HBox>
+        </VBox>
+        <Button fx:id="supChatFab" text="🤖" onAction="#handleSupChatToggle"
+                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-size: 22px;
+                       -fx-background-radius: 30; -fx-min-width: 58; -fx-min-height: 58;
+                       -fx-cursor: hand; -fx-effect: dropshadow(gaussian,rgba(161,44,47,0.5),14,0,0,4);">
+            <VBox.margin><Insets top="8"/></VBox.margin>
+        </Button>
+    </VBox>
+</StackPane>
+
+</StackPane>

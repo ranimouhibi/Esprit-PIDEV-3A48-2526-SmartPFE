@@ -123,4 +123,19 @@
 .split-pane > .split-pane-divider {
     -fx-background-color: #e5e7eb;
     -fx-padding: 0 1;
+/* Meeting module — selected row */
+.table-row-cell:selected {
+    -fx-background-color: #a12c2f;
+}
+.table-row-cell:selected .text {
+    -fx-fill: white;
+}
+.table-row-cell:selected:focused {
+    -fx-background-color: #a12c2f;
+}
+.table-row-cell:selected:focused .text {
+    -fx-fill: white;
+}
+.table-row-cell:hover:!selected {
+    -fx-background-color: #f5e9e9;
 }

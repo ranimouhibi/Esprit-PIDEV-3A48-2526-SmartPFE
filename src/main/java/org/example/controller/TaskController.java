@@ -18,6 +18,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Window;
+import org.example.util.ModernAlert;
+import javafx.scene.control.cell.PropertyValueFactory;
+
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -217,6 +220,17 @@ public class TaskController implements Initializable {
         if (scrollPane != null && scrollPane.getScene() != null) return scrollPane.getScene().getWindow();
         if (cardPane != null && cardPane.getScene() != null) return cardPane.getScene().getWindow();
         return null;
+    @FXML
+    public void handleDelete() {
+        if (selectedTask == null) { showMessage("Sélectionnez une tâche.", true); return; }
+        if (ModernAlert.confirmDelete("this task")) {
+            try {
+                taskDAO.delete(selectedTask.getId());
+                showMessage("Tâche supprimée.", false);
+                handleClear();
+                loadTasks();
+            } catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
+        }
     }
 
     private void applyFilters() {

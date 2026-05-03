@@ -37,6 +37,7 @@ public class NavigationUtil {
             return loader.load();
         } catch (Exception e) {
             System.err.println("=== FXML LOAD ERROR: " + fxmlFile + " ===");
+            System.err.println("ERROR loading FXML: " + fxmlFile + " → " + e.getMessage());
             e.printStackTrace();
             Label err = new Label("Error loading " + fxmlFile + ":\n" + e.getMessage());
             err.setStyle("-fx-text-fill: red; -fx-padding: 20; -fx-font-size: 13px;");

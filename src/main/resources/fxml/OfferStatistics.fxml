@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.controller.OfferStatisticsController">
+    <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+
+    <top>
+        <VBox spacing="4">
+            <Label fx:id="lblOfferTitle" text="Offer Statistics"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+            <padding><Insets bottom="10"/></padding>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: #f4f6fb; -fx-background: #f4f6fb;">
+            <VBox spacing="16">
+                <padding><Insets top="4" bottom="8"/></padding>
+
+                <!-- Summary cards -->
+                <HBox spacing="12">
+                    <VBox style="-fx-background-color: #1a1a2e; -fx-background-radius: 10; -fx-padding: 14 20;" alignment="CENTER" HBox.hgrow="ALWAYS">
+                        <Label text="Total" style="-fx-text-fill: #aaa; -fx-font-size: 11px;"/>
+                        <Label fx:id="lblTotal" text="0" style="-fx-text-fill: white; -fx-font-size: 26px; -fx-font-weight: bold;"/>
+                    </VBox>
+                    <VBox style="-fx-background-color: #ffc107; -fx-background-radius: 10; -fx-padding: 14 20;" alignment="CENTER" HBox.hgrow="ALWAYS">
+                        <Label text="Pending" style="-fx-text-fill: #333; -fx-font-size: 11px;"/>
+                        <Label fx:id="lblPending" text="0" style="-fx-text-fill: #333; -fx-font-size: 26px; -fx-font-weight: bold;"/>
+                    </VBox>
+                    <VBox style="-fx-background-color: #28a745; -fx-background-radius: 10; -fx-padding: 14 20;" alignment="CENTER" HBox.hgrow="ALWAYS">
+                        <Label text="Accepted" style="-fx-text-fill: white; -fx-font-size: 11px;"/>
+                        <Label fx:id="lblAccepted" text="0" style="-fx-text-fill: white; -fx-font-size: 26px; -fx-font-weight: bold;"/>
+                    </VBox>
+                    <VBox style="-fx-background-color: #dc3545; -fx-background-radius: 10; -fx-padding: 14 20;" alignment="CENTER" HBox.hgrow="ALWAYS">
+                        <Label text="Rejected" style="-fx-text-fill: white; -fx-font-size: 11px;"/>
+                        <Label fx:id="lblRejected" text="0" style="-fx-text-fill: white; -fx-font-size: 26px; -fx-font-weight: bold;"/>
+                    </VBox>
+                    <VBox style="-fx-background-color: #667eea; -fx-background-radius: 10; -fx-padding: 14 20;" alignment="CENTER" HBox.hgrow="ALWAYS">
+                        <Label text="Avg AI Score" style="-fx-text-fill: white; -fx-font-size: 11px;"/>
+                        <Label fx:id="lblAvgScore" text="--" style="-fx-text-fill: white; -fx-font-size: 26px; -fx-font-weight: bold;"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Score distribution -->
+                <VBox spacing="10" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.07),10,0,0,3);">
+                    <Label text="Score Distribution" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <Label text="Excellent" prefWidth="80" style="-fx-font-size: 12px;"/>
+                        <Region fx:id="barExcellent" prefHeight="18" style="-fx-background-color: #28a745; -fx-background-radius: 4;" minWidth="4"/>
+                        <Label fx:id="lblExcellent" text="0" style="-fx-font-size: 12px;"/>
+                    </HBox>
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <Label text="Good" prefWidth="80" style="-fx-font-size: 12px;"/>
+                        <Region fx:id="barGood" prefHeight="18" style="-fx-background-color: #ffc107; -fx-background-radius: 4;" minWidth="4"/>
+                        <Label fx:id="lblGood" text="0" style="-fx-font-size: 12px;"/>
+                    </HBox>
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <Label text="Fair" prefWidth="80" style="-fx-font-size: 12px;"/>
+                        <Region fx:id="barFair" prefHeight="18" style="-fx-background-color: #fd7e14; -fx-background-radius: 4;" minWidth="4"/>
+                        <Label fx:id="lblFair" text="0" style="-fx-font-size: 12px;"/>
+                    </HBox>
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <Label text="Low" prefWidth="80" style="-fx-font-size: 12px;"/>
+                        <Region fx:id="barLow" prefHeight="18" style="-fx-background-color: #dc3545; -fx-background-radius: 4;" minWidth="4"/>
+                        <Label fx:id="lblLow" text="0" style="-fx-font-size: 12px;"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Top 5 candidates -->
+                <VBox spacing="8" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.07),10,0,0,3);">
+                    <Label text="Top 5 Candidates by AI Score" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                    <TableView fx:id="topTable" prefHeight="200">
+                        <columns>
+                            <TableColumn fx:id="colStudent" text="Student" prefWidth="200"/>
+                            <TableColumn fx:id="colStatus" text="Status" prefWidth="100"/>
+                            <TableColumn fx:id="colScore" text="AI Score" prefWidth="100"/>
+                            <TableColumn fx:id="colLevel" text="Level" prefWidth="100"/>
+                        </columns>
+                        <placeholder><Label text="No scored candidatures yet"/></placeholder>
+                    </TableView>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

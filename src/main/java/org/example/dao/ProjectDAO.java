@@ -11,7 +11,8 @@ import java.util.List;
 public class ProjectDAO {
 
     private static final String SELECT_BASE =
-        "SELECT p.*, u.name as owner_name, s.name as supervisor_name " +
+        "SELECT p.*, u.name as owner_name, u.email as owner_email, " +
+        "s.name as supervisor_name, s.email as supervisor_email " +
         "FROM projects p " +
         "LEFT JOIN users u ON p.owner_id = u.id " +
         "LEFT JOIN users s ON p.supervisor_id = s.id ";
@@ -160,6 +161,28 @@ public class ProjectDAO {
         }
     }
 
+    /**
+     * Check if a project with the same title, type and owner already exists on the same day
+     * Used for uniqueness validation before saving
+     */
+    public boolean existsDuplicate(String title, String projectType, int ownerId, int excludeId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM projects " +
+                     "WHERE LOWER(TRIM(title)) = LOWER(TRIM(?)) " +
+                     "AND project_type = ? " +
+                     "AND owner_id = ? " +
+                     "AND DATE(created_at) = CURDATE() " +
+                     "AND id != ?";
+        try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
+            ps.setString(1, title);
+            ps.setString(2, projectType);
+            ps.setInt(3, ownerId);
+            ps.setInt(4, excludeId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1) > 0;
+        }
+        return false;
+    }
+
     public void update(Project p) throws SQLException {
         String sql = "UPDATE projects SET title=?, description=?, project_type=?, status=?, supervisor_id=?, updated_at=? WHERE id=?";
         try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
@@ -200,8 +223,10 @@ public class ProjectDAO {
         p.setJoinCode(rs.getString("join_code"));
         p.setOwnerId(rs.getInt("owner_id"));
         p.setOwnerName(rs.getString("owner_name"));
+        p.setOwnerEmail(rs.getString("owner_email"));
         p.setSupervisorId(rs.getInt("supervisor_id"));
         p.setSupervisorName(rs.getString("supervisor_name"));
+        p.setSupervisorEmail(rs.getString("supervisor_email"));
         Timestamp ts = rs.getTimestamp("created_at");
         if (ts != null) p.setCreatedAt(ts.toLocalDateTime());
         return p;

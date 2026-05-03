@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import org.example.util.ModernAlert;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
@@ -15,7 +16,6 @@ import java.util.ResourceBundle;
 public class UserController implements Initializable {
 
     @FXML private TableView<User> userTable;
-    @FXML private TableColumn<User, Integer> colId;
     @FXML private TableColumn<User, String> colName;
     @FXML private TableColumn<User, String> colEmail;
     @FXML private TableColumn<User, String> colRole;
@@ -36,7 +36,6 @@ public class UserController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
         colRole.setCellValueFactory(new PropertyValueFactory<>("role"));
@@ -96,17 +95,14 @@ public class UserController implements Initializable {
     @FXML
     public void handleDelete() {
         if (selectedUser == null) { showMessage("Sélectionnez un utilisateur.", true); return; }
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer cet utilisateur?", ButtonType.YES, ButtonType.NO);
-        confirm.showAndWait().ifPresent(btn -> {
-            if (btn == ButtonType.YES) {
-                try {
-                    userDAO.delete(selectedUser.getId());
-                    showMessage("Utilisateur supprimé.", false);
-                    handleClear();
-                    loadUsers();
-                } catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
-            }
-        });
+        if (ModernAlert.confirmDelete(selectedUser.getName())) {
+            try {
+                userDAO.delete(selectedUser.getId());
+                showMessage("Utilisateur supprimé.", false);
+                handleClear();
+                loadUsers();
+            } catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
+        }
     }
 
     @FXML
