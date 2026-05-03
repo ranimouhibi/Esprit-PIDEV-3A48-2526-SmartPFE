@@ -1,186 +1,292 @@
 package org.example.controller;
 
-import org.example.dao.ProjectDAO;
-import org.example.dao.SprintDAO;
 import org.example.dao.TaskDAO;
 import org.example.dao.UserDAO;
-import org.example.model.Project;
-import org.example.model.Sprint;
+import org.example.dao.ProjectDAO;
 import org.example.model.Task;
 import org.example.model.User;
+import org.example.model.Project;
+import org.example.util.EmailService;
+import org.example.util.SessionManager;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Window;
+import org.example.util.ModernAlert;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
-import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class TaskController implements Initializable {
 
-    @FXML private TableView<Task> taskTable;
-    @FXML private TableColumn<Task, Integer> colId;
-    @FXML private TableColumn<Task, String> colTitle;
-    @FXML private TableColumn<Task, String> colStatus;
-    @FXML private TableColumn<Task, String> colPriority;
-    @FXML private TableColumn<Task, String> colProject;
-    @FXML private TableColumn<Task, String> colAssigned;
-    @FXML private TableColumn<Task, LocalDate> colDeadline;
-
-    @FXML private TextField titleField;
-    @FXML private TextArea descriptionField;
-    @FXML private ComboBox<String> statusCombo;
-    @FXML private ComboBox<String> priorityCombo;
-    @FXML private ComboBox<Project> projectCombo;
-    @FXML private ComboBox<Sprint> sprintCombo;
-    @FXML private ComboBox<User> assignedCombo;
-    @FXML private Spinner<Integer> storyPointsSpinner;
-    @FXML private DatePicker deadlinePicker;
-    @FXML private CheckBox blockedCheck;
+    @FXML private FlowPane cardPane;
+    @FXML private ScrollPane scrollPane;
     @FXML private TextField searchField;
     @FXML private Label messageLabel;
+    @FXML private Label statTotal;
+    @FXML private Label statTodo;
+    @FXML private Label statInProgress;
+    @FXML private Label statDone;
+    @FXML private Label statCritical;
+    @FXML private ComboBox<String> filterStatus;
+    @FXML private ComboBox<String> filterPriority;
 
     private final TaskDAO taskDAO = new TaskDAO();
-    private final ProjectDAO projectDAO = new ProjectDAO();
-    private final SprintDAO sprintDAO = new SprintDAO();
-    private final UserDAO userDAO = new UserDAO();
-    private Task selectedTask;
+    private List<Task> allTasks = List.of();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        setupColumns();
-        statusCombo.setItems(FXCollections.observableArrayList("todo", "in_progress", "review", "done"));
-        priorityCombo.setItems(FXCollections.observableArrayList("low", "medium", "high", "critical"));
-        storyPointsSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100, 1));
-        loadProjects();
-        loadUsers();
+        if (filterStatus != null)
+            filterStatus.setItems(FXCollections.observableArrayList("All", "todo", "in_progress", "done"));
+        if (filterPriority != null)
+            filterPriority.setItems(FXCollections.observableArrayList("All", "low", "medium", "high", "critical"));
         loadTasks();
-
-        projectCombo.setOnAction(e -> {
-            Project p = projectCombo.getValue();
-            if (p != null) loadSprintsForProject(p.getId());
-        });
-
-        taskTable.getSelectionModel().selectedItemProperty().addListener((obs, old, sel) -> {
-            if (sel != null) populateForm(sel);
-        });
-    }
-
-    private void setupColumns() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
-        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
-        colPriority.setCellValueFactory(new PropertyValueFactory<>("priority"));
-        colProject.setCellValueFactory(new PropertyValueFactory<>("projectTitle"));
-        colAssigned.setCellValueFactory(new PropertyValueFactory<>("assignedToName"));
-        colDeadline.setCellValueFactory(new PropertyValueFactory<>("deadline"));
-    }
-
-    private void loadProjects() {
-        try { projectCombo.setItems(FXCollections.observableArrayList(projectDAO.findAll())); }
-        catch (Exception e) { e.printStackTrace(); }
-    }
-
-    private void loadSprintsForProject(int projectId) {
-        try { sprintCombo.setItems(FXCollections.observableArrayList(sprintDAO.findByProject(projectId))); }
-        catch (Exception e) { e.printStackTrace(); }
-    }
-
-    private void loadUsers() {
-        try { assignedCombo.setItems(FXCollections.observableArrayList(userDAO.findAll())); }
-        catch (Exception e) { e.printStackTrace(); }
+        if (searchField != null)
+            searchField.textProperty().addListener((o, old, v) -> applyFilters());
+        if (filterStatus != null)
+            filterStatus.valueProperty().addListener((o, old, v) -> applyFilters());
+        if (filterPriority != null)
+            filterPriority.valueProperty().addListener((o, old, v) -> applyFilters());
     }
 
     private void loadTasks() {
-        try { taskTable.setItems(FXCollections.observableArrayList(taskDAO.findAll())); }
-        catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
+        try {
+            User current = SessionManager.getCurrentUser();
+            if (current != null && "student".equals(current.getRole())) {
+                allTasks = taskDAO.findByAssignedUser(current.getId());
+            } else {
+                allTasks = taskDAO.findAll();
+            }
+            updateStats();
+            renderCards(allTasks);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showMessage("Error: " + e.getMessage(), true);
+        }
     }
 
-    private void populateForm(Task t) {
-        selectedTask = t;
-        titleField.setText(t.getTitle());
-        descriptionField.setText(t.getDescription());
-        statusCombo.setValue(t.getStatus());
-        priorityCombo.setValue(t.getPriority());
-        storyPointsSpinner.getValueFactory().setValue(t.getStoryPoints());
-        deadlinePicker.setValue(t.getDeadline());
-        blockedCheck.setSelected(t.isBlocked());
+    private void updateStats() {
+        long total      = allTasks.size();
+        long todo       = allTasks.stream().filter(t -> "todo".equals(t.getStatus())).count();
+        long inProgress = allTasks.stream().filter(t -> "in_progress".equals(t.getStatus())).count();
+        long done       = allTasks.stream().filter(t -> "done".equals(t.getStatus())).count();
+        long critical   = allTasks.stream().filter(t -> "critical".equals(t.getPriority())).count();
+        if (statTotal      != null) statTotal.setText(String.valueOf(total));
+        if (statTodo       != null) statTodo.setText(String.valueOf(todo));
+        if (statInProgress != null) statInProgress.setText(String.valueOf(inProgress));
+        if (statDone       != null) statDone.setText(String.valueOf(done));
+        if (statCritical   != null) statCritical.setText(String.valueOf(critical));
     }
 
-    @FXML
-    public void handleSave() {
-        if (titleField.getText().trim().isEmpty() || projectCombo.getValue() == null) {
-            showMessage("Titre et projet sont obligatoires.", true);
+    private void renderCards(List<Task> tasks) {
+        if (cardPane == null) return;
+        cardPane.getChildren().clear();
+        if (tasks.isEmpty()) {
+            Label empty = new Label("No tasks found.");
+            empty.setStyle("-fx-text-fill: #9ca3af; -fx-font-size: 14px;");
+            cardPane.getChildren().add(empty);
             return;
         }
-        try {
-            Task t = selectedTask != null ? selectedTask : new Task();
-            t.setTitle(titleField.getText().trim());
-            t.setDescription(descriptionField.getText());
-            t.setStatus(statusCombo.getValue());
-            t.setPriority(priorityCombo.getValue());
-            t.setProjectId(projectCombo.getValue().getId());
-            if (sprintCombo.getValue() != null) t.setSprintId(sprintCombo.getValue().getId());
-            if (assignedCombo.getValue() != null) t.setAssignedToId(assignedCombo.getValue().getId());
-            t.setStoryPoints(storyPointsSpinner.getValue());
-            t.setDeadline(deadlinePicker.getValue());
-            t.setBlocked(blockedCheck.isSelected());
-
-            if (selectedTask == null) taskDAO.save(t);
-            else taskDAO.update(t);
-
-            showMessage("Tâche sauvegardée.", false);
-            handleClear();
-            loadTasks();
-        } catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
+        for (Task t : tasks) cardPane.getChildren().add(buildCard(t));
     }
 
-    @FXML
-    public void handleDelete() {
-        if (selectedTask == null) { showMessage("Sélectionnez une tâche.", true); return; }
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer cette tâche?", ButtonType.YES, ButtonType.NO);
-        confirm.showAndWait().ifPresent(btn -> {
-            if (btn == ButtonType.YES) {
-                try {
-                    taskDAO.delete(selectedTask.getId());
-                    showMessage("Tâche supprimée.", false);
-                    handleClear();
-                    loadTasks();
-                } catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
+    private VBox buildCard(Task task) {
+        VBox card = new VBox(8);
+        card.setPrefWidth(270);
+        card.setPadding(new Insets(16));
+        card.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 3); -fx-cursor: hand;");
+        
+        // Add double-click handler to show task details
+        card.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                Window owner = getWindow();
+                if (owner != null) {
+                    new TaskDetailsDialog(owner, task).show();
+                }
             }
         });
+        HBox header = new HBox(8);
+        header.setAlignment(Pos.CENTER_LEFT);
+        Label title = new Label(task.getTitle());
+        title.setFont(Font.font("Segoe UI", FontWeight.BOLD, 13));
+        title.setTextFill(Color.web("#1a1a2e"));
+        title.setWrapText(true);
+        HBox.setHgrow(title, Priority.ALWAYS);
+        header.getChildren().addAll(title, statusBadge(task.getStatus()));
+        Label priority = priorityBadge(task.getPriority());
+        Label sprint  = info("Sprint: " + nvl(task.getSprintName()));
+        Label project = info("Project: " + nvl(task.getProjectTitle()));
+        
+        // Show assigned field only for supervisors
+        User currentUser = SessionManager.getCurrentUser();
+        boolean isSupervisor = currentUser != null && "supervisor".equals(currentUser.getRole());
+        Label assigned = null;
+        if (isSupervisor) {
+            assigned = info("Assigned: " + (task.getAssignedToName() != null ? task.getAssignedToName() : "Unassigned"));
+        }
+        
+        HBox actions = new HBox(8);
+        actions.setAlignment(Pos.CENTER_RIGHT);
+        Button editBtn = btn("Edit", "#667eea");
+        Button delBtn  = btn("Delete", "#ef4444");
+        editBtn.setOnAction(e -> {
+            Window owner = getWindow();
+            if (owner != null && new TaskDialog(owner, task).showAndWait()) { loadTasks(); }
+        });
+        delBtn.setOnAction(e -> {
+            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Delete task?", ButtonType.YES, ButtonType.NO);
+            confirm.showAndWait().ifPresent(b -> {
+                if (b == ButtonType.YES) {
+                    try {
+                        User current = SessionManager.getCurrentUser();
+                        boolean isStudent = current != null && "student".equals(current.getRole());
+                        
+                        if (isStudent) {
+                            // Student deleting task → email supervisor
+                            int projectId = task.getProjectId();
+                            if (projectId > 0) {
+                                ProjectDAO projectDAO = new ProjectDAO();
+                                Project taskProject = projectDAO.findById(projectId);
+                                if (taskProject != null && taskProject.getSupervisorId() > 0) {
+                                    UserDAO userDAO = new UserDAO();
+                                    User supervisor = userDAO.findById(taskProject.getSupervisorId());
+                                    if (supervisor != null && supervisor.getEmail() != null) {
+                                        String studentName = current.getName() != null ? current.getName() : current.getEmail();
+                                        String emailBody = EmailService.taskSupervisorTemplate(
+                                            "deleted",
+                                            task.getTitle(),
+                                            task.getSprintName() != null ? task.getSprintName() : "N/A",
+                                            task.getPriority() != null ? task.getPriority() : "N/A",
+                                            studentName,
+                                            supervisor.getName() != null ? supervisor.getName() : supervisor.getEmail()
+                                        );
+                                        EmailService.sendAsync(
+                                            supervisor.getEmail(),
+                                            "Task deleted by student: " + task.getTitle(),
+                                            emailBody
+                                        );
+                                    }
+                                }
+                            }
+                        } else {
+                            // Supervisor deleting task → email assigned student
+                            if (task.getAssignedToId() != null) {
+                                UserDAO userDAO = new UserDAO();
+                                User assignedUser = userDAO.findById(task.getAssignedToId());
+                                if (assignedUser != null && assignedUser.getEmail() != null) {
+                                    String emailBody = EmailService.taskTemplate(
+                                        "deleted",
+                                        task.getTitle(),
+                                        task.getSprintName() != null ? task.getSprintName() : "N/A",
+                                        task.getPriority() != null ? task.getPriority() : "N/A",
+                                        assignedUser.getName()
+                                    );
+                                    EmailService.sendAsync(
+                                        assignedUser.getEmail(),
+                                        "Task Deleted: " + task.getTitle(),
+                                        emailBody
+                                    );
+                                }
+                            }
+                        }
+                        
+                        taskDAO.delete(task.getId());
+                        loadTasks();
+                    }
+                    catch (Exception ex) { showMessage("Error: " + ex.getMessage(), true); }
+                }
+            });
+        });
+        actions.getChildren().addAll(editBtn, delBtn);
+        
+        // Build card children list conditionally
+        if (isSupervisor && assigned != null) {
+            card.getChildren().addAll(header, priority, sprint, project, assigned, new Separator(), actions);
+        } else {
+            card.getChildren().addAll(header, priority, sprint, project, new Separator(), actions);
+        }
+        return card;
+    }
+
+    private Label statusBadge(String s) {
+        String c = "done".equals(s) ? "#10b981" : "in_progress".equals(s) ? "#3b82f6" : "#f59e0b";
+        Label b = new Label(s != null ? s.replace("_"," ").toUpperCase() : "");
+        b.setStyle("-fx-background-color:"+c+";-fx-text-fill:white;-fx-background-radius:6;-fx-padding:2 7;-fx-font-size:9px;-fx-font-weight:bold;");
+        return b;
+    }
+
+    private Label priorityBadge(String p) {
+        String c = "critical".equals(p) ? "#dc2626" : "high".equals(p) ? "#f97316" : "medium".equals(p) ? "#eab308" : "#6b7280";
+        Label b = new Label(p != null ? p.toUpperCase() : "");
+        b.setStyle("-fx-background-color:"+c+"22;-fx-text-fill:"+c+";-fx-background-radius:4;-fx-padding:1 6;-fx-font-size:10px;-fx-font-weight:bold;");
+        return b;
+    }
+
+    private Label info(String text) {
+        Label l = new Label(text);
+        l.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 11px;");
+        return l;
+    }
+
+    private Button btn(String text, String color) {
+        Button b = new Button(text);
+        b.setStyle("-fx-background-color:"+color+";-fx-text-fill:white;-fx-background-radius:6;-fx-padding:5 12;-fx-font-size:11px;-fx-cursor:hand;");
+        return b;
+    }
+
+    private String nvl(String s) { return s != null ? s : ""; }
+
+    private Window getWindow() {
+        if (scrollPane != null && scrollPane.getScene() != null) return scrollPane.getScene().getWindow();
+        if (cardPane != null && cardPane.getScene() != null) return cardPane.getScene().getWindow();
+        return null;
+    }
+
+    @FXML public void handleSearch() { applyFilters(); }
+
+    @FXML public void handleReset() {
+        if (searchField != null) searchField.clear();
+        if (filterStatus != null) filterStatus.setValue(null);
+        if (filterPriority != null) filterPriority.setValue(null);
+        applyFilters();
+    }
+
+    private void applyFilters() {
+        String q  = searchField   != null && searchField.getText()   != null ? searchField.getText().toLowerCase()   : "";
+        String st = filterStatus  != null && filterStatus.getValue()  != null && !"All".equals(filterStatus.getValue())  ? filterStatus.getValue()  : null;
+        String pr = filterPriority != null && filterPriority.getValue() != null && !"All".equals(filterPriority.getValue()) ? filterPriority.getValue() : null;
+
+        renderCards(allTasks.stream().filter(t -> {
+            boolean matchQ  = q.isBlank()  || (t.getTitle() != null && t.getTitle().toLowerCase().contains(q))
+                                            || (t.getStatus() != null && t.getStatus().toLowerCase().contains(q))
+                                            || (t.getAssignedToName() != null && t.getAssignedToName().toLowerCase().contains(q));
+            boolean matchSt = st == null   || st.equals(t.getStatus());
+            boolean matchPr = pr == null   || pr.equals(t.getPriority());
+            return matchQ && matchSt && matchPr;
+        }).toList());
     }
 
     @FXML
-    public void handleClear() {
-        selectedTask = null;
-        titleField.clear();
-        descriptionField.clear();
-        statusCombo.setValue(null);
-        priorityCombo.setValue(null);
-        projectCombo.setValue(null);
-        sprintCombo.setValue(null);
-        assignedCombo.setValue(null);
-        deadlinePicker.setValue(null);
-        blockedCheck.setSelected(false);
-        taskTable.getSelectionModel().clearSelection();
-    }
-
-    @FXML
-    public void handleSearch() {
-        String query = searchField.getText().trim().toLowerCase();
-        try {
-            List<Task> all = taskDAO.findAll();
-            if (!query.isEmpty()) all = all.stream().filter(t -> t.getTitle().toLowerCase().contains(query)).toList();
-            taskTable.setItems(FXCollections.observableArrayList(all));
-        } catch (Exception e) { e.printStackTrace(); }
+    public void handleAddDialog() {
+        Window owner = getWindow();
+        if (owner == null) return;
+        if (new TaskDialog(owner, null).showAndWait()) loadTasks();
     }
 
     private void showMessage(String msg, boolean isError) {
-        messageLabel.setText(msg);
-        messageLabel.setStyle(isError ? "-fx-text-fill: red;" : "-fx-text-fill: green;");
+        if (messageLabel != null) {
+            messageLabel.setText(msg);
+            messageLabel.setStyle(isError ? "-fx-text-fill:#dc2626;" : "-fx-text-fill:#16a34a;");
+        }
     }
 }

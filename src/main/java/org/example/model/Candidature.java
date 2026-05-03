@@ -9,14 +9,16 @@ public class Candidature {
     private int studentId;
     private String studentName;
     private String motivationLetter;
-    private String cvPath;
-    private String status; // pending, accepted, rejected
+    private String cvPath;           // filename only
+    private String portfolioUrl;
+    private String githubUrl;        // optional
+    private String status;           // pending, accepted, rejected
     private String feedback;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public Candidature() {}
 
-    // Getters & Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -38,6 +40,12 @@ public class Candidature {
     public String getCvPath() { return cvPath; }
     public void setCvPath(String cvPath) { this.cvPath = cvPath; }
 
+    public String getPortfolioUrl() { return portfolioUrl; }
+    public void setPortfolioUrl(String portfolioUrl) { this.portfolioUrl = portfolioUrl; }
+
+    public String getGithubUrl() { return githubUrl; }
+    public void setGithubUrl(String githubUrl) { this.githubUrl = githubUrl; }
+
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
@@ -47,6 +55,9 @@ public class Candidature {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
     @Override
-    public String toString() { return studentName + " → " + offerTitle; }
+    public String toString() { return studentName + " -> " + offerTitle; }
 }

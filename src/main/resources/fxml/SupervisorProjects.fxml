@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<SplitPane xmlns:fx="http://javafx.com/fxml" dividerPositions="0.35"
+           fx:controller="org.example.controller.SupervisorProjectsController"
+           style="-fx-background-color: #f4f6fb;">
+
+    <!-- Left: project list -->
+    <VBox spacing="8" style="-fx-background-color: white; -fx-padding: 16;">
+        <Label text="My Supervised Projects" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+        <TableView fx:id="projectTable" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colTitle" text="Title" prefWidth="160"/>
+                <TableColumn fx:id="colStatus" text="Status" prefWidth="80"/>
+                <TableColumn fx:id="colOwner" text="Owner" prefWidth="100"/>
+                <TableColumn fx:id="colType" text="Type" prefWidth="80"/>
+            </columns>
+            <placeholder><Label text="No supervised projects"/></placeholder>
+        </TableView>
+    </VBox>
+
+    <!-- Right: project detail -->
+    <ScrollPane fitToWidth="true" style="-fx-background-color: #f4f6fb; -fx-background: #f4f6fb; -fx-border-color: transparent;">
+        <VBox spacing="14">
+            <padding><Insets top="16" left="16" right="16" bottom="16"/></padding>
+
+            <!-- Info -->
+            <VBox spacing="6" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 14; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.06),8,0,0,2);">
+                <Label fx:id="detailTitle" text="Select a project" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+                <Label fx:id="detailStatus" text="" style="-fx-font-size: 12px; -fx-text-fill: #888;"/>
+                <Label fx:id="detailOwner" text="" style="-fx-font-size: 12px; -fx-text-fill: #888;"/>
+                <Label fx:id="detailDesc" text="" wrapText="true" style="-fx-font-size: 12px; -fx-text-fill: #555;"/>
+            </VBox>
+
+            <!-- Members -->
+            <VBox fx:id="membersBox" spacing="6" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 14; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.06),8,0,0,2);"/>
+
+            <!-- Burndown -->
+            <VBox fx:id="burndownBox" spacing="8" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 14; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.06),8,0,0,2);"/>
+
+            <!-- Sprint summary -->
+            <VBox fx:id="sprintsBox" spacing="6" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 14; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.06),8,0,0,2);"/>
+        </VBox>
+    </ScrollPane>
+</SplitPane>
