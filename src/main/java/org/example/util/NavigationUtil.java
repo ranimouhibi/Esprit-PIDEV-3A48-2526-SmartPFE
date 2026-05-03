@@ -34,6 +34,7 @@ public class NavigationUtil {
             FXMLLoader loader = new FXMLLoader(NavigationUtil.class.getResource("/fxml/" + fxmlFile));
             return loader.load();
         } catch (Exception e) {
+            System.err.println("ERROR loading FXML: " + fxmlFile + " → " + e.getMessage());
             e.printStackTrace();
             return new Pane();
         }

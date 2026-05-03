@@ -17,10 +17,21 @@ public class UserDAO {
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                String hashed = rs.getString("password").replace("$2y$", "$2a$");
-                if (BCrypt.checkpw(password, hashed)) {
-                    return mapRow(rs);
+                String stored = rs.getString("password");
+                boolean match;
+                if (stored != null && stored.startsWith("$2")) {
+                    // BCrypt hash — normalize $2y$ and $2b$ to $2a$
+                    String hashed = stored.replaceAll("^\\$2[yb]\\$", "\\$2a\\$");
+                    try {
+                        match = BCrypt.checkpw(password, hashed);
+                    } catch (Exception e) {
+                        match = false;
+                    }
+                } else {
+                    // Plain text password (test accounts)
+                    match = password.equals(stored);
                 }
+                if (match) return mapRow(rs);
             }
         }
         return null;

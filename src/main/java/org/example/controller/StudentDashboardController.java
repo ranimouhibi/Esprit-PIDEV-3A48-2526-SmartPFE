@@ -144,6 +144,19 @@ public class StudentDashboardController implements Initializable {
             });
         }).start();
     }
+    
+    @FXML public void showMeetings() { 
+        setActiveNav(navMeetings);
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        System.out.println("DEBUG: Loading Meetings.fxml...");
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Meetings.fxml");
+        System.out.println("DEBUG: Pane loaded, children count: " + (pane != null ? pane.getChildren().size() : "null"));
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        } else {
+            System.err.println("ERROR: Pane is null!");
 
     private void showSuggestedQuestions() {
         if (chatMessages == null) return;

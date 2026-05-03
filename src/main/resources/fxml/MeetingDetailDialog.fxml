@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.controller.MeetingDetailDialogController"
+      spacing="0" style="-fx-background-color: #f0f2f5;">
+
+    <!-- Header -->
+    <VBox style="-fx-background-color: #1e1e2e;" spacing="6">
+        <padding><Insets top="20" bottom="20" left="24" right="24"/></padding>
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <Label text="Détails du Meeting" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="statusBadge" text="PENDING"/>
+        </HBox>
+        <Label fx:id="headerSub" text="" style="-fx-font-size: 12px; -fx-text-fill: #8b8fa8;"/>
+    </VBox>
+
+    <!-- Content -->
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-background: transparent;">
+        <VBox spacing="12">
+            <padding><Insets top="20" bottom="20" left="24" right="24"/></padding>
+
+            <!-- Meeting Info Card -->
+            <VBox style="-fx-background-color: white; -fx-background-radius: 10;" spacing="12">
+                <padding><Insets top="16" bottom="16" left="16" right="16"/></padding>
+                <HBox spacing="20">
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label text="Projet" style="-fx-font-size: 11px; -fx-text-fill: #9ca3af;"/>
+                        <Label fx:id="detailProject" text="—" style="-fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+                    </VBox>
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label text="Type" style="-fx-font-size: 11px; -fx-text-fill: #9ca3af;"/>
+                        <Label fx:id="detailType" text="—" style="-fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+                    </VBox>
+                </HBox>
+                <HBox spacing="20">
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label text="Date planifiée" style="-fx-font-size: 11px; -fx-text-fill: #9ca3af;"/>
+                        <Label fx:id="detailDate" text="—" style="-fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+                    </VBox>
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label text="Durée" style="-fx-font-size: 11px; -fx-text-fill: #9ca3af;"/>
+                        <Label fx:id="detailDuration" text="—" style="-fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+                    </VBox>
+                </HBox>
+                <HBox spacing="20">
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label text="Reprogrammations" style="-fx-font-size: 11px; -fx-text-fill: #9ca3af;"/>
+                        <Label fx:id="detailReschedule" text="0" style="-fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+                    </VBox>
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label text="Créé le" style="-fx-font-size: 11px; -fx-text-fill: #9ca3af;"/>
+                        <Label fx:id="detailCreatedAt" text="—" style="-fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+                    </VBox>
+                </HBox>
+                <VBox spacing="4">
+                    <Label text="Lieu" style="-fx-font-size: 11px; -fx-text-fill: #9ca3af;"/>
+                    <Label fx:id="detailLocation" text="—" style="-fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+                </VBox>
+                <VBox spacing="4">
+                    <Label text="Lien" style="-fx-font-size: 11px; -fx-text-fill: #9ca3af;"/>
+                    <Label fx:id="detailLink" text="—" style="-fx-text-fill: #2980b9;" wrapText="true"/>
+                </VBox>
+                <VBox spacing="4">
+                    <Label text="Agenda" style="-fx-font-size: 11px; -fx-text-fill: #9ca3af;"/>
+                    <Label fx:id="detailAgenda" text="—" style="-fx-text-fill: #374151;" wrapText="true"/>
+                </VBox>
+            </VBox>
+
+            <!-- Action Buttons -->
+            <HBox spacing="10">
+                <Button fx:id="distanceBtn" text="📏 Distance"
+                        onAction="#handleCalculateDistance" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                        style="-fx-background-color: #374151; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 9 16; -fx-font-weight: bold;"/>
+                <Button fx:id="followUpEmailBtn" text="📧 Email de Suivi"
+                        onAction="#handleFollowUpEmail" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                        style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 9 16; -fx-font-weight: bold;"/>
+            </HBox>
+
+            <!-- AI Summary Card -->
+            <VBox style="-fx-background-color: white; -fx-background-radius: 10;" spacing="10">
+                <padding><Insets top="14" bottom="14" left="16" right="16"/></padding>
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label text="🤖 AI Summary" style="-fx-font-weight: bold; -fx-text-fill: #1f2937; -fx-font-size: 13px;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="generateAiBtn" text="🤖 Generate AI Summary"
+                            onAction="#handleGenerateAiSummary"
+                            style="-fx-background-color: #8e44ad; -fx-text-fill: white; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 5 12; -fx-font-size: 11px;"/>
+                </HBox>
+                <Label fx:id="aiSummaryLabel" text="No AI summary yet."
+                       style="-fx-text-fill: #6b7280; -fx-font-size: 12px;" wrapText="true"/>
+            </VBox>
+        </VBox>
+    </ScrollPane>
+
+    <!-- Footer -->
+    <HBox alignment="CENTER_RIGHT" style="-fx-background-color: white; -fx-border-color: #e5e7eb; -fx-border-width: 1 0 0 0;">
+        <padding><Insets top="14" bottom="14" left="24" right="24"/></padding>
+        <Button fx:id="closeBtn" text="Fermer" onAction="#handleClose"
+                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 8 24;"/>
+    </HBox>
+</VBox>

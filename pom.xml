@@ -70,6 +70,13 @@
             <version>1.6.2</version>
         </dependency>
 
+        <!-- JavaFX Web (WebView for Calendar and Distance) -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
         <!-- Jackson for JSON parsing (HuggingFace/Gemini responses) -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -77,12 +84,7 @@
             <version>2.15.2</version>
         </dependency>
 
-        <!-- iText for calendar/extra PDF features -->
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>io</artifactId>
-            <version>7.2.5</version>
-        </dependency>
+      
 
         <!-- Google Gson (used by AIUtil, SpeechUtil, TranslationUtil, VoskSpeechUtil) -->
         <dependency>
@@ -151,6 +153,7 @@
                     <mainClass>org.example.Main</mainClass>
                     <options>
                         <option>--add-opens=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED</option>
+                        <option>--add-opens=javafx.web/com.sun.webkit=ALL-UNNAMED</option>
                     </options>
                 </configuration>
             </plugin>
