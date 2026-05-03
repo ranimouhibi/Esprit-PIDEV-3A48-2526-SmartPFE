@@ -3,7 +3,6 @@ package org.example.service;
 import org.example.dao.CommentDAO;
 import org.example.model.Comment;
 import org.example.util.ProfanityFilter;
-import org.example.util.SpeechUtil;
 import org.example.util.TranslationUtil;
 
 import java.util.List;
@@ -11,7 +10,6 @@ import java.util.List;
 /**
  * Service pour la gestion des commentaires avec fonctionnalités avancées:
  * - Traduction (multi-langues)
- * - Insertion vocale (speech-to-text)
  * - Filtre de mots inappropriés
  */
 public class CommentService {
@@ -67,33 +65,6 @@ public class CommentService {
             e.printStackTrace();
             return content; // Retourner le texte original en cas d'erreur
         }
-    }
-
-    /**
-     * Créer un commentaire depuis l'audio (speech-to-text)
-     */
-    public Comment createCommentFromVoice(int projectId, int userId) throws Exception {
-        // Enregistrer et transcrire l'audio
-        String transcribedText = SpeechUtil.recordAndTranscribe();
-
-        if (transcribedText == null || transcribedText.trim().isEmpty()) {
-            throw new Exception("Impossible de transcrire l'audio");
-        }
-
-        // Vérifier les mots inappropriés
-        if (ProfanityFilter.containsProfanity(transcribedText)) {
-            throw new Exception("Le commentaire vocal contient des mots inappropriés");
-        }
-
-        // Créer le commentaire
-        Comment comment = new Comment();
-        comment.setCommentableType("Project");
-        comment.setCommentableId(projectId);
-        comment.setAuthorId(userId);
-        comment.setContent(transcribedText);
-
-        commentDAO.save(comment);
-        return comment;
     }
 
     /**

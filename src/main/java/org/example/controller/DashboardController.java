@@ -38,7 +38,6 @@ public class DashboardController implements Initializable {
     @FXML private Button btnMeetings;
     @FXML private Button btnOffers;
     @FXML private Button btnProjectOffers;
-    @FXML private Button btnCalendar;
     @FXML private Button btnCandidatures;
     @FXML private Button btnUsers;
 
@@ -72,13 +71,13 @@ public class DashboardController implements Initializable {
     }
 
     private void setActiveButton(Button active) {
-        Button[] all = {btnProjects, btnComments, btnDocuments, btnSprints, btnTasks, btnMeetings, btnOffers, btnProjectOffers, btnCalendar, btnCandidatures, btnUsers};
+        Button[] all = {btnProjects, btnComments, btnDocuments, btnSprints, btnTasks, btnMeetings, btnOffers, btnProjectOffers, btnCandidatures, btnUsers};
         for (Button b : all) { b.setStyle(STYLE_INACTIVE); }
         active.setStyle(STYLE_ACTIVE);
     }
 
     @FXML public void showDashboard() {
-        Button[] all = {btnProjects, btnComments, btnDocuments, btnSprints, btnTasks, btnMeetings, btnOffers, btnProjectOffers, btnCalendar, btnCandidatures, btnUsers};
+        Button[] all = {btnProjects, btnComments, btnDocuments, btnSprints, btnTasks, btnMeetings, btnOffers, btnProjectOffers, btnCandidatures, btnUsers};
         for (Button b : all) b.setStyle(STYLE_INACTIVE);
         contentArea.setCenter(statsPane);
         loadStats();
@@ -92,11 +91,11 @@ public class DashboardController implements Initializable {
     @FXML public void showMeetings()     { setActiveButton(btnMeetings);      loadContent("Meetings.fxml"); }
     @FXML public void showOffers()       { setActiveButton(btnOffers);        loadContent("Offers.fxml"); }
     @FXML public void showProjectOffers(){ setActiveButton(btnProjectOffers); loadContent("ProjectOffers.fxml"); }
-    @FXML public void showCalendar()     { setActiveButton(btnCalendar);      loadContent("OfferCalendar.fxml"); }
     @FXML public void showCandidatures() { setActiveButton(btnCandidatures);  loadContent("Candidatures.fxml"); }
     @FXML public void showUsers()        { setActiveButton(btnUsers);         loadContent("Users.fxml"); }
     @FXML public void showStudentOffers()  { loadContent("StudentOffers.fxml"); }
     @FXML public void showMyCandidatures() { loadContent("MyCandidatures.fxml"); }
+    @FXML public void showAuditLog()       { loadContent("AuditLog.fxml"); }
 
     private void loadContent(String fxml) {
         // Clear old content completely

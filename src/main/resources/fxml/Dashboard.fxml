@@ -60,8 +60,6 @@
                         style="-fx-background-color: transparent; -fx-text-fill: #ccc; -fx-alignment: CENTER-LEFT; -fx-cursor: hand; -fx-font-size: 13px; -fx-background-radius: 8; -fx-padding: 9 12;"/>
                 <Button fx:id="btnProjectOffers" text="🎯 Project Offers" onAction="#showProjectOffers" maxWidth="Infinity"
                         style="-fx-background-color: transparent; -fx-text-fill: #ccc; -fx-alignment: CENTER-LEFT; -fx-cursor: hand; -fx-font-size: 13px; -fx-background-radius: 8; -fx-padding: 9 12;"/>
-                <Button fx:id="btnCalendar" text="📅 Calendar" onAction="#showCalendar" maxWidth="Infinity"
-                        style="-fx-background-color: transparent; -fx-text-fill: #ccc; -fx-alignment: CENTER-LEFT; -fx-cursor: hand; -fx-font-size: 13px; -fx-background-radius: 8; -fx-padding: 9 12;"/>
                 <Button fx:id="btnCandidatures" text="Applications" onAction="#showCandidatures" maxWidth="Infinity"
                         style="-fx-background-color: transparent; -fx-text-fill: #ccc; -fx-alignment: CENTER-LEFT; -fx-cursor: hand; -fx-font-size: 13px; -fx-background-radius: 8; -fx-padding: 9 12;"/>
             </VBox>
