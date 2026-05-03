@@ -1,12 +1,13 @@
 package org.example.controller;
 
-import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -29,12 +30,23 @@ public class SprintStatsController {
     private List<Sprint> sprints;
     private List<Task> allTasks;
 
+    private static final String C_BG      = "#f4f6fb";
+    private static final String C_CARD    = "white";
+    private static final String C_PRIMARY = "#a12c2f";
+    private static final String C_PLANNED = "#f59e0b";
+    private static final String C_ACTIVE  = "#3b82f6";
+    private static final String C_CLOSED  = "#6b7280";
+    private static final String C_DONE    = "#10b981";
+    private static final String C_ORANGE  = "#f97316";
+    private static final String C_DARK    = "#1a1a2e";
+    private static final String C_MUTED   = "#6b7280";
+
     public SprintStatsController(Window owner) {
         stage = new Stage();
         stage.initOwner(owner);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setTitle("Sprint Statistics");
-        stage.setWidth(950);
+        stage.setWidth(860);
         stage.setHeight(700);
         stage.setResizable(true);
     }
@@ -57,172 +69,338 @@ public class SprintStatsController {
         stage.show();
     }
 
+    // ── Root ─────────────────────────────────────────────────────────────────
+
     private BorderPane buildLayout() {
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #f4f6fb;");
-        root.setPadding(new Insets(24, 28, 24, 28));
+        root.setStyle("-fx-background-color: " + C_BG + ";");
+        root.setTop(buildHeader());
 
-        HBox header = new HBox();
-        header.setAlignment(Pos.CENTER_LEFT);
-        header.setSpacing(16);
-        header.setPadding(new Insets(0, 0, 16, 0));
-        Label title = new Label("Sprint Statistics");
-        title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;");
-        Region spacer = new Region(); HBox.setHgrow(spacer, Priority.ALWAYS);
-        Button exportBtn = new Button("Export PDF");
-        exportBtn.setStyle("-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 8 18; -fx-font-weight: bold; -fx-cursor: hand;");
-        exportBtn.setOnAction(e -> handleExport());
-        header.getChildren().addAll(title, spacer, exportBtn);
-        root.setTop(header);
-
-        long totalSprints = sprints.size();
-        long totalTasks   = allTasks.stream().filter(t -> sprintIds().contains(t.getSprintId())).count();
-
-        HBox cards = new HBox(12);
-        cards.setPadding(new Insets(0, 0, 16, 0));
-        cards.getChildren().addAll(
-            statCard("Sprints",     String.valueOf(totalSprints),          "#667eea"),
-            statCard("Tasks",       String.valueOf(totalTasks),            "#a12c2f"),
-            statCard("To Do",       String.valueOf(countByStatus("todo")), "#f59e0b"),
-            statCard("In Progress", String.valueOf(countByStatus("in_progress")), "#3b82f6"),
-            statCard("Done",        String.valueOf(countByStatus("done")), "#10b981")
+        VBox body = new VBox(20);
+        body.setPadding(new Insets(20, 28, 28, 28));
+        body.getChildren().addAll(
+            buildKpiRow(),
+            buildTaskBreakdownSection(),
+            buildSprintProgressSection()
         );
 
-        HBox charts = new HBox(16);
-        charts.setPrefHeight(260);
-        charts.getChildren().addAll(buildStatusPieChart(), buildStudentBarChart());
-        HBox.setHgrow(charts.getChildren().get(0), Priority.ALWAYS);
-        HBox.setHgrow(charts.getChildren().get(1), Priority.ALWAYS);
-
-        ScrollPane scroll = new ScrollPane();
+        ScrollPane scroll = new ScrollPane(body);
         scroll.setFitToWidth(true);
         scroll.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-        scroll.setContent(new VBox(12, cards, charts, buildSprintProgressTable()));
         root.setCenter(scroll);
         return root;
     }
 
-    private Set<Integer> sprintIds() {
-        return sprints.stream().map(Sprint::getId).collect(Collectors.toSet());
+    // ── Header ────────────────────────────────────────────────────────────────
+
+    private HBox buildHeader() {
+        HBox header = new HBox();
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setPadding(new Insets(20, 28, 0, 28));
+
+        VBox titles = new VBox(2);
+        Label title = new Label("Sprint Statistics");
+        title.setFont(Font.font("Segoe UI", FontWeight.BOLD, 24));
+        title.setTextFill(Color.web(C_DARK));
+        Label sub = new Label(sprints.size() + " sprints  ·  " + scopedTasks().size() + " tasks");
+        sub.setStyle("-fx-text-fill: " + C_MUTED + "; -fx-font-size: 13px;");
+        titles.getChildren().addAll(title, sub);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Button exportBtn = new Button("⬇  Export PDF");
+        exportBtn.setStyle("-fx-background-color: " + C_PRIMARY + "; -fx-text-fill: white; "
+            + "-fx-background-radius: 8; -fx-padding: 9 20; -fx-font-weight: bold; -fx-cursor: hand;");
+        exportBtn.setOnAction(e -> handleExport());
+
+        header.getChildren().addAll(titles, spacer, exportBtn);
+        return header;
     }
 
-    private long countByStatus(String status) {
-        Set<Integer> ids = sprintIds();
-        return allTasks.stream().filter(t -> ids.contains(t.getSprintId()) && status.equals(t.getStatus())).count();
+    // ── KPI cards ─────────────────────────────────────────────────────────────
+
+    private HBox buildKpiRow() {
+        List<Task> tasks = scopedTasks();
+        long done   = tasks.stream().filter(t -> "done".equals(t.getStatus())).count();
+        long inProg = tasks.stream().filter(t -> "in_progress".equals(t.getStatus())).count();
+        long todo   = tasks.stream().filter(t -> "todo".equals(t.getStatus())).count();
+        long active = sprints.stream().filter(s -> "active".equals(s.getStatus())).count();
+
+        HBox row = new HBox(14);
+        row.getChildren().addAll(
+            kpiCard("📋", String.valueOf(sprints.size()), "Total Sprints",  C_PRIMARY),
+            kpiCard("🔵", String.valueOf(active),         "Active Sprints", C_ACTIVE),
+            kpiCard("✅", String.valueOf(done),            "Tasks Done",     C_DONE),
+            kpiCard("⏳", String.valueOf(inProg),          "In Progress",    C_ORANGE),
+            kpiCard("📝", String.valueOf(todo),            "To Do",          C_PLANNED)
+        );
+        for (var node : row.getChildren()) HBox.setHgrow(node, Priority.ALWAYS);
+        return row;
     }
 
-    private VBox statCard(String label, String value, String color) {
-        VBox card = new VBox(4);
-        card.setAlignment(Pos.CENTER);
-        card.setPadding(new Insets(16));
-        card.setStyle("-fx-background-color: " + color + "; -fx-background-radius: 12;");
-        card.setPrefWidth(160);
-        Label val = new Label(value);
-        val.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;");
+    private VBox kpiCard(String icon, String value, String label, String accent) {
+        VBox card = new VBox(6);
+        card.setAlignment(Pos.CENTER_LEFT);
+        card.setPadding(new Insets(16, 20, 16, 20));
+        card.setStyle("-fx-background-color: " + C_CARD + "; -fx-background-radius: 14; "
+            + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 10, 0, 0, 2); "
+            + "-fx-border-color: " + accent + "; -fx-border-width: 0 0 0 4; -fx-border-radius: 0 0 0 14;");
+        HBox top = new HBox(8);
+        top.setAlignment(Pos.CENTER_LEFT);
+        Label iconLbl = new Label(icon);
+        iconLbl.setStyle("-fx-font-size: 18px;");
+        Label valLbl = new Label(value);
+        valLbl.setFont(Font.font("Segoe UI", FontWeight.BOLD, 26));
+        valLbl.setTextFill(Color.web(accent));
+        top.getChildren().addAll(iconLbl, valLbl);
         Label lbl = new Label(label);
-        lbl.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.9);");
-        card.getChildren().addAll(val, lbl);
-        HBox.setHgrow(card, Priority.ALWAYS);
+        lbl.setStyle("-fx-text-fill: " + C_MUTED + "; -fx-font-size: 12px;");
+        card.getChildren().addAll(top, lbl);
         return card;
     }
 
-    private PieChart buildStatusPieChart() {
-        PieChart chart = new PieChart(FXCollections.observableArrayList(
-            new PieChart.Data("To Do",       countByStatus("todo")),
-            new PieChart.Data("In Progress", countByStatus("in_progress")),
-            new PieChart.Data("Done",        countByStatus("done"))
-        ));
-        chart.setTitle("Tasks by Status");
-        chart.setStyle("-fx-background-color: white; -fx-background-radius: 12;");
-        chart.setPrefHeight(260);
-        return chart;
-    }
+    // ── Task breakdown (replaces charts) ─────────────────────────────────────
 
-    private BarChart<String, Number> buildStudentBarChart() {
-        CategoryAxis xAxis = new CategoryAxis();
-        NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Student"); yAxis.setLabel("Tasks");
-        BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
-        chart.setTitle("Tasks per Student");
-        chart.setStyle("-fx-background-color: white; -fx-background-radius: 12;");
-        chart.setPrefHeight(260);
-        chart.setLegendVisible(false);
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        Set<Integer> ids = sprintIds();
-        allTasks.stream().filter(t -> ids.contains(t.getSprintId()))
-            .collect(Collectors.groupingBy(
-                t -> t.getAssignedToName() != null ? t.getAssignedToName() : "Unassigned",
-                Collectors.counting()))
-            .forEach((name, count) -> series.getData().add(new XYChart.Data<>(name, count)));
-        chart.getData().add(series);
-        return chart;
-    }
+    private VBox buildTaskBreakdownSection() {
+        List<Task> tasks = scopedTasks();
+        int total = tasks.size();
 
-    private VBox buildSprintProgressTable() {
-        VBox box = new VBox(8);
-        box.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);");
-        Label title = new Label("Sprint Progress");
-        title.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;");
-        box.getChildren().add(title);
-
-        for (Sprint sprint : sprints) {
-            List<Task> sprintTasks = allTasks.stream()
-                .filter(t -> Objects.equals(t.getSprintId(), sprint.getId())).toList();
-            int total = sprintTasks.size();
-            long done = sprintTasks.stream().filter(t -> "done".equals(t.getStatus())).count();
-            double pct = total == 0 ? 0 : (done * 100.0 / total);
-
-            VBox sprintBox = new VBox(4);
-            sprintBox.setPadding(new Insets(8, 0, 8, 0));
-            sprintBox.setStyle("-fx-border-color: transparent transparent #f3f4f6 transparent;");
-
-            HBox row = new HBox(12);
-            row.setAlignment(Pos.CENTER_LEFT);
-            Label nameLabel = new Label(sprint.getName());
-            nameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #374151; -fx-min-width: 160;");
-            Label pctLabel = new Label(String.format("%.0f%%  (%d/%d tasks)", pct, done, total));
-            pctLabel.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 12px;");
-            Label badge = new Label(sprint.getStatus());
-            badge.setStyle("-fx-background-color: " + statusColor(sprint.getStatus()) +
-                "; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 2 8; -fx-font-size: 11px;");
-            Region sp = new Region(); HBox.setHgrow(sp, Priority.ALWAYS);
-            row.getChildren().addAll(nameLabel, badge, sp, pctLabel);
-
-            ProgressBar bar = new ProgressBar(pct / 100.0);
-            bar.setMaxWidth(Double.MAX_VALUE);
-            bar.setPrefHeight(8);
-            bar.setStyle("-fx-accent: " + progressColor(pct) + ";");
-            sprintBox.getChildren().addAll(row, bar);
-
-            if (!sprintTasks.isEmpty()) {
-                GridPane grid = new GridPane();
-                grid.setHgap(12); grid.setVgap(4);
-                grid.setPadding(new Insets(6, 0, 0, 12));
-                int r = 0;
-                for (Task t : sprintTasks) {
-                    Label tTitle = new Label("• " + t.getTitle());
-                    tTitle.setStyle("-fx-text-fill: #374151; -fx-font-size: 12px; -fx-min-width: 200;");
-                    Label tStatus = new Label(t.getStatus());
-                    tStatus.setStyle("-fx-text-fill: " + taskStatusColor(t.getStatus()) + "; -fx-font-size: 11px; -fx-min-width: 80;");
-                    Label tAssigned = new Label(t.getAssignedToName() != null ? t.getAssignedToName() : "—");
-                    tAssigned.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 11px;");
-                    grid.add(tTitle, 0, r); grid.add(tStatus, 1, r); grid.add(tAssigned, 2, r); r++;
-                }
-                sprintBox.getChildren().add(grid);
-            }
-            box.getChildren().add(sprintBox);
+        VBox card = sectionCard("Task Breakdown");
+        if (total == 0) {
+            card.getChildren().add(mutedLabel("No tasks yet."));
+            return card;
         }
+
+        long done   = tasks.stream().filter(t -> "done".equals(t.getStatus())).count();
+        long inProg = tasks.stream().filter(t -> "in_progress".equals(t.getStatus())).count();
+        long todo   = tasks.stream().filter(t -> "todo".equals(t.getStatus())).count();
+
+        card.getChildren().addAll(
+            statBar("Done",        done,   total, C_DONE),
+            statBar("In Progress", inProg, total, C_ACTIVE),
+            statBar("To Do",       todo,   total, C_PLANNED)
+        );
+
+        // Sprint status breakdown
+        Label sprintTitle = new Label("Sprint Status");
+        sprintTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, 13));
+        sprintTitle.setTextFill(Color.web(C_DARK));
+        sprintTitle.setPadding(new Insets(12, 0, 4, 0));
+        card.getChildren().add(sprintTitle);
+
+        int totalSprints = sprints.size();
+        long planned = sprints.stream().filter(s -> "planned".equals(s.getStatus())).count();
+        long active  = sprints.stream().filter(s -> "active".equals(s.getStatus())).count();
+        long closed  = sprints.stream().filter(s -> "closed".equals(s.getStatus())).count();
+
+        card.getChildren().addAll(
+            statBar("Planned", planned, totalSprints, C_PLANNED),
+            statBar("Active",  active,  totalSprints, C_ACTIVE),
+            statBar("Closed",  closed,  totalSprints, C_CLOSED)
+        );
+
+        return card;
+    }
+
+    /** A labeled progress bar row: "Label   ████░░░░  12 (60%)" */
+    private HBox statBar(String label, long count, int total, String color) {
+        HBox row = new HBox(12);
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.setPadding(new Insets(4, 0, 4, 0));
+
+        Label nameLbl = new Label(label);
+        nameLbl.setStyle("-fx-text-fill: #374151; -fx-font-size: 12px;");
+        nameLbl.setMinWidth(90);
+
+        double pct = total == 0 ? 0 : (count * 100.0 / total);
+        ProgressBar bar = new ProgressBar(pct / 100.0);
+        bar.setPrefHeight(10);
+        bar.setPrefWidth(300);
+        bar.setMaxWidth(Double.MAX_VALUE);
+        bar.setStyle("-fx-accent: " + color + ";");
+        HBox.setHgrow(bar, Priority.ALWAYS);
+
+        Label countLbl = new Label(count + "  (" + String.format("%.0f", pct) + "%)");
+        countLbl.setStyle("-fx-text-fill: " + color + "; -fx-font-size: 12px; -fx-font-weight: bold; -fx-min-width: 70;");
+
+        row.getChildren().addAll(nameLbl, bar, countLbl);
+        return row;
+    }
+
+    // ── Sprint progress cards ─────────────────────────────────────────────────
+
+    private VBox buildSprintProgressSection() {
+        VBox section = new VBox(12);
+        Label title = new Label("Sprint Progress");
+        title.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
+        title.setTextFill(Color.web(C_DARK));
+        section.getChildren().add(title);
+
+        if (sprints.isEmpty()) {
+            section.getChildren().add(mutedLabel("No sprints to display."));
+            return section;
+        }
+        for (Sprint sprint : sprints) section.getChildren().add(buildSprintCard(sprint));
+        return section;
+    }
+
+    private VBox buildSprintCard(Sprint sprint) {
+        List<Task> sprintTasks = allTasks.stream()
+            .filter(t -> Objects.equals(t.getSprintId(), sprint.getId())).toList();
+        int total   = sprintTasks.size();
+        long done   = sprintTasks.stream().filter(t -> "done".equals(t.getStatus())).count();
+        long inProg = sprintTasks.stream().filter(t -> "in_progress".equals(t.getStatus())).count();
+        long todo   = sprintTasks.stream().filter(t -> "todo".equals(t.getStatus())).count();
+        double pct  = total == 0 ? 0 : (done * 100.0 / total);
+
+        VBox card = new VBox(10);
+        card.setPadding(new Insets(16, 20, 16, 20));
+        card.setStyle("-fx-background-color: " + C_CARD + "; -fx-background-radius: 14; "
+            + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);");
+
+        // Header
+        HBox headerRow = new HBox(10);
+        headerRow.setAlignment(Pos.CENTER_LEFT);
+        Label nameLbl = new Label(sprint.getName());
+        nameLbl.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
+        nameLbl.setTextFill(Color.web(C_DARK));
+        HBox.setHgrow(nameLbl, Priority.ALWAYS);
+        headerRow.getChildren().add(nameLbl);
+        if (sprint.getProjectTitle() != null) {
+            Label projLbl = new Label("📁 " + sprint.getProjectTitle());
+            projLbl.setStyle("-fx-text-fill: " + C_MUTED + "; -fx-font-size: 11px;");
+            headerRow.getChildren().add(projLbl);
+        }
+        Label badge = new Label(sprint.getStatus().toUpperCase());
+        badge.setStyle("-fx-background-color: " + statusColor(sprint.getStatus()) + "; "
+            + "-fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 3 10; "
+            + "-fx-font-size: 10px; -fx-font-weight: bold;");
+        headerRow.getChildren().add(badge);
+
+        // Progress bar
+        HBox progressRow = new HBox(10);
+        progressRow.setAlignment(Pos.CENTER_LEFT);
+        ProgressBar bar = new ProgressBar(pct / 100.0);
+        bar.setPrefHeight(10);
+        bar.setMaxWidth(Double.MAX_VALUE);
+        bar.setStyle("-fx-accent: " + progressColor(pct) + ";");
+        HBox.setHgrow(bar, Priority.ALWAYS);
+        Label pctLbl = new Label(String.format("%.0f%%", pct));
+        pctLbl.setFont(Font.font("Segoe UI", FontWeight.BOLD, 13));
+        pctLbl.setTextFill(Color.web(progressColor(pct)));
+        pctLbl.setMinWidth(40);
+        progressRow.getChildren().addAll(bar, pctLbl);
+
+        // Mini counters
+        HBox counters = new HBox(10);
+        counters.setAlignment(Pos.CENTER_LEFT);
+        counters.getChildren().addAll(
+            miniCounter("✅ Done",        done,   C_DONE),
+            miniCounter("⏳ In Progress", inProg, C_ACTIVE),
+            miniCounter("📝 To Do",       todo,   C_PLANNED),
+            miniCounter("📦 Total",       total,  C_MUTED)
+        );
+
+        card.getChildren().addAll(headerRow, progressRow, counters);
+
+        // Collapsible task list
+        if (!sprintTasks.isEmpty()) {
+            TitledPane taskPane = new TitledPane("Tasks (" + total + ")", buildTaskList(sprintTasks));
+            taskPane.setExpanded(false);
+            taskPane.setStyle("-fx-background-color: transparent; -fx-border-color: transparent; "
+                + "-fx-font-size: 12px; -fx-text-fill: " + C_MUTED + ";");
+            card.getChildren().add(taskPane);
+        }
+        return card;
+    }
+
+    private VBox buildTaskList(List<Task> tasks) {
+        VBox list = new VBox(4);
+        list.setPadding(new Insets(4, 0, 0, 0));
+        for (Task t : tasks) {
+            HBox row = new HBox(10);
+            row.setAlignment(Pos.CENTER_LEFT);
+            row.setPadding(new Insets(6, 8, 6, 8));
+            row.setStyle("-fx-background-color: #f9fafb; -fx-background-radius: 8;");
+
+            Label dot = new Label("●");
+            dot.setStyle("-fx-text-fill: " + taskStatusColor(t.getStatus()) + "; -fx-font-size: 10px;");
+
+            Label titleLbl = new Label(t.getTitle());
+            titleLbl.setStyle("-fx-text-fill: #374151; -fx-font-size: 12px;");
+            HBox.setHgrow(titleLbl, Priority.ALWAYS);
+
+            String priorityColor = switch (t.getPriority() != null ? t.getPriority() : "") {
+                case "critical" -> "#dc2626"; case "high" -> "#f97316";
+                case "medium"   -> "#eab308"; default     -> C_MUTED;
+            };
+            Label priorityLbl = new Label(t.getPriority() != null ? t.getPriority().toUpperCase() : "—");
+            priorityLbl.setStyle("-fx-text-fill: " + priorityColor + "; -fx-font-size: 10px; "
+                + "-fx-font-weight: bold; -fx-min-width: 55;");
+
+            Label statusLbl = new Label(t.getStatus() != null ? t.getStatus().replace("_", " ") : "—");
+            statusLbl.setStyle("-fx-background-color: " + taskStatusColor(t.getStatus()) + "22; "
+                + "-fx-text-fill: " + taskStatusColor(t.getStatus()) + "; "
+                + "-fx-background-radius: 4; -fx-padding: 2 7; -fx-font-size: 10px; -fx-font-weight: bold;");
+
+            row.getChildren().addAll(dot, titleLbl, priorityLbl, statusLbl);
+            list.getChildren().add(row);
+        }
+        return list;
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private VBox sectionCard(String title) {
+        VBox card = new VBox(10);
+        card.setPadding(new Insets(18, 20, 18, 20));
+        card.setStyle("-fx-background-color: " + C_CARD + "; -fx-background-radius: 14; "
+            + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 10, 0, 0, 2);");
+        Label lbl = new Label(title);
+        lbl.setFont(Font.font("Segoe UI", FontWeight.BOLD, 15));
+        lbl.setTextFill(Color.web(C_DARK));
+        card.getChildren().add(lbl);
+        return card;
+    }
+
+    private HBox miniCounter(String label, long count, String color) {
+        HBox box = new HBox(5);
+        box.setAlignment(Pos.CENTER_LEFT);
+        box.setPadding(new Insets(4, 10, 4, 10));
+        box.setStyle("-fx-background-color: " + color + "18; -fx-background-radius: 8;");
+        Label val = new Label(String.valueOf(count));
+        val.setFont(Font.font("Segoe UI", FontWeight.BOLD, 13));
+        val.setTextFill(Color.web(color));
+        Label lbl = new Label(label);
+        lbl.setStyle("-fx-text-fill: " + color + "; -fx-font-size: 11px;");
+        box.getChildren().addAll(val, lbl);
         return box;
     }
 
+    private Label mutedLabel(String text) {
+        Label l = new Label(text);
+        l.setStyle("-fx-text-fill: " + C_MUTED + "; -fx-font-size: 13px;");
+        return l;
+    }
+
+    private List<Task> scopedTasks() {
+        Set<Integer> ids = sprints.stream().map(Sprint::getId).collect(Collectors.toSet());
+        return allTasks.stream().filter(t -> ids.contains(t.getSprintId())).toList();
+    }
+
     private String statusColor(String s) {
-        return switch (s != null ? s : "") { case "active" -> "#10b981"; case "closed" -> "#6b7280"; default -> "#f59e0b"; };
+        return switch (s != null ? s : "") {
+            case "active" -> C_ACTIVE; case "closed" -> C_CLOSED; default -> C_PLANNED;
+        };
     }
     private String progressColor(double pct) {
-        if (pct >= 75) return "#10b981"; if (pct >= 40) return "#3b82f6"; return "#f59e0b";
+        if (pct >= 75) return C_DONE; if (pct >= 40) return C_ACTIVE; return C_PLANNED;
     }
     private String taskStatusColor(String s) {
-        return switch (s != null ? s : "") { case "done" -> "#10b981"; case "in_progress" -> "#3b82f6"; default -> "#f59e0b"; };
+        return switch (s != null ? s : "") {
+            case "done" -> C_DONE; case "in_progress" -> C_ACTIVE; default -> C_PLANNED;
+        };
     }
 
     private void handleExport() {
