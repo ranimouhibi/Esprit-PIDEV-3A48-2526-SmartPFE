@@ -10,6 +10,7 @@ import org.example.util.SessionManager;
 import org.example.util.QRCodeUtil;
 import org.example.util.ExcelExporter;
 import org.example.util.ChartUtil;
+import org.example.util.ChartDialog;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -195,25 +196,25 @@ public class StudentProjectsController implements Initializable {
         HBox actions = new HBox(8);
         actions.setAlignment(javafx.geometry.Pos.CENTER);
         
-        Button commentsBtn = new Button("View Comments");
-        commentsBtn.setStyle("-fx-background-color: #667eea; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;");
+        Button commentsBtn = new Button("💬 Comments");
+        commentsBtn.setStyle("-fx-background-color: #5b7fc4; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 6 10; -fx-cursor: hand;");
         // Show comment count on button
         try {
             int count = commentDAO.findByProject(project.getId()).size();
-            commentsBtn.setText("Comments (" + count + ")");
+            commentsBtn.setText("💬 Com. (" + count + ")");
         } catch (Exception ignored) {}
         commentsBtn.setOnAction(e -> handleViewComments(project));
 
-        Button docsBtn = new Button("Documents");
-        docsBtn.setStyle("-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;");
+        Button docsBtn = new Button("📄 Docs");
+        docsBtn.setStyle("-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 6 10; -fx-cursor: hand;");
         docsBtn.setOnAction(e -> handleViewDocuments(project));
         
-        Button editBtn = new Button("Edit");
-        editBtn.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;");
+        Button editBtn = new Button("✏️ Edit");
+        editBtn.setStyle("-fx-background-color: #4a5568; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 6 10; -fx-cursor: hand;");
         editBtn.setOnAction(e -> handleEditProject(project));
         
-        Button deleteBtn = new Button("Delete");
-        deleteBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;");
+        Button deleteBtn = new Button("🗑️ Delete");
+        deleteBtn.setStyle("-fx-background-color: #a94442; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 6 10; -fx-cursor: hand;");
         deleteBtn.setOnAction(e -> handleDeleteProject(project));
         
         actions.getChildren().addAll(commentsBtn, docsBtn, editBtn, deleteBtn);
@@ -222,12 +223,12 @@ public class StudentProjectsController implements Initializable {
         HBox aiActions = new HBox(8);
         aiActions.setAlignment(javafx.geometry.Pos.CENTER);
         
-        Button aiBtn = new Button("💡 AI Suggestions");
-        aiBtn.setStyle("-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;");
+        Button aiBtn = new Button("🤖 AI Suggest");
+        aiBtn.setStyle("-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 6 10; -fx-cursor: hand;");
         aiBtn.setOnAction(e -> handleAISuggestions(project));
         
         Button historyBtn = new Button("📜 History");
-        historyBtn.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;");
+        historyBtn.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 6 10; -fx-cursor: hand;");
         historyBtn.setOnAction(e -> handleViewHistory(project));
         
         aiActions.getChildren().addAll(aiBtn, historyBtn);
@@ -238,18 +239,18 @@ public class StudentProjectsController implements Initializable {
         
         // QR Code button (only for team projects)
         if ("team".equalsIgnoreCase(project.getProjectType())) {
-            Button qrBtn = new Button("🔐 QR Code");
-            qrBtn.setStyle("-fx-background-color: #06D6A0; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;");
+            Button qrBtn = new Button("📱 QR Code");
+            qrBtn.setStyle("-fx-background-color: #4a5568; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 6 10; -fx-cursor: hand;");
             qrBtn.setOnAction(e -> handleGenerateQRCode(project));
             exportActions.getChildren().add(qrBtn);
         }
         
-        Button excelBtn = new Button("📊 Export Excel");
-        excelBtn.setStyle("-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;");
+        Button excelBtn = new Button("📊 Export");
+        excelBtn.setStyle("-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 6 10; -fx-cursor: hand;");
         excelBtn.setOnAction(e -> handleExportProjectExcel(project));
         
-        Button chartBtn = new Button("📈 Charts");
-        chartBtn.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-size: 11px; -fx-background-radius: 6; -fx-padding: 6 14; -fx-cursor: hand;");
+        Button chartBtn = new Button("📈 Stats");
+        chartBtn.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 6 10; -fx-cursor: hand;");
         chartBtn.setOnAction(e -> handleGenerateCharts(project));
         
         exportActions.getChildren().addAll(excelBtn, chartBtn);
@@ -435,13 +436,13 @@ public class StudentProjectsController implements Initializable {
         List<Project> toExport = filteredProjects != null && !filteredProjects.isEmpty() ? filteredProjects : allProjects;
         
         if (toExport.isEmpty()) {
-            showAlert("Warning", "Aucun projet à exporter", Alert.AlertType.WARNING);
+            showAlert("Warning", "No projects to export", Alert.AlertType.WARNING);
             return;
         }
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Exporter en Excel");
-        fileChooser.setInitialFileName("mes_projets.xlsx");
+        fileChooser.setTitle("Export to Excel");
+        fileChooser.setInitialFileName("my_projects.xlsx");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
         
         File file = fileChooser.showSaveDialog(projectsContainer.getScene().getWindow());
@@ -449,19 +450,19 @@ public class StudentProjectsController implements Initializable {
             try {
                 ExcelExporter.exportProjects(toExport, file);
                 
-                // Ouvrir le fichier Excel
+                // Open Excel file
                 if (Desktop.isDesktopSupported()) {
                     Desktop.getDesktop().open(file);
                 }
                 
-                showAlert("Succès", 
-                    "✅ Export Excel réussi!\n\n" +
-                    "Fichier: " + file.getName() + "\n" +
-                    "Projets exportés: " + toExport.size(), 
+                showAlert("Success", 
+                    "✅ Excel export successful!\n\n" +
+                    "File: " + file.getName() + "\n" +
+                    "Projects exported: " + toExport.size(), 
                     Alert.AlertType.INFORMATION);
             } catch (Exception e) {
                 e.printStackTrace();
-                showAlert("Erreur", "Échec de l'export Excel: " + e.getMessage(), Alert.AlertType.ERROR);
+                showAlert("Error", "Excel export failed: " + e.getMessage(), Alert.AlertType.ERROR);
             }
         }
     }
@@ -702,45 +703,28 @@ public class StudentProjectsController implements Initializable {
     // ═══════════════════════════════════════════════════════════════════════
 
     /**
-     * Générer un QR Code pour un projet team
+     * Generate a QR Code for a team project
      */
     private void handleGenerateQRCode(Project project) {
         try {
+            // Generate the QR code
             String qrPath = QRCodeUtil.generateProjectQRCode(project.getId(), project.getTitle());
             
             if (qrPath != null) {
-                File qrFile = new File(qrPath);
-                if (qrFile.exists()) {
-                    // Ouvrir le QR code généré
-                    if (Desktop.isDesktopSupported()) {
-                        Desktop.getDesktop().open(qrFile);
-                    }
-                    
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("QR Code généré");
-                    alert.setHeaderText("QR Code pour : " + project.getTitle());
-                    alert.setContentText(
-                        "✅ QR Code généré avec succès!\n\n" +
-                        "Fichier: " + qrPath + "\n\n" +
-                        "Join Code: " + project.getJoinCode() + "\n\n" +
-                        "Scannez ce QR code avec votre smartphone pour partager le projet!"
-                    );
-                    alert.showAndWait();
-                } else {
-                    showAlert("Erreur", "Le fichier QR code n'a pas été créé", Alert.AlertType.ERROR);
-                }
+                // Display QR code in a JavaFX Dialog (instead of gallery)
+                QRCodeUtil.showQRCodeDialog(qrPath, project.getTitle());
             } else {
-                showAlert("Erreur", "Échec de la génération du QR code", Alert.AlertType.ERROR);
+                showAlert("Error", "Failed to generate QR code", Alert.AlertType.ERROR);
             }
             
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Erreur", "Erreur lors de la génération du QR Code:\n" + e.getMessage(), Alert.AlertType.ERROR);
+            showAlert("Error", "Error generating QR Code:\n" + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
     /**
-     * Exporter un projet en Excel avec ses commentaires
+     * Export a project to Excel with its comments
      */
     private void handleExportProjectExcel(Project project) {
         try {
@@ -748,7 +732,7 @@ public class StudentProjectsController implements Initializable {
             List<org.example.model.Document> documents = new org.example.dao.DocumentDAO().findByProject(project.getId());
             
             FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Exporter en Excel");
+            fileChooser.setTitle("Export to Excel");
             fileChooser.setInitialFileName("project_" + project.getId() + "_" + project.getTitle().replaceAll("[^a-zA-Z0-9]", "_") + ".xlsx");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
             
@@ -756,25 +740,25 @@ public class StudentProjectsController implements Initializable {
             if (file != null) {
                 ExcelExporter.exportProjectStatistics(project, comments, documents, file);
                 
-                // Ouvrir le fichier Excel
+                // Open Excel file
                 if (Desktop.isDesktopSupported()) {
                     Desktop.getDesktop().open(file);
                 }
                 
-                showAlert("Succès", 
-                    "✅ Export Excel réussi!\n\n" +
-                    "Fichier: " + file.getName() + "\n\n" +
-                    "Contenu:\n" +
-                    "• Informations du projet\n" +
-                    "• Statistiques\n" +
-                    "• " + comments.size() + " commentaires\n" +
+                showAlert("Success", 
+                    "✅ Excel export successful!\n\n" +
+                    "File: " + file.getName() + "\n\n" +
+                    "Content:\n" +
+                    "• Project information\n" +
+                    "• Statistics\n" +
+                    "• " + comments.size() + " comments\n" +
                     "• " + documents.size() + " documents", 
                     Alert.AlertType.INFORMATION);
             }
             
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Erreur", "Erreur lors de l'export Excel:\n" + e.getMessage(), Alert.AlertType.ERROR);
+            showAlert("Error", "Error exporting to Excel:\n" + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
@@ -787,38 +771,18 @@ public class StudentProjectsController implements Initializable {
             
             if (comments.isEmpty()) {
                 showAlert("Information", 
-                    "Aucun commentaire disponible pour générer des graphiques.\n\n" +
-                    "Ajoutez des commentaires au projet pour voir les statistiques.", 
+                    "No comments available to generate charts.\n\n" +
+                    "Add comments to the project to see statistics.", 
                     Alert.AlertType.INFORMATION);
                 return;
             }
             
-            // Générer les graphiques
-            String typeChartPath = ChartUtil.generateCommentsTypeChart(comments, 
-                "Commentaires par Type - " + project.getTitle());
-            String importanceChartPath = ChartUtil.generateCommentsImportanceChart(comments, 
-                "Commentaires par Importance - " + project.getTitle());
-            
-            if (typeChartPath != null && new File(typeChartPath).exists()) {
-                // Ouvrir le graphique
-                if (Desktop.isDesktopSupported()) {
-                    Desktop.getDesktop().open(new File(typeChartPath));
-                }
-                
-                showAlert("Graphiques générés", 
-                    "✅ Graphiques générés avec succès!\n\n" +
-                    "Fichiers créés:\n" +
-                    "• " + typeChartPath + "\n" +
-                    "• " + importanceChartPath + "\n\n" +
-                    "Les graphiques ont été ouverts dans votre navigateur.", 
-                    Alert.AlertType.INFORMATION);
-            } else {
-                showAlert("Erreur", "Échec de la génération des graphiques", Alert.AlertType.ERROR);
-            }
+            // Display charts in a JavaFX Dialog (instead of Chrome)
+            ChartDialog.showCommentStatistics(comments, project.getTitle());
             
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Erreur", "Erreur lors de la génération des graphiques:\n" + e.getMessage(), Alert.AlertType.ERROR);
+            showAlert("Error", "Error generating charts:\n" + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 }

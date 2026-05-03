@@ -5,11 +5,19 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
+import javafx.geometry.Pos;
+import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 /**
  * Utilitaire pour générer des QR codes
@@ -32,6 +40,96 @@ public class QRCodeUtil {
         MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
         
         System.out.println("✅ QR Code généré : " + filePath);
+    }
+
+    /**
+     * Display a QR code in a JavaFX Dialog
+     */
+    public static void showQRCodeDialog(String qrCodePath, String title) {
+        try {
+            File qrFile = new File(qrCodePath);
+            if (!qrFile.exists()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("QR Code not found");
+                alert.setContentText("The QR code file does not exist: " + qrCodePath);
+                alert.showAndWait();
+                return;
+            }
+
+            // Create the Dialog
+            Dialog<Void> dialog = new Dialog<>();
+            dialog.setTitle("QR Code - " + title);
+            dialog.setHeaderText("Scan this QR code with your smartphone");
+
+            // Load the image
+            Image qrImage = new Image(qrFile.toURI().toString());
+            ImageView imageView = new ImageView(qrImage);
+            imageView.setFitWidth(350);
+            imageView.setFitHeight(350);
+            imageView.setPreserveRatio(true);
+
+            // Create content
+            VBox content = new VBox(15);
+            content.setAlignment(Pos.CENTER);
+            content.setStyle("-fx-padding: 20;");
+            
+            Label infoLabel = new Label("📱 Use your phone's camera to scan");
+            infoLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #666;");
+            
+            content.getChildren().addAll(imageView, infoLabel);
+            dialog.getDialogPane().setContent(content);
+
+            // Buttons
+            ButtonType saveButton = new ButtonType("💾 Save", ButtonBar.ButtonData.LEFT);
+            ButtonType closeButton = new ButtonType("Close", ButtonBar.ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().addAll(saveButton, closeButton);
+
+            // Button styles
+            dialog.getDialogPane().lookupButton(saveButton).setStyle(
+                "-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; " +
+                "-fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px;"
+            );
+            dialog.getDialogPane().lookupButton(closeButton).setStyle(
+                "-fx-background-color: #4a5568; -fx-text-fill: white; -fx-font-weight: bold; " +
+                "-fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px;"
+            );
+
+            // Save button action
+            ((Button) dialog.getDialogPane().lookupButton(saveButton)).setOnAction(e -> {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Save QR Code");
+                fileChooser.setInitialFileName("qrcode_" + title.replaceAll("[^a-zA-Z0-9]", "_") + ".png");
+                fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("PNG Image", "*.png")
+                );
+                
+                File saveFile = fileChooser.showSaveDialog(dialog.getOwner());
+                if (saveFile != null) {
+                    try {
+                        Files.copy(qrFile.toPath(), saveFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        NotificationUtil.showSuccess("QR Code saved", 
+                            "QR code has been saved: " + saveFile.getName());
+                    } catch (IOException ex) {
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                        errorAlert.setTitle("Error");
+                        errorAlert.setHeaderText("Save error");
+                        errorAlert.setContentText("Unable to save QR code: " + ex.getMessage());
+                        errorAlert.showAndWait();
+                    }
+                }
+            });
+
+            dialog.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Display error");
+            alert.setContentText("Unable to display QR code: " + e.getMessage());
+            alert.showAndWait();
+        }
     }
 
     /**
@@ -63,6 +161,16 @@ public class QRCodeUtil {
             System.err.println("❌ Erreur génération QR Code : " + e.getMessage());
             e.printStackTrace();
             return null;
+        }
+    }
+
+    /**
+     * Générer ET afficher un QR code pour un projet
+     */
+    public static void generateAndShowProjectQRCode(int projectId, String projectTitle) {
+        String qrPath = generateProjectQRCode(projectId, projectTitle);
+        if (qrPath != null) {
+            showQRCodeDialog(qrPath, projectTitle);
         }
     }
 
