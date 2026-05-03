@@ -53,7 +53,7 @@ public class LoginController {
             User user = userDAO.authenticate(email, password);
             if (user != null) {
                 SessionManager.setCurrentUser(user);
-                switch (user.getRole()) {
+                switch (user.getRole().toLowerCase()) {
                     case "student"       -> NavigationUtil.navigateTo("StudentDashboard.fxml");
                     case "supervisor"    -> NavigationUtil.navigateTo("SupervisorDashboard.fxml");
                     case "establishment" -> NavigationUtil.navigateTo("EstablishmentDashboard.fxml");

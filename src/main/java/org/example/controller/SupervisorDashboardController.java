@@ -27,6 +27,7 @@ public class SupervisorDashboardController implements Initializable {
     @FXML private Label welcomeLabel;
     @FXML private Label projectCountLabel;
     @FXML private Label taskCountLabel;
+    @FXML private Label sprintCountLabel;
     @FXML private Label meetingCountLabel;
     @FXML private Label pendingRequestsLabel;
     @FXML private BorderPane contentArea;
@@ -48,6 +49,7 @@ public class SupervisorDashboardController implements Initializable {
     @FXML private Label navProjects;
     @FXML private Label navSprints;
     @FXML private Label navTasks;
+    @FXML private Label navSprints;
     @FXML private Label navDocuments;
     @FXML private Label navComments;
     @FXML private Label navCandidatures;
@@ -82,6 +84,24 @@ public class SupervisorDashboardController implements Initializable {
             User user = SessionManager.getCurrentUser();
             List<Project> projects = projectDAO.findBySupervisor(user.getId());
             projectCountLabel.setText(String.valueOf(projects.size()));
+            taskCountLabel.setText(String.valueOf(taskDAO.findAll().size()));
+            sprintCountLabel.setText(String.valueOf(sprintDAO.findAll().size()));
+            meetingCountLabel.setText("0");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setActiveNav(Label activeLabel) {
+        navHome.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
+        navMeetings.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
+        navProjects.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
+        navComments.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
+        navDocuments.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
+        navTasks.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
+        navSprints.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
+        navProfile.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
+        activeLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #a12c2f; -fx-cursor: hand;");
 
             // Tasks for supervised projects
             long taskCount = projects.stream().mapToLong(p -> {
@@ -201,6 +221,26 @@ public class SupervisorDashboardController implements Initializable {
         if (supChatScroll != null) Platform.runLater(() -> supChatScroll.setVvalue(1.0));
     }
 
+    @FXML public void showSprints() {
+        setActiveNav(navSprints);
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Sprints.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
+    }
+    
+    @FXML public void showDocuments() { 
+        setActiveNav(navDocuments);
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Documents.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
+        }
     private void addUserMessage(String text) {
         if (supChatMessages == null) return;
         HBox row = new HBox();

@@ -53,6 +53,8 @@ public class StudentDashboardController implements Initializable {
     @FXML private Label navMeetings;
     @FXML private Label navOffers;
     @FXML private Label navProjects;
+    @FXML private Label navSprints;
+    @FXML private Label navTasks;
     @FXML private Label navDocuments;
     @FXML private Label navApplications;
     @FXML private Label navProfile;
@@ -121,6 +123,14 @@ public class StudentDashboardController implements Initializable {
         if (show) scrollChatToBottom();
     }
 
+    private void setActiveNav(Label activeLabel) {
+        // Reset all
+        for (Label l : new Label[]{navHome, navMeetings, navOffers, navProjects,
+                                    navSprints, navTasks, navDocuments, navProfile}) {
+            l.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand; -fx-font-weight: normal;");
+        }
+        // Set active
+        activeLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #a12c2f; -fx-cursor: hand;");
     @FXML public void handleChatSend() {
         String msg = chatInput.getText().trim();
         chatInput.clear();
@@ -204,6 +214,16 @@ public class StudentDashboardController implements Initializable {
                 return "You have " + count + " project(s). Go to MY PROJECTS to manage them.";
             } catch (Exception e) { return "Go to MY PROJECTS to view your projects."; }
         }
+    }
+    
+    @FXML public void showTasks() { 
+        setActiveNav(navTasks);
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Tasks.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
         if (lower.contains("task") || lower.contains("tâche")) {
             return "Go to MY PROJECTS > Tasks to see your assigned tasks and update their status.";
         }
@@ -233,6 +253,9 @@ public class StudentDashboardController implements Initializable {
         }
         return "I'm not sure about that. Try asking about: offers, applications, projects, tasks, meetings, or AI score.";
     }
+    
+    @FXML public void showSprints() { 
+        setActiveNav(navSprints);
 
     private void addBotMessage(String text) {
         if (chatMessages == null) return;

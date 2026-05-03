@@ -4,89 +4,31 @@
 <?import javafx.geometry.Insets?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.example.controller.TaskController">
-    <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+            fx:controller="org.example.controller.TaskController"
+            style="-fx-background-color: #f4f6fb;">
+    <padding><Insets top="28" left="32" right="32" bottom="28"/></padding>
 
     <top>
-        <VBox spacing="10">
-            <Label text="Task Management" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <TextField fx:id="searchField" promptText="Search a task..." prefWidth="250"/>
-                <Button text="🔍 Search" onAction="#handleSearch" style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6;"/>
+        <VBox spacing="14">
+            <padding><Insets bottom="8"/></padding>
+            <Label text="Tasks" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #1a1a2e;"/>
+            <HBox spacing="10" alignment="CENTER_LEFT"
+                  style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 12 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                <Button text="New Task" onAction="#handleAddDialog" minWidth="100"
+                        style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 9 18; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="searchField" promptText="Search tasks..." prefWidth="280"
+                           style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e5e7eb; -fx-padding: 8 12; -fx-background-color: #f9fafb;"/>
+                <Label fx:id="messageLabel" text="" wrapText="true" style="-fx-font-size: 12px;"/>
             </HBox>
         </VBox>
     </top>
 
     <center>
-        <SplitPane dividerPositions="0.6">
-            <TableView fx:id="taskTable" VBox.vgrow="ALWAYS">
-                <columns>
-                    <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
-                    <TableColumn fx:id="colTitle" text="Title" prefWidth="200"/>
-                    <TableColumn fx:id="colStatus" text="Status" prefWidth="90"/>
-                    <TableColumn fx:id="colPriority" text="Priority" prefWidth="90"/>
-                    <TableColumn fx:id="colProject" text="Project" prefWidth="150"/>
-                    <TableColumn fx:id="colAssigned" text="Assigned to" prefWidth="130"/>
-                    <TableColumn fx:id="colDeadline" text="Deadline" prefWidth="100"/>
-                </columns>
-            </TableView>
-
-            <ScrollPane fitToWidth="true">
-                <VBox spacing="10">
-                    <padding><Insets top="10" left="15" right="15" bottom="10"/></padding>
-                    <Label text="Task Form" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-
-                    <Label text="Title *"/>
-                    <TextField fx:id="titleField" promptText="Task title"/>
-
-                    <Label text="Description"/>
-                    <TextArea fx:id="descriptionField" prefRowCount="2"/>
-
-                    <HBox spacing="10">
-                        <VBox spacing="5" HBox.hgrow="ALWAYS">
-                            <Label text="Status"/>
-                            <ComboBox fx:id="statusCombo" maxWidth="Infinity"/>
-                        </VBox>
-                        <VBox spacing="5" HBox.hgrow="ALWAYS">
-                            <Label text="Priority"/>
-                            <ComboBox fx:id="priorityCombo" maxWidth="Infinity"/>
-                        </VBox>
-                    </HBox>
-
-                    <Label text="Project *"/>
-                    <ComboBox fx:id="projectCombo" maxWidth="Infinity"/>
-
-                    <Label text="Sprint"/>
-                    <ComboBox fx:id="sprintCombo" maxWidth="Infinity"/>
-
-                    <Label text="Assigned to"/>
-                    <ComboBox fx:id="assignedCombo" maxWidth="Infinity"/>
-
-                    <HBox spacing="10">
-                        <VBox spacing="5" HBox.hgrow="ALWAYS">
-                            <Label text="Story Points"/>
-                            <Spinner fx:id="storyPointsSpinner" maxWidth="Infinity"/>
-                        </VBox>
-                        <VBox spacing="5" HBox.hgrow="ALWAYS">
-                            <Label text="Deadline"/>
-                            <DatePicker fx:id="deadlinePicker" maxWidth="Infinity"/>
-                        </VBox>
-                    </HBox>
-
-                    <CheckBox fx:id="blockedCheck" text="Blocked task"/>
-
-                    <Label fx:id="messageLabel" text="" wrapText="true"/>
-
-                    <HBox spacing="10">
-                        <Button text="💾 Save" onAction="#handleSave" maxWidth="Infinity" HBox.hgrow="ALWAYS"
-                                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                        <Button text="🗑 Delete" onAction="#handleDelete" maxWidth="Infinity" HBox.hgrow="ALWAYS"
-                                style="-fx-background-color: #FF6B6B; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                        <Button text="✖ Clear" onAction="#handleClear" maxWidth="Infinity" HBox.hgrow="ALWAYS"
-                                style="-fx-background-color: #aaa; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                    </HBox>
-                </VBox>
-            </ScrollPane>
-        </SplitPane>
+        <ScrollPane fx:id="scrollPane" fitToWidth="true"
+                    style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 8;">
+            <FlowPane fx:id="cardPane" hgap="16" vgap="16" prefWrapLength="900"
+                      style="-fx-background-color: transparent; -fx-padding: 12;"/>
+        </ScrollPane>
     </center>
 </BorderPane>

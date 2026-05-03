@@ -2,7 +2,6 @@ package org.example.dao;
 
 import org.example.config.DatabaseConfig;
 import org.example.model.User;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -12,10 +11,12 @@ import java.util.List;
 public class UserDAO {
 
     public User authenticate(String email, String password) throws SQLException {
-        String sql = "SELECT * FROM users WHERE email = ? AND is_active = 1";
+        String sql = "SELECT * FROM users WHERE email = ? AND password = ? AND is_active = 1";
         try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
             ps.setString(1, email);
+            ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
+            if (rs.next()) return mapRow(rs);
             if (rs.next()) {
                 String stored = rs.getString("password");
                 boolean match;
@@ -72,7 +73,7 @@ public class UserDAO {
         String sql = "INSERT INTO users (email, password, role, name, phone, is_active, is_verified, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, user.getEmail());
-            ps.setString(2, BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
+            ps.setString(2, user.getPassword());
             ps.setString(3, user.getRole());
             ps.setString(4, user.getName());
             ps.setString(5, user.getPhone());
@@ -218,6 +219,7 @@ public class UserDAO {
         u.setName(rs.getString("name"));
         u.setPhone(rs.getString("phone"));
         u.setActive(rs.getBoolean("is_active"));
+        try { u.setSkills(rs.getString("skills")); } catch (Exception ignored) {}
         try { u.setEstablishmentId(rs.getInt("establishment_id")); } catch (Exception ignored) {}
         Timestamp ts = rs.getTimestamp("created_at");
         if (ts != null) u.setCreatedAt(ts.toLocalDateTime());

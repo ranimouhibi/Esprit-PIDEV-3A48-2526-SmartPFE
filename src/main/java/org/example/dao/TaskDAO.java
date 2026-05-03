@@ -26,6 +26,16 @@ public class TaskDAO {
         return list;
     }
 
+    public Task findById(int id) throws SQLException {
+        String sql = SELECT_BASE + "WHERE t.id = ?";
+        try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return mapRow(rs);
+        }
+        return null;
+    }
+
     public List<Task> findByProject(int projectId) throws SQLException {
         List<Task> list = new ArrayList<>();
         String sql = SELECT_BASE + "WHERE t.project_id = ? ORDER BY t.priority DESC, t.created_at DESC";
@@ -50,9 +60,18 @@ public class TaskDAO {
 
     public List<Task> findByAssignedUser(int userId) throws SQLException {
         List<Task> list = new ArrayList<>();
-        String sql = SELECT_BASE + "WHERE t.assigned_to_id = ? ORDER BY t.deadline ASC";
+        // Tasks assigned directly to this student OR assigned to entire team (null) in their projects
+        String sql = SELECT_BASE
+            + "WHERE t.assigned_to_id = ? "
+            + "OR (t.assigned_to_id IS NULL AND t.project_id IN ("
+            + "  SELECT id FROM projects WHERE owner_id = ? "
+            + "  UNION "
+            + "  SELECT project_id FROM project_members WHERE user_id = ? AND status IN ('pending','approved')"
+            + ")) ORDER BY t.deadline ASC";
         try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
             ps.setInt(1, userId);
+            ps.setInt(2, userId);
+            ps.setInt(3, userId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) list.add(mapRow(rs));
         }

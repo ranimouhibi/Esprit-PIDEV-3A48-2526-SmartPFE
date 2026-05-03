@@ -3,7 +3,9 @@ package org.example.util;
 import org.example.Main;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 
 public class NavigationUtil {
 
@@ -34,9 +36,13 @@ public class NavigationUtil {
             FXMLLoader loader = new FXMLLoader(NavigationUtil.class.getResource("/fxml/" + fxmlFile));
             return loader.load();
         } catch (Exception e) {
+            System.err.println("=== FXML LOAD ERROR: " + fxmlFile + " ===");
             System.err.println("ERROR loading FXML: " + fxmlFile + " → " + e.getMessage());
             e.printStackTrace();
-            return new Pane();
+            Label err = new Label("Error loading " + fxmlFile + ":\n" + e.getMessage());
+            err.setStyle("-fx-text-fill: red; -fx-padding: 20; -fx-font-size: 13px;");
+            err.setWrapText(true);
+            return new javafx.scene.layout.VBox(err);
         }
     }
 }

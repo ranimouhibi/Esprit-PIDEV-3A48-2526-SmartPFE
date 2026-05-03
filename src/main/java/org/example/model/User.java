@@ -9,6 +9,7 @@ public class User {
     private String role;
     private String name;
     private String phone;
+    private String skills;
     private boolean isActive;
     private int establishmentId; // links to establishments.id for role=establishment
     private LocalDateTime createdAt;
@@ -42,6 +43,9 @@ public class User {
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
 
+    public String getSkills() { return skills; }
+    public void setSkills(String skills) { this.skills = skills; }
+
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { isActive = active; }
 
@@ -55,5 +59,8 @@ public class User {
     public void setProfilePicture(String profilePicture) { this.profilePicture = profilePicture; }
 
     @Override
-    public String toString() { return name + " (" + email + ")"; }
+    public String toString() {
+        if (email == null || email.isEmpty()) return name;
+        return name + " (" + email + ")";
+    }
 }

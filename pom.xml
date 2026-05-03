@@ -47,13 +47,8 @@
         <!-- iText for PDF generation -->
         <dependency>
             <groupId>com.itextpdf</groupId>
-            <artifactId>kernel</artifactId>
-            <version>7.2.5</version>
-        </dependency>
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>layout</artifactId>
-            <version>7.2.5</version>
+            <artifactId>itextpdf</artifactId>
+            <version>5.5.13.3</version>
         </dependency>
 
         <!-- SLF4J Simple implementation (to remove warnings) -->
@@ -70,6 +65,11 @@
             <version>1.6.2</version>
         </dependency>
 
+        <!-- CalendarFX — JavaFX calendar UI library -->
+        <dependency>
+            <groupId>com.calendarfx</groupId>
+            <artifactId>view</artifactId>
+            <version>11.10.1</version>
         <!-- JavaFX Web (WebView for Calendar and Distance) -->
         <dependency>
             <groupId>org.openjfx</groupId>

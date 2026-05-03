@@ -24,6 +24,10 @@
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label fx:id="navProjects" text="MY PROJECTS" onMouseClicked="#showProjects"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
+            <Label fx:id="navSprints" text="SPRINTS" onMouseClicked="#showSprints"
+                   style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
+            <Label fx:id="navTasks" text="TASKS" onMouseClicked="#showTasks"
+                   style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label fx:id="navDocuments" text="DOCUMENTS" onMouseClicked="#showDocuments"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label fx:id="navApplications" text="MY CANDIDATURES" onMouseClicked="#showMyCandidatures"

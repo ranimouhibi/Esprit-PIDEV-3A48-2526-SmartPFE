@@ -53,5 +53,10 @@ public class Sprint {
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
     @Override
-    public String toString() { return "Sprint #" + sprintNumber + ": " + name; }
+    public String toString() {
+        String label = (name != null && !name.isEmpty()) ? name : "Sprint";
+        if (sprintNumber > 0) label = "Sprint #" + sprintNumber + ": " + label;
+        if (startDate != null) label += " (" + startDate + ")";
+        return label;
+    }
 }
