@@ -161,9 +161,7 @@ public class DocumentController implements Initializable {
     @FXML
     public void handleExportPDF() {
         if (filteredDocs == null || filteredDocs.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setContentText("No documents to export");
-            alert.showAndWait();
+            ModernAlert.show(ModernAlert.Type.WARNING, "Warning", "No documents to export");
             return;
         }
 
@@ -176,14 +174,10 @@ public class DocumentController implements Initializable {
         if (file != null) {
             try {
                 PDFExporter.exportDocuments(filteredDocs, file);
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setContentText("PDF exported successfully!");
-                alert.showAndWait();
+                ModernAlert.show(ModernAlert.Type.INFO, "Info", "PDF exported successfully!");
             } catch (Exception e) {
                 e.printStackTrace();
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setContentText("Failed to export PDF: " + e.getMessage());
-                alert.showAndWait();
+                ModernAlert.show(ModernAlert.Type.ERROR, "Error", "Failed to export PDF: " + e.getMessage());
             }
         }
     }
@@ -296,9 +290,7 @@ public class DocumentController implements Initializable {
                 loadDocuments();
             } catch (Exception e) {
                 e.printStackTrace();
-                Alert err = new Alert(Alert.AlertType.ERROR);
-                err.setContentText("Failed to delete: " + e.getMessage());
-                err.showAndWait();
+                ModernAlert.show(ModernAlert.Type.ERROR, "Error", "Failed to delete: " + e.getMessage());
             }
         }
     }
@@ -353,14 +345,10 @@ public class DocumentController implements Initializable {
                 
             } catch (Exception e) {
                 e.printStackTrace();
-                Alert err = new Alert(Alert.AlertType.ERROR);
-                err.setTitle("Error");
-                err.setHeaderText("Failed to generate AI summary");
-                err.setContentText("Error: " + e.getMessage() + "\n\nMake sure:\n" +
+                ModernAlert.show(ModernAlert.Type.ERROR, "Error", "Error: " + e.getMessage() + "\n\nMake sure:\n" +
                     "1. The document file exists\n" +
                     "2. OpenAI API key is configured in AIUtil.java\n" +
                     "3. The document contains readable text content");
-                err.showAndWait();
             }
         }
     }

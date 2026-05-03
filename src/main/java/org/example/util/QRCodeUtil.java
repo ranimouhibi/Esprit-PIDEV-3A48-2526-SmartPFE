@@ -6,6 +6,7 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import javafx.scene.control.*;
+import org.example.util.ModernAlert;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
@@ -49,11 +50,7 @@ public class QRCodeUtil {
         try {
             File qrFile = new File(qrCodePath);
             if (!qrFile.exists()) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("QR Code not found");
-                alert.setContentText("The QR code file does not exist: " + qrCodePath);
-                alert.showAndWait();
+                ModernAlert.show(ModernAlert.Type.ERROR, "Error", "The QR code file does not exist: " + qrCodePath);
                 return;
             }
 
@@ -111,11 +108,7 @@ public class QRCodeUtil {
                         NotificationUtil.showSuccess("QR Code saved", 
                             "QR code has been saved: " + saveFile.getName());
                     } catch (IOException ex) {
-                        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                        errorAlert.setTitle("Error");
-                        errorAlert.setHeaderText("Save error");
-                        errorAlert.setContentText("Unable to save QR code: " + ex.getMessage());
-                        errorAlert.showAndWait();
+                        ModernAlert.show(ModernAlert.Type.ERROR, "Error", "Unable to save QR code: " + ex.getMessage());
                     }
                 }
             });
@@ -124,11 +117,7 @@ public class QRCodeUtil {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Display error");
-            alert.setContentText("Unable to display QR code: " + e.getMessage());
-            alert.showAndWait();
+            ModernAlert.show(ModernAlert.Type.ERROR, "Error", "Unable to display QR code: " + e.getMessage());
         }
     }
 

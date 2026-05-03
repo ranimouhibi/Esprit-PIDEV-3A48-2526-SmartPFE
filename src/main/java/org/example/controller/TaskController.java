@@ -144,9 +144,7 @@ public class TaskController implements Initializable {
             if (owner != null && new TaskDialog(owner, task).showAndWait()) { loadTasks(); }
         });
         delBtn.setOnAction(e -> {
-            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Delete task?", ButtonType.YES, ButtonType.NO);
-            confirm.showAndWait().ifPresent(b -> {
-                if (b == ButtonType.YES) {
+            if (ModernAlert.confirm("Delete Task", "Delete this task?")) {
                     try {
                         User current = SessionManager.getCurrentUser();
                         boolean isStudent = current != null && "student".equals(current.getRole());
@@ -206,7 +204,6 @@ public class TaskController implements Initializable {
                     catch (Exception ex) { showMessage("Error: " + ex.getMessage(), true); }
                 }
             });
-        });
         actions.getChildren().addAll(editBtn, delBtn);
         
         // Build card children list conditionally

@@ -161,14 +161,12 @@ public class MeetingController implements Initializable {
     }
 
     private void handleDelete(Meeting meeting) {
-        Alert c=new Alert(Alert.AlertType.CONFIRMATION,"Supprimer ce meeting et ses reports ?",ButtonType.YES,ButtonType.NO);
-        c.setHeaderText(null);
-        c.showAndWait().ifPresent(btn->{ if(btn==ButtonType.YES) {
+        if (ModernAlert.confirm("Confirmation", "Supprimer ce meeting et ses reports ?")) {
             try {
                 if(emailService.isEnabled()) new Thread(()->{ try { List<User> r=participantDAO.findParticipantsAndSupervisor(meeting.getId()); if(!r.isEmpty())emailService.sendMeetingCancellation(meeting,r); } catch(Exception ex){LOG.warning(ex.getMessage());} }).start();
                 reportDAO.deleteByMeeting(meeting.getId()); meetingDAO.delete(meeting.getId()); loadMeetings();
             } catch(Exception e){e.printStackTrace();showAlert("Erreur suppression.");}
-        }});
+        }
     }
 
     private void openDialog(String fxml,double w,double h,java.util.function.Consumer<Object> setup) {
@@ -182,5 +180,5 @@ public class MeetingController implements Initializable {
         } catch(Exception e){e.printStackTrace();}
     }
 
-    private void showAlert(String msg){new Alert(Alert.AlertType.WARNING,msg,ButtonType.OK).showAndWait();}
+    private void showAlert(String msg) { ModernAlert.show(ModernAlert.Type.WARNING, "Warning", msg); }
 }

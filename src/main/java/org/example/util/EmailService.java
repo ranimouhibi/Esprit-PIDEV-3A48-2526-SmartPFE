@@ -8,9 +8,9 @@ public class EmailService {
 
     // Configure these with your SMTP credentials
     private static final String SMTP_HOST = "smtp.gmail.com";
-    private static final String SMTP_PORT = "465"; // Changed from 587 to 465 (SSL)
-    private static final String FROM_EMAIL = "manefbelkadhi800@gmail.com";
-    private static final String FROM_PASSWORD = "upulidjovtmuigvf";
+    private static final String SMTP_PORT = "465";
+    private static final String FROM_EMAIL = "cursorc456@gmail.com";
+    private static final String FROM_PASSWORD = "rccbogauxhtfyhwp";
 
     public static void sendAsync(String toEmail, String subject, String htmlBody) {
         if (toEmail == null || toEmail.isBlank()) {

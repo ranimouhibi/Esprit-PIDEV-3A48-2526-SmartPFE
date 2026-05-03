@@ -353,9 +353,9 @@ public class MyCandidaturesController implements Initializable {
             MatchingScore ms = matchingScoreDAO.findByCandidature(c.getId());
             java.util.List<org.example.model.CandidatureNote> notes = noteDAO.findByCandidature(c.getId());
             pdfService.exportCandidature(c, ms, notes, file.getAbsolutePath());
-            new Alert(Alert.AlertType.INFORMATION, "PDF exported:\n" + file.getAbsolutePath()).showAndWait();
+            ModernAlert.show(ModernAlert.Type.SUCCESS, "PDF Exported", "PDF exported:\n" + file.getAbsolutePath());
         } catch (Exception e) {
-            new Alert(Alert.AlertType.ERROR, "PDF error: " + e.getMessage()).showAndWait();
+            ModernAlert.show(ModernAlert.Type.ERROR, "PDF Error", "PDF error: " + e.getMessage());
         }
     }
 }

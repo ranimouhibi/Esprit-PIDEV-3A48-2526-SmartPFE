@@ -4,6 +4,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import org.example.util.ModernAlert;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -62,7 +63,7 @@ public class SprintStatsController {
             for (var p : projects) sprints.addAll(new SprintDAO().findByProject(p.getId()));
             allTasks = new TaskDAO().findAll();
         } catch (Exception e) {
-            new Alert(Alert.AlertType.ERROR, "Load error: " + e.getMessage()).showAndWait();
+            ModernAlert.show(ModernAlert.Type.ERROR, "Error", "Load error: " + e.getMessage());
             return;
         }
         stage.setScene(new Scene(buildLayout()));
@@ -412,9 +413,9 @@ public class SprintStatsController {
         if (file != null) {
             try {
                 PDFExporter.export(sprints, allTasks, file);
-                new Alert(Alert.AlertType.INFORMATION, "PDF exported successfully.").showAndWait();
+                ModernAlert.show(ModernAlert.Type.INFO, "Info", "PDF exported successfully.");
             } catch (Exception e) {
-                new Alert(Alert.AlertType.ERROR, "Export error: " + e.getMessage()).showAndWait();
+                ModernAlert.show(ModernAlert.Type.ERROR, "Error", "Export error: " + e.getMessage());
             }
         }
     }

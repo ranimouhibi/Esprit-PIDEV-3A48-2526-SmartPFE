@@ -20,6 +20,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import org.example.util.ModernAlert;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -243,11 +244,7 @@ public class MeetingReportController implements Initializable {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    private void showAlert(String msg) {
-        new Alert(Alert.AlertType.WARNING, msg, ButtonType.OK).showAndWait();
-    }
+    private void showAlert(String msg) { ModernAlert.show(ModernAlert.Type.WARNING, "Warning", msg); }
 
-    private void showInfo(String msg) {
-        new Alert(Alert.AlertType.INFORMATION, msg, ButtonType.OK).showAndWait();
-    }
+    private void showInfo(String msg) { ModernAlert.show(ModernAlert.Type.INFO, "Info", msg); }
 }

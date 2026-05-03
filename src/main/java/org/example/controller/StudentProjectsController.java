@@ -515,11 +515,10 @@ public class StudentProjectsController implements Initializable {
     }
 
     private void showAlert(String title, String message, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        ModernAlert.Type mType = (type == Alert.AlertType.ERROR) ? ModernAlert.Type.ERROR :
+                                 (type == Alert.AlertType.WARNING) ? ModernAlert.Type.WARNING :
+                                 ModernAlert.Type.INFO;
+        ModernAlert.show(mType, title, message);
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -550,11 +549,7 @@ public class StudentProjectsController implements Initializable {
             alert.showAndWait();
             
         } catch (Exception e) {
-            Alert error = new Alert(Alert.AlertType.ERROR);
-            error.setTitle("Error");
-            error.setHeaderText("Unable to generate suggestions");
-            error.setContentText(e.getMessage());
-            error.showAndWait();
+            ModernAlert.show(ModernAlert.Type.ERROR, "Error", e.getMessage());
         }
     }
 
@@ -690,11 +685,7 @@ public class StudentProjectsController implements Initializable {
             
         } catch (Exception e) {
             e.printStackTrace();
-            Alert error = new Alert(Alert.AlertType.ERROR);
-            error.setTitle("Error");
-            error.setHeaderText("Unable to load history");
-            error.setContentText(e.getMessage());
-            error.showAndWait();
+            ModernAlert.show(ModernAlert.Type.ERROR, "Error", e.getMessage());
         }
     }
 

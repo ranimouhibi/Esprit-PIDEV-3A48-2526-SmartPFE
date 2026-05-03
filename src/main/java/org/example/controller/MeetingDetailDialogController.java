@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import org.example.util.ModernAlert;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -189,15 +190,7 @@ public class MeetingDetailDialogController {
 
     private String safe(String s) { return s != null ? s : "—"; }
 
-    private void showAlert(String msg) {
-        Alert a = new Alert(Alert.AlertType.WARNING, msg, ButtonType.OK);
-        a.setHeaderText(null);
-        a.showAndWait();
-    }
+    private void showAlert(String msg) { ModernAlert.show(ModernAlert.Type.WARNING, "Warning", msg); }
 
-    private void showInfo(String msg) {
-        Alert a = new Alert(Alert.AlertType.INFORMATION, msg, ButtonType.OK);
-        a.setHeaderText(null);
-        a.showAndWait();
-    }
+    private void showInfo(String msg) { ModernAlert.show(ModernAlert.Type.INFO, "Info", msg); }
 }
