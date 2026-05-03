@@ -45,6 +45,10 @@ public class SprintController implements Initializable {
     @FXML private DatePicker fromDate;
     @FXML private DatePicker toDate;
     @FXML private Label messageLabel;
+    @FXML private Label statTotal;
+    @FXML private Label statPlanned;
+    @FXML private Label statActive;
+    @FXML private Label statClosed;
 
     private final SprintDAO sprintDAO = new SprintDAO();
     private List<Sprint> allSprints = List.of();
@@ -64,8 +68,20 @@ public class SprintController implements Initializable {
             } else {
                 allSprints = sprintDAO.findAll();
             }
+            updateStats();
             renderCards(allSprints);
         } catch (Exception e) { showMessage("Error: " + e.getMessage(), true); }
+    }
+
+    private void updateStats() {
+        long total   = allSprints.size();
+        long planned = allSprints.stream().filter(s -> "planned".equals(s.getStatus())).count();
+        long active  = allSprints.stream().filter(s -> "active".equals(s.getStatus())).count();
+        long closed  = allSprints.stream().filter(s -> "closed".equals(s.getStatus())).count();
+        if (statTotal  != null) statTotal.setText(String.valueOf(total));
+        if (statPlanned != null) statPlanned.setText(String.valueOf(planned));
+        if (statActive  != null) statActive.setText(String.valueOf(active));
+        if (statClosed  != null) statClosed.setText(String.valueOf(closed));
     }
 
     // ── Card rendering ────────────────────────────────────────────────────────
@@ -418,17 +434,6 @@ public class SprintController implements Initializable {
                 } catch (Exception e) { showMessage("Error: " + e.getMessage(), true); }
             }
         });
-    @FXML
-    public void handleDelete() {
-        if (selectedSprint == null) { showMessage("Sélectionnez un sprint.", true); return; }
-        if (ModernAlert.confirmDelete(selectedSprint.getName())) {
-            try {
-                sprintDAO.delete(selectedSprint.getId());
-                showMessage("Sprint supprimé.", false);
-                handleClear();
-                loadSprints();
-            } catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
-        }
     }
 
     // ── Filters ───────────────────────────────────────────────────────────────

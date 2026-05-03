@@ -8,6 +8,7 @@ import org.example.model.User;
 import org.example.model.Project;
 import org.example.util.EmailService;
 import org.example.util.SessionManager;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -32,15 +33,30 @@ public class TaskController implements Initializable {
     @FXML private ScrollPane scrollPane;
     @FXML private TextField searchField;
     @FXML private Label messageLabel;
+    @FXML private Label statTotal;
+    @FXML private Label statTodo;
+    @FXML private Label statInProgress;
+    @FXML private Label statDone;
+    @FXML private Label statCritical;
+    @FXML private ComboBox<String> filterStatus;
+    @FXML private ComboBox<String> filterPriority;
 
     private final TaskDAO taskDAO = new TaskDAO();
     private List<Task> allTasks = List.of();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        if (filterStatus != null)
+            filterStatus.setItems(FXCollections.observableArrayList("All", "todo", "in_progress", "done"));
+        if (filterPriority != null)
+            filterPriority.setItems(FXCollections.observableArrayList("All", "low", "medium", "high", "critical"));
         loadTasks();
         if (searchField != null)
             searchField.textProperty().addListener((o, old, v) -> applyFilters());
+        if (filterStatus != null)
+            filterStatus.valueProperty().addListener((o, old, v) -> applyFilters());
+        if (filterPriority != null)
+            filterPriority.valueProperty().addListener((o, old, v) -> applyFilters());
     }
 
     private void loadTasks() {
@@ -51,11 +67,25 @@ public class TaskController implements Initializable {
             } else {
                 allTasks = taskDAO.findAll();
             }
+            updateStats();
             renderCards(allTasks);
         } catch (Exception e) {
             e.printStackTrace();
             showMessage("Error: " + e.getMessage(), true);
         }
+    }
+
+    private void updateStats() {
+        long total      = allTasks.size();
+        long todo       = allTasks.stream().filter(t -> "todo".equals(t.getStatus())).count();
+        long inProgress = allTasks.stream().filter(t -> "in_progress".equals(t.getStatus())).count();
+        long done       = allTasks.stream().filter(t -> "done".equals(t.getStatus())).count();
+        long critical   = allTasks.stream().filter(t -> "critical".equals(t.getPriority())).count();
+        if (statTotal      != null) statTotal.setText(String.valueOf(total));
+        if (statTodo       != null) statTodo.setText(String.valueOf(todo));
+        if (statInProgress != null) statInProgress.setText(String.valueOf(inProgress));
+        if (statDone       != null) statDone.setText(String.valueOf(done));
+        if (statCritical   != null) statCritical.setText(String.valueOf(critical));
     }
 
     private void renderCards(List<Task> tasks) {
@@ -220,30 +250,31 @@ public class TaskController implements Initializable {
         if (scrollPane != null && scrollPane.getScene() != null) return scrollPane.getScene().getWindow();
         if (cardPane != null && cardPane.getScene() != null) return cardPane.getScene().getWindow();
         return null;
-    @FXML
-    public void handleDelete() {
-        if (selectedTask == null) { showMessage("Sélectionnez une tâche.", true); return; }
-        if (ModernAlert.confirmDelete("this task")) {
-            try {
-                taskDAO.delete(selectedTask.getId());
-                showMessage("Tâche supprimée.", false);
-                handleClear();
-                loadTasks();
-            } catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
-        }
-    }
-
-    private void applyFilters() {
-        String q = searchField != null ? searchField.getText().toLowerCase() : "";
-        renderCards(allTasks.stream().filter(t ->
-            q.isBlank() ||
-            (t.getTitle() != null && t.getTitle().toLowerCase().contains(q)) ||
-            (t.getStatus() != null && t.getStatus().toLowerCase().contains(q)) ||
-            (t.getAssignedToName() != null && t.getAssignedToName().toLowerCase().contains(q))
-        ).toList());
     }
 
     @FXML public void handleSearch() { applyFilters(); }
+
+    @FXML public void handleReset() {
+        if (searchField != null) searchField.clear();
+        if (filterStatus != null) filterStatus.setValue(null);
+        if (filterPriority != null) filterPriority.setValue(null);
+        applyFilters();
+    }
+
+    private void applyFilters() {
+        String q  = searchField   != null && searchField.getText()   != null ? searchField.getText().toLowerCase()   : "";
+        String st = filterStatus  != null && filterStatus.getValue()  != null && !"All".equals(filterStatus.getValue())  ? filterStatus.getValue()  : null;
+        String pr = filterPriority != null && filterPriority.getValue() != null && !"All".equals(filterPriority.getValue()) ? filterPriority.getValue() : null;
+
+        renderCards(allTasks.stream().filter(t -> {
+            boolean matchQ  = q.isBlank()  || (t.getTitle() != null && t.getTitle().toLowerCase().contains(q))
+                                            || (t.getStatus() != null && t.getStatus().toLowerCase().contains(q))
+                                            || (t.getAssignedToName() != null && t.getAssignedToName().toLowerCase().contains(q));
+            boolean matchSt = st == null   || st.equals(t.getStatus());
+            boolean matchPr = pr == null   || pr.equals(t.getPriority());
+            return matchQ && matchSt && matchPr;
+        }).toList());
+    }
 
     @FXML
     public void handleAddDialog() {

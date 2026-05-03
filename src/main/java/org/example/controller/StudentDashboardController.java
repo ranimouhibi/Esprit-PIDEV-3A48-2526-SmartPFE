@@ -16,7 +16,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 
 import java.net.URL;
 import java.sql.ResultSet;
@@ -30,7 +29,6 @@ public class StudentDashboardController implements Initializable {
     @FXML private Label taskCountLabel;
     @FXML private Label sprintCountLabel;
     @FXML private Label meetingCountLabel;
-    // Extended stats
     @FXML private Label taskInProgressLabel;
     @FXML private Label taskDoneLabel;
     @FXML private Label upcomingMeetingsLabel;
@@ -41,8 +39,6 @@ public class StudentDashboardController implements Initializable {
     // Chatbot
     @FXML private VBox chatbotPanel;
     @FXML private Button chatFab;
-
-
     @FXML private VBox chatMessages;
     @FXML private TextField chatInput;
     @FXML private ScrollPane chatScroll;
@@ -67,7 +63,8 @@ public class StudentDashboardController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         User user = SessionManager.getCurrentUser();
-        if (user != null) welcomeLabel.setText("WELCOME " + user.getName().toUpperCase());
+        if (user != null && welcomeLabel != null)
+            welcomeLabel.setText("WELCOME " + user.getName().toUpperCase());
         loadStats();
     }
 
@@ -80,7 +77,6 @@ public class StudentDashboardController implements Initializable {
             if (projectCountLabel != null) projectCountLabel.setText(String.valueOf(projects.size()));
             if (activeProjectsLabel != null) activeProjectsLabel.setText(String.valueOf(active));
 
-            // Tasks in progress / done for this student
             long inProgress = 0, done = 0;
             try (ResultSet rs = DatabaseConfig.getConnection().createStatement().executeQuery(
                 "SELECT status, COUNT(*) as cnt FROM tasks WHERE assigned_to_id = " + user.getId() + " GROUP BY status")) {
@@ -95,7 +91,6 @@ public class StudentDashboardController implements Initializable {
             if (taskInProgressLabel != null) taskInProgressLabel.setText(String.valueOf(inProgress));
             if (taskDoneLabel != null) taskDoneLabel.setText(String.valueOf(done));
 
-            // Upcoming meetings
             long upcoming = 0;
             try (ResultSet rs = DatabaseConfig.getConnection().createStatement().executeQuery(
                 "SELECT COUNT(*) FROM meetings WHERE scheduled_date >= NOW() AND status = 'scheduled'")) {
@@ -123,24 +118,14 @@ public class StudentDashboardController implements Initializable {
         if (show) scrollChatToBottom();
     }
 
-    private void setActiveNav(Label activeLabel) {
-        // Reset all
-        for (Label l : new Label[]{navHome, navMeetings, navOffers, navProjects,
-                                    navSprints, navTasks, navDocuments, navProfile}) {
-            l.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand; -fx-font-weight: normal;");
-        }
-        // Set active
-        activeLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #a12c2f; -fx-cursor: hand;");
     @FXML public void handleChatSend() {
+        if (chatInput == null || chatInput.getText().isBlank()) return;
         String msg = chatInput.getText().trim();
         chatInput.clear();
         addUserMessage(msg);
         new Thread(() -> {
             String reply = generateBotReply(msg);
-            Platform.runLater(() -> {
-                addBotMessage(reply);
-                showSuggestedQuestions();
-            });
+            Platform.runLater(() -> { addBotMessage(reply); showSuggestedQuestions(); });
         }).start();
     }
 
@@ -148,35 +133,13 @@ public class StudentDashboardController implements Initializable {
         addUserMessage(question);
         new Thread(() -> {
             String reply = generateBotReply(question);
-            Platform.runLater(() -> {
-                addBotMessage(reply);
-                showSuggestedQuestions();
-            });
+            Platform.runLater(() -> { addBotMessage(reply); showSuggestedQuestions(); });
         }).start();
     }
-    
-    @FXML public void showMeetings() { 
-        setActiveNav(navMeetings);
-        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
-        contentArea.setCenter(null);
-        System.out.println("DEBUG: Loading Meetings.fxml...");
-        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Meetings.fxml");
-        System.out.println("DEBUG: Pane loaded, children count: " + (pane != null ? pane.getChildren().size() : "null"));
-        if (pane != null) {
-            contentArea.setCenter(pane);
-            pane.setVisible(true);
-        } else {
-            System.err.println("ERROR: Pane is null!");
 
     private void showSuggestedQuestions() {
         if (chatMessages == null) return;
-        String[] suggestions = {
-            "How many offers?",
-            "My applications",
-            "AI matching score",
-            "Export PDF",
-            "Upcoming meetings"
-        };
+        String[] suggestions = {"How many offers?", "My applications", "AI matching score", "Export PDF", "Upcoming meetings"};
         HBox row = new HBox(6);
         row.setAlignment(Pos.CENTER_RIGHT);
         for (String q : suggestions) {
@@ -195,67 +158,42 @@ public class StudentDashboardController implements Initializable {
     private String generateBotReply(String msg) {
         String lower = msg.toLowerCase();
         User user = SessionManager.getCurrentUser();
-
-        if (lower.contains("offer") || lower.contains("offre") || lower.contains("how many")) {
-            try {
+        try {
+            if (lower.contains("offer") || lower.contains("offre") || lower.contains("how many")) {
                 int count = new org.example.dao.OfferDAO().findAllOpen().size();
                 return "There are currently " + count + " open offer(s) available. Go to the OFFERS section to browse and apply!";
-            } catch (Exception e) { return "Go to the OFFERS section to browse available offers."; }
-        }
-        if (lower.contains("candidature") || lower.contains("application") || lower.contains("my application")) {
-            try {
+            }
+            if (lower.contains("candidature") || lower.contains("application") || lower.contains("my application")) {
                 int count = candidatureDAO.findByStudent(user.getId()).size();
                 return "You have " + count + " application(s) submitted. Check MY CANDIDATURES for status updates.";
-            } catch (Exception e) { return "Go to MY CANDIDATURES to track your applications."; }
-        }
-        if (lower.contains("project") || lower.contains("projet")) {
-            try {
+            }
+            if (lower.contains("project") || lower.contains("projet")) {
                 int count = projectDAO.findByOwner(user.getId()).size();
                 return "You have " + count + " project(s). Go to MY PROJECTS to manage them.";
-            } catch (Exception e) { return "Go to MY PROJECTS to view your projects."; }
-        }
-    }
-    
-    @FXML public void showTasks() { 
-        setActiveNav(navTasks);
-        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
-        contentArea.setCenter(null);
-        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Tasks.fxml");
-        if (pane != null) {
-            contentArea.setCenter(pane);
-            pane.setVisible(true);
-        if (lower.contains("task") || lower.contains("tâche")) {
-            return "Go to MY PROJECTS > Tasks to see your assigned tasks and update their status.";
-        }
-        if (lower.contains("meeting") || lower.contains("upcoming")) {
-            return "Go to MEETINGS to schedule or view upcoming meetings with your supervisor.";
-        }
-        if (lower.contains("cv") || lower.contains("resume")) {
-            return "When applying for an offer, you can upload your CV (PDF or Word). Make sure it's up to date!";
-        }
-        if (lower.contains("score") || lower.contains("matching") || lower.contains("ai")) {
-            return "After applying, your candidature gets an AI Matching Score based on your skills vs offer requirements. Check MY CANDIDATURES to see your score!";
-        }
-        if (lower.contains("pdf") || lower.contains("export")) {
-            return "You can export your candidature as a PDF from MY CANDIDATURES. Click the PDF button on any application card.";
-        }
-        if (lower.contains("deadline") || lower.contains("calendar")) {
-            return "Check offer deadlines in the OFFERS section (Calendar tab). Deadlines are shown in purple.";
-        }
-        if (lower.contains("hello") || lower.contains("hi") || lower.contains("bonjour")) {
-            return "Hello " + user.getName() + "! How can I help you today?";
-        }
-        if (lower.contains("help") || lower.contains("aide")) {
-            return "I can help with:\n• Offers & Applications\n• Projects & Tasks\n• Meetings\n• AI Matching Score\n• PDF Export\nJust ask!";
-        }
-        if (lower.contains("statistic") || lower.contains("stat")) {
-            return "Check the Statistics tab in the OFFERS section to see monthly charts of your applications.";
+            }
+            if (lower.contains("task") || lower.contains("tâche"))
+                return "Go to MY PROJECTS > Tasks to see your assigned tasks and update their status.";
+            if (lower.contains("meeting") || lower.contains("upcoming"))
+                return "Go to MEETINGS to schedule or view upcoming meetings with your supervisor.";
+            if (lower.contains("cv") || lower.contains("resume"))
+                return "When applying for an offer, you can upload your CV (PDF or Word). Make sure it's up to date!";
+            if (lower.contains("score") || lower.contains("matching") || lower.contains("ai"))
+                return "After applying, your candidature gets an AI Matching Score based on your skills vs offer requirements. Check MY CANDIDATURES to see your score!";
+            if (lower.contains("pdf") || lower.contains("export"))
+                return "You can export your candidature as a PDF from MY CANDIDATURES. Click the PDF button on any application card.";
+            if (lower.contains("deadline") || lower.contains("calendar"))
+                return "Check offer deadlines in the OFFERS section (Calendar tab). Deadlines are shown in purple.";
+            if (lower.contains("hello") || lower.contains("hi") || lower.contains("bonjour"))
+                return "Hello " + user.getName() + "! How can I help you today?";
+            if (lower.contains("help") || lower.contains("aide"))
+                return "I can help with:\n• Offers & Applications\n• Projects & Tasks\n• Meetings\n• AI Matching Score\n• PDF Export\nJust ask!";
+            if (lower.contains("statistic") || lower.contains("stat"))
+                return "Check the Statistics tab in the OFFERS section to see monthly charts of your applications.";
+        } catch (Exception e) {
+            return "Sorry, I encountered an error. Please try again.";
         }
         return "I'm not sure about that. Try asking about: offers, applications, projects, tasks, meetings, or AI score.";
     }
-    
-    @FXML public void showSprints() { 
-        setActiveNav(navSprints);
 
     private void addBotMessage(String text) {
         if (chatMessages == null) return;
@@ -296,6 +234,7 @@ public class StudentDashboardController implements Initializable {
     // ── Navigation ────────────────────────────────────────────────────────────
 
     private void load(String fxml) {
+        if (contentArea == null) return;
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
         contentArea.setCenter(null);
         javafx.scene.layout.Pane pane = NavigationUtil.loadPane(fxml);
@@ -306,15 +245,15 @@ public class StudentDashboardController implements Initializable {
     }
 
     private void setActiveNav(Label activeLabel) {
-        Label[] all = {navHome, navMeetings, navOffers, navProjects, navDocuments, navApplications, navProfile};
-        for (Label l : all) if (l != null) l.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
+        Label[] all = {navHome, navMeetings, navOffers, navProjects, navSprints, navTasks, navDocuments, navApplications, navProfile};
+        for (Label l : all) if (l != null) l.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand; -fx-font-weight: normal;");
         if (activeLabel != null) activeLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #a12c2f; -fx-cursor: hand;");
     }
 
     @FXML public void showHome() {
         setActiveNav(navHome);
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
-        javafx.scene.Node node = homePane.getParent() instanceof ScrollPane sp ? sp : homePane;
+        javafx.scene.Node node = homePane != null && homePane.getParent() instanceof ScrollPane sp ? sp : homePane;
         if (node instanceof ScrollPane sp) {
             sp.setPrefHeight(javafx.scene.layout.Region.USE_COMPUTED_SIZE);
             sp.setMaxHeight(Double.MAX_VALUE);
@@ -324,14 +263,14 @@ public class StudentDashboardController implements Initializable {
         loadStats();
     }
 
-    @FXML public void showMeetings()       { setActiveNav(navMeetings);      load("Meetings.fxml"); }
-    @FXML public void showOffers()         { setActiveNav(navOffers);        load("StudentOffers.fxml"); }
-    @FXML public void showMyCandidatures() { setActiveNav(navApplications);  load("MyCandidatures.fxml"); }
-    @FXML public void showProjects()       { setActiveNav(navProjects);       load("StudentProjects.fxml"); }
-    @FXML public void showDocuments()      { setActiveNav(navDocuments);      load("Documents.fxml"); }
-    @FXML public void showTasks()          { load("Tasks.fxml"); }
-    @FXML public void showSprints()        { load("Sprints.fxml"); }
-    @FXML public void showProfile()        { setActiveNav(navProfile);        load("Users.fxml"); }
+    @FXML public void showMeetings()       { setActiveNav(navMeetings);     load("Meetings.fxml"); }
+    @FXML public void showOffers()         { setActiveNav(navOffers);       load("StudentOffers.fxml"); }
+    @FXML public void showMyCandidatures() { setActiveNav(navApplications); load("MyCandidatures.fxml"); }
+    @FXML public void showProjects()       { setActiveNav(navProjects);     load("StudentProjects.fxml"); }
+    @FXML public void showDocuments()      { setActiveNav(navDocuments);    load("Documents.fxml"); }
+    @FXML public void showTasks()          { setActiveNav(navTasks);        load("Tasks.fxml"); }
+    @FXML public void showSprints()        { setActiveNav(navSprints);      load("Sprints.fxml"); }
+    @FXML public void showProfile()        { setActiveNav(navProfile);      load("Users.fxml"); }
 
     @FXML public void handleLogout() {
         SessionManager.logout();
