@@ -108,19 +108,6 @@ public class MeetingController implements Initializable {
         meetingsContainer.getChildren().clear();
         if(list.isEmpty()) { meetingsContainer.getChildren().add(buildEmpty()); return; }
         for(Meeting m:list) meetingsContainer.getChildren().add(buildCard(m));
-    @FXML
-    public void handleDelete() {
-        if (selectedMeeting == null) { showMessage("Sélectionnez un meeting.", true); return; }
-        if (ModernAlert.confirmDelete("this meeting")) {
-            try {
-                PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement("DELETE FROM meetings WHERE id=?");
-                ps.setInt(1, selectedMeeting.getId());
-                ps.executeUpdate();
-                showMessage("Meeting supprimé.", false);
-                handleClear();
-                loadMeetings();
-            } catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
-        }
     }
 
     private VBox buildEmpty() {

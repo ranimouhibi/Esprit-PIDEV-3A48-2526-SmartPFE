@@ -49,7 +49,6 @@ public class SupervisorDashboardController implements Initializable {
     @FXML private Label navProjects;
     @FXML private Label navSprints;
     @FXML private Label navTasks;
-    @FXML private Label navSprints;
     @FXML private Label navDocuments;
     @FXML private Label navComments;
     @FXML private Label navCandidatures;
@@ -90,44 +89,6 @@ public class SupervisorDashboardController implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void setActiveNav(Label activeLabel) {
-        navHome.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navMeetings.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navProjects.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navComments.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navDocuments.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navTasks.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navSprints.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        navProfile.setStyle("-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;");
-        activeLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #a12c2f; -fx-cursor: hand;");
-
-            // Tasks for supervised projects
-            long taskCount = projects.stream().mapToLong(p -> {
-                try { return taskDAO.findByProject(p.getId()).size(); } catch (Exception e) { return 0; }
-            }).sum();
-            taskCountLabel.setText(String.valueOf(taskCount));
-
-            // Upcoming meetings
-            long meetings = 0;
-            try (ResultSet rs = DatabaseConfig.getConnection().createStatement().executeQuery(
-                "SELECT COUNT(*) FROM meetings WHERE scheduled_date >= NOW() AND status = 'scheduled'")) {
-                if (rs.next()) meetings = rs.getLong(1);
-            }
-            meetingCountLabel.setText(String.valueOf(meetings));
-
-            // Pending supervision requests
-            long pending = 0;
-            try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(
-                "SELECT COUNT(*) FROM supervision_requests WHERE supervisor_id = ? AND status = 'pending'")) {
-                ps.setInt(1, user.getId());
-                ResultSet rs = ps.executeQuery();
-                if (rs.next()) pending = rs.getLong(1);
-            } catch (Exception ignored) {}
-            if (pendingRequestsLabel != null) pendingRequestsLabel.setText(String.valueOf(pending));
-
-        } catch (Exception e) { e.printStackTrace(); }
     }
 
     // ── Chatbot ───────────────────────────────────────────────────────────────
@@ -221,26 +182,8 @@ public class SupervisorDashboardController implements Initializable {
         if (supChatScroll != null) Platform.runLater(() -> supChatScroll.setVvalue(1.0));
     }
 
-    @FXML public void showSprints() {
-        setActiveNav(navSprints);
-        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
-        contentArea.setCenter(null);
-        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Sprints.fxml");
-        if (pane != null) {
-            contentArea.setCenter(pane);
-            pane.setVisible(true);
-        }
-    }
-    
-    @FXML public void showDocuments() { 
-        setActiveNav(navDocuments);
-        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
-        contentArea.setCenter(null);
-        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Documents.fxml");
-        if (pane != null) {
-            contentArea.setCenter(pane);
-            pane.setVisible(true);
-        }
+    // ── Navigation ────────────────────────────────────────────────────────────
+
     private void addUserMessage(String text) {
         if (supChatMessages == null) return;
         HBox row = new HBox();
@@ -254,8 +197,6 @@ public class SupervisorDashboardController implements Initializable {
         supChatMessages.getChildren().add(row);
         if (supChatScroll != null) Platform.runLater(() -> supChatScroll.setVvalue(1.0));
     }
-
-    // ── Navigation ────────────────────────────────────────────────────────────
 
     private void load(String fxml) {
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);

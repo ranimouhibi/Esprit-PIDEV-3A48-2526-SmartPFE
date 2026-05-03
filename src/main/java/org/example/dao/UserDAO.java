@@ -2,6 +2,7 @@ package org.example.dao;
 
 import org.example.config.DatabaseConfig;
 import org.example.model.User;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
 import java.time.LocalDateTime;
