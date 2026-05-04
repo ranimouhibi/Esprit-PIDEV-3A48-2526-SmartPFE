@@ -9,7 +9,7 @@
 
     <top>
         <VBox spacing="10">
-            <Label text="User Management" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Label fx:id="titleLabel" text="User Management" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
             <HBox spacing="10">
                 <TextField fx:id="searchField" promptText="Search..." prefWidth="200"/>
                 <Button text="🔍" onAction="#handleSearch" style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6;"/>

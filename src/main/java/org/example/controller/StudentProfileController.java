@@ -2,7 +2,9 @@ package org.example.controller;
 
 import org.example.dao.UserDAO;
 import org.example.model.User;
+import org.example.util.AIService;
 import org.example.util.CloudinaryService;
+import org.example.util.LocalSessionStore;
 import org.example.util.SessionManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -10,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -45,6 +48,23 @@ public class StudentProfileController {
     @FXML private Label phoneError;
     @FXML private Label infoFeedback;
 
+    // Skills & Experience
+    @FXML private TextField skillsField;
+    @FXML private TextArea  experienceField;
+    @FXML private TextArea  formationsField;
+
+    // ── Bio ───────────────────────────────────────────────────────────────────
+    @FXML private TextArea  bioField;
+    @FXML private Button    generateBioBtn;
+    @FXML private Label     bioStatus;
+
+    // PIN card
+    @FXML private PasswordField pinField;
+    @FXML private PasswordField pinConfirmField;
+    @FXML private Label         pinStatusLabel;
+    @FXML private Label         pinFeedback;
+    @FXML private Button        removePinBtn;
+
     // Password
     @FXML private PasswordField currentPassField;
     @FXML private PasswordField newPassField;
@@ -77,8 +97,126 @@ public class StudentProfileController {
         nameField.setText(user.getName());
         emailField.setText(user.getEmail());
         phoneField.setText(user.getPhone() != null ? user.getPhone() : "");
+        skillsField.setText(user.getSkills() != null ? user.getSkills() : "");
+        experienceField.setText(user.getExperience() != null ? user.getExperience() : "");
+        formationsField.setText(user.getFormations() != null ? user.getFormations() : "");
+        bioField.setText(user.getBio() != null ? user.getBio() : "");
 
         loadAvatarFromUrl(user.getProfilePicture(), user);
+
+        // Clip images to circles so they don't overflow the rounded background
+        avatarImage.setClip(new Circle(50, 50, 50));
+        previewImage.setClip(new Circle(40, 40, 40));
+
+        // PIN status
+        refreshPinStatus(user);
+    }
+
+    // ── AI Bio Generator ──────────────────────────────────────────────────────
+
+    @FXML
+    public void handleGenerateBio() {
+        User user = SessionManager.getCurrentUser();
+        String name = nameField.getText().trim();
+        if (name.isEmpty()) name = user.getName();
+
+        String skills     = skillsField.getText().trim();
+        String experience = experienceField.getText().trim();
+        String formations = formationsField.getText().trim();
+
+        // Resolve establishment name from DB if linked
+        String institution = null;
+        if (user.getEstablishmentId() != null) {
+            try {
+                org.example.model.User est = new org.example.dao.UserDAO().findById(user.getEstablishmentId());
+                if (est != null) institution = est.getName();
+            } catch (Exception ignored) {}
+        }
+
+        generateBioBtn.setDisable(true);
+        generateBioBtn.setText("⏳ Generating…");
+        showBioStatus("Calling AI, please wait…", true);
+
+        final String finalName        = name;
+        final String finalInstitution = institution;
+        final String finalSkills      = skills.isEmpty() ? null : skills;
+        final String finalExperience  = experience.isEmpty() ? null : experience;
+        final String finalFormations  = formations.isEmpty() ? null : formations;
+
+        new Thread(() -> {
+            try {
+                String bio = AIService.generateBio(finalName, user.getRole(),
+                        finalInstitution, finalSkills, finalExperience, finalFormations);
+                Platform.runLater(() -> {
+                    bioField.setText(bio);
+                    generateBioBtn.setDisable(false);
+                    generateBioBtn.setText("✨ Generate with AI");
+                    showBioStatus("Bio generated! Review and click Save Changes to keep it.", true);
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    generateBioBtn.setDisable(false);
+                    generateBioBtn.setText("✨ Generate with AI");
+                    showBioStatus("Failed: " + e.getMessage(), false);
+                });
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private void showBioStatus(String msg, boolean success) {
+        bioStatus.setText(msg);
+        bioStatus.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: "
+                + (success ? "#7c3aed" : "#dc2626") + ";");
+        bioStatus.setVisible(true);
+        bioStatus.setManaged(true);
+    }
+
+    // ── PIN management ───────────────────────────────────────────────────────
+
+    private void refreshPinStatus(User user) {
+        String hash = LocalSessionStore.loadPinHash(user.getId());
+        boolean hasPin = hash != null;
+        pinStatusLabel.setText(hasPin ? "✓ PIN is set — you can use it at login" : "No PIN set");
+        pinStatusLabel.setStyle(hasPin
+            ? "-fx-font-size: 11px; -fx-text-fill: #16a34a;"
+            : "-fx-font-size: 11px; -fx-text-fill: #888;");
+        removePinBtn.setVisible(hasPin);
+        removePinBtn.setManaged(hasPin);
+    }
+
+    @FXML
+    public void handleSavePin() {
+        hide(pinFeedback);
+        String pin     = pinField.getText();
+        String confirm = pinConfirmField.getText();
+        if (pin.isEmpty())            { showPinFeedback("Enter a PIN.", false); return; }
+        if (!pin.matches("\\d{6}"))   { showPinFeedback("PIN must be exactly 6 digits.", false); return; }
+        if (!pin.equals(confirm))     { showPinFeedback("PINs do not match.", false); return; }
+
+        User user = SessionManager.getCurrentUser();
+        String hashed = BCrypt.hashpw(pin, BCrypt.gensalt());
+        LocalSessionStore.savePin(user.getId(), hashed);
+        pinField.clear();
+        pinConfirmField.clear();
+        showPinFeedback("PIN saved! You can now use it at login.", true);
+        refreshPinStatus(user);
+    }
+
+    @FXML
+    public void handleRemovePin() {
+        User user = SessionManager.getCurrentUser();
+        LocalSessionStore.clearPin(user.getId());
+        showPinFeedback("PIN removed.", true);
+        refreshPinStatus(user);
+    }
+
+    private void showPinFeedback(String msg, boolean success) {
+        pinFeedback.setText(msg);
+        pinFeedback.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: "
+                + (success ? "#16a34a" : "#dc2626") + ";");
+        pinFeedback.setVisible(true);
+        pinFeedback.setManaged(true);
     }
 
     // ── Profile Picture ──────────────────────────────────────────────────────
@@ -174,6 +312,10 @@ public class StudentProfileController {
                 user.setName(name);
                 user.setEmail(email);
                 user.setPhone(phone);
+                user.setSkills(skillsField.getText().trim());
+                user.setExperience(experienceField.getText().trim());
+                user.setFormations(formationsField.getText().trim());
+                user.setBio(bioField.getText().trim());
 
                 // Handle picture
                 if (pendingImageFile != null) {

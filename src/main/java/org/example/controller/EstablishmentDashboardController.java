@@ -37,7 +37,14 @@ public class EstablishmentDashboardController implements Initializable {
 
     private void loadStats() {
         try {
-            userCountLabel.setText(String.valueOf(userDAO.findAll().size()));
+            User me = SessionManager.getCurrentUser();
+            if (me != null) {
+                // Count only users that belong to this establishment
+                int memberCount = userDAO.findByEstablishment(me.getId()).size();
+                userCountLabel.setText(String.valueOf(memberCount));
+            } else {
+                userCountLabel.setText("0");
+            }
             projectCountLabel.setText(String.valueOf(projectDAO.findAll().size()));
             applicationCountLabel.setText("0");
         } catch (Exception e) {
@@ -45,25 +52,36 @@ public class EstablishmentDashboardController implements Initializable {
         }
     }
 
-    @FXML public void showHome() { 
+    @FXML public void showHome() {
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
         contentArea.setCenter(null);
         javafx.scene.Node node = homePane.getParent() instanceof javafx.scene.control.ScrollPane sp ? sp : homePane;
         contentArea.setCenter(node);
         if (node != null) node.setVisible(true);
     }
-    
-    @FXML public void showUsers() { 
+
+    @FXML public void showUsers() {
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
         contentArea.setCenter(null);
+
+        // Scope the user list to this establishment only
+        User me = SessionManager.getCurrentUser();
+        if (me != null) {
+            UserController.setEstablishmentScope(me.getId());
+        }
+
         javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Users.fxml");
+
+        // Clear scope after loading so other dashboards are unaffected
+        UserController.clearEstablishmentScope();
+
         if (pane != null) {
             contentArea.setCenter(pane);
             pane.setVisible(true);
         }
     }
-    
-    @FXML public void showProjects() { 
+
+    @FXML public void showProjects() {
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
         contentArea.setCenter(null);
         javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Projects.fxml");
@@ -72,8 +90,8 @@ public class EstablishmentDashboardController implements Initializable {
             pane.setVisible(true);
         }
     }
-    
-    @FXML public void showApplications() { 
+
+    @FXML public void showApplications() {
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
         contentArea.setCenter(null);
         javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Candidatures.fxml");
@@ -82,8 +100,8 @@ public class EstablishmentDashboardController implements Initializable {
             pane.setVisible(true);
         }
     }
-    
-    @FXML public void showProfile() { 
+
+    @FXML public void showProfile() {
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
         contentArea.setCenter(null);
         javafx.scene.layout.Pane pane = NavigationUtil.loadPane("UserProfile.fxml");
