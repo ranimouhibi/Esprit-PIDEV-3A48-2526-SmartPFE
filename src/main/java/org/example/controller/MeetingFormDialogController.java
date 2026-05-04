@@ -210,19 +210,7 @@ public class MeetingFormDialogController implements Initializable {
         if (project == null) { errorLabel.setText("Le projet est obligatoire."); return; }
         if (type == null) { errorLabel.setText("Le type est obligatoire."); return; }
         if (date == null) { errorLabel.setText("La date est obligatoire."); return; }
-        if (date.isBefore(LocalDate.now().plusDays(1))) { errorLabel.setText("La date doit être dans le futur (au moins demain)."); return; }
-
-        // Unicité : vérifier qu'aucun meeting n'existe déjà à cette date
-        try {
-            int excludeId = editMeeting != null ? editMeeting.getId() : -1;
-            if (meetingDAO.existsByDate(date, excludeId)) {
-                errorLabel.setText("Un meeting existe déjà à cette date. Veuillez choisir une autre date.");
-                return;
-            }
-        } catch (Exception e) {
-            errorLabel.setText("Erreur lors de la vérification de la date.");
-            return;
-        }
+        if (date.isBefore(LocalDate.now())) { errorLabel.setText("La date doit être aujourd'hui ou dans le futur."); return; }
         int duration;
         try { duration = Integer.parseInt(durationStr); } catch (NumberFormatException e) { errorLabel.setText("Durée invalide."); return; }
         if (duration < 15 || duration > 480) { errorLabel.setText("Durée entre 15 et 480 minutes."); return; }
