@@ -4,8 +4,8 @@ import org.example.dao.CommentDAO;
 import org.example.model.Comment;
 import org.example.model.Project;
 import org.example.model.User;
-import org.example.util.PDFExporter;
-import org.example.util.SessionManager;
+import org.example.service.CommentService;
+import org.example.util.*;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -15,6 +15,7 @@ import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
@@ -62,6 +63,7 @@ public class ProjectCommentsDialogController implements Initializable {
     private Stage dialogStage;
     private Project project;
     private final CommentDAO commentDAO = new CommentDAO();
+    private final CommentService commentService = new CommentService();
     private List<Comment> allComments = new ArrayList<>();
     private Comment editingComment = null;
 
@@ -295,6 +297,22 @@ public class ProjectCommentsDialogController implements Initializable {
 
         card.getChildren().addAll(header, content, authorBox);
 
+        // 🆕 Boutons de métiers (Traduction, TTS, QR Code)
+        Separator metiersSep = new Separator();
+        HBox metiersActions = new HBox(8);
+        metiersActions.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        
+        Button translateBtn = new Button("🌍 Translate");
+        translateBtn.setStyle("-fx-background-color: #667eea; -fx-text-fill: white; -fx-font-size: 10px; -fx-background-radius: 6; -fx-padding: 5 12; -fx-cursor: hand;");
+        translateBtn.setOnAction(e -> handleTranslateComment(comment));
+        
+        Button ttsBtn = new Button("🔊 Listen");
+        ttsBtn.setStyle("-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-size: 10px; -fx-background-radius: 6; -fx-padding: 5 12; -fx-cursor: hand;");
+        ttsBtn.setOnAction(e -> handleListenComment(comment));
+        
+        metiersActions.getChildren().addAll(translateBtn, ttsBtn);
+        card.getChildren().addAll(metiersSep, metiersActions);
+
         // Actions only for author
         User currentUser = SessionManager.getCurrentUser();
         if (currentUser != null && currentUser.getId() == comment.getAuthorId()) {
@@ -401,23 +419,70 @@ public class ProjectCommentsDialogController implements Initializable {
 
         if (!valid) return;
 
+        // 🆕 Vérifier les mots inappropriés avec le filtre de profanité
+        String content = contentField.getText().trim();
+        if (commentService.containsProfanity(content)) {
+            Alert profanityAlert = new Alert(Alert.AlertType.WARNING);
+            profanityAlert.setTitle("Profanity Detected");
+            profanityAlert.setHeaderText("Inappropriate content detected");
+            profanityAlert.setContentText("Your comment contains inappropriate words. Do you want to:\n\n" +
+                "• Filter them automatically (replace with ***)\n" +
+                "• Edit your comment manually");
+            
+            ButtonType filterButton = new ButtonType("Filter Automatically");
+            ButtonType editButton = new ButtonType("Edit Manually");
+            ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+            
+            profanityAlert.getButtonTypes().setAll(filterButton, editButton, cancelButton);
+            
+            Optional<ButtonType> result = profanityAlert.showAndWait();
+            if (result.isPresent()) {
+                if (result.get() == filterButton) {
+                    // Filtrer automatiquement
+                    content = commentService.filterProfanity(content);
+                    contentField.setText(content);
+                } else if (result.get() == editButton) {
+                    // Laisser l'utilisateur éditer
+                    return;
+                } else {
+                    // Annuler
+                    return;
+                }
+            } else {
+                return;
+            }
+        }
+
         try {
             User user = SessionManager.getCurrentUser();
+            String subject = subjectField.getText().trim();
 
             if (editingComment == null) {
+                // ── Uniqueness check (new comment only) ───────────────────
+                if (commentDAO.existsDuplicate(subject, content, user.getId(), project.getId(), 0)) {
+                    subjectError.setText("A comment with the same subject and content already exists today");
+                    showAlert("Duplicate Comment",
+                        "You already added a comment with the same subject and content today.\nPlease modify your comment.",
+                        Alert.AlertType.WARNING);
+                    return;
+                }
+
                 Comment c = new Comment();
                 c.setAuthorId(user.getId());
                 c.setCommentableType("project");
                 c.setCommentableId(project.getId());
-                c.setSubject(subjectField.getText().trim());
-                c.setContent(contentField.getText().trim());
+                c.setSubject(subject);
+                c.setContent(content);
                 c.setCommentType(typeCombo.getValue());
                 c.setTarget(targetCombo.getValue());
                 c.setImportance(importanceCombo.getValue());
                 commentDAO.save(c);
+                
+                // 🆕 Notification
+                NotificationUtil.Notifications.newComment(project.getTitle());
             } else {
-                editingComment.setSubject(subjectField.getText().trim());
-                editingComment.setContent(contentField.getText().trim());
+                editingComment.setSubject(subject);
+                editingComment.setContent(content);
                 editingComment.setCommentType(typeCombo.getValue());
                 editingComment.setTarget(targetCombo.getValue());
                 editingComment.setImportance(importanceCombo.getValue());
@@ -472,6 +537,315 @@ public class ProjectCommentsDialogController implements Initializable {
                 e.printStackTrace();
                 showAlert("Error", "Failed to export PDF: " + e.getMessage(), Alert.AlertType.ERROR);
             }
+        }
+    }
+
+    // ── Métiers Methods ──────────────────────────────────────────────────────
+
+    /**
+     * Traduire un commentaire
+     */
+    private void handleTranslateComment(Comment comment) {
+        // Créer un dialog pour choisir la langue
+        Dialog<String> dialog = new Dialog<>();
+        dialog.setTitle("Traduire le commentaire");
+        dialog.setHeaderText("Choisir la langue cible");
+
+        // Boutons
+        ButtonType translateButtonType = new ButtonType("Traduire", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButtonType = new ButtonType("Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialog.getDialogPane().getButtonTypes().addAll(translateButtonType, cancelButtonType);
+
+        // Contenu
+        VBox content = new VBox(10);
+        content.setPadding(new Insets(20));
+
+        Label label = new Label("Sélectionner la langue :");
+        ComboBox<String> languageCombo = new ComboBox<>();
+        languageCombo.setItems(FXCollections.observableArrayList(
+            "English", "Français", "Español", "Deutsch", "Italiano", "العربية", "中文"
+        ));
+        languageCombo.setValue("Français");
+
+        content.getChildren().addAll(label, languageCombo);
+        dialog.getDialogPane().setContent(content);
+
+        // Convertir le résultat
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == translateButtonType) {
+                String selected = languageCombo.getValue();
+                // Mapper vers le code de langue
+                switch (selected) {
+                    case "English": return "en";
+                    case "Français": return "fr";
+                    case "Español": return "es";
+                    case "Deutsch": return "de";
+                    case "Italiano": return "it";
+                    case "العربية": return "ar";
+                    case "中文": return "zh";
+                    default: return "fr";
+                }
+            }
+            return null;
+        });
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(targetLang -> {
+            try {
+                // Traduire le commentaire
+                String translatedContent = commentService.translateComment(comment.getContent(), targetLang);
+                
+                // Afficher le résultat dans un dialog
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Résultat de la traduction");
+                alert.setHeaderText("Traduit en " + commentService.getLanguageName(targetLang));
+                
+                TextArea textArea = new TextArea(translatedContent);
+                textArea.setWrapText(true);
+                textArea.setEditable(false);
+                textArea.setPrefRowCount(10);
+                
+                alert.getDialogPane().setContent(textArea);
+                alert.showAndWait();
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert("Erreur", "La traduction a échoué : " + e.getMessage(), Alert.AlertType.ERROR);
+            }
+        });
+    }
+
+    /**
+     * Créer un commentaire vocal
+     */
+    @FXML
+    public void handleVocalComment() {
+        // Vérifier si le modèle Vosk doit être téléchargé
+        if (!VoskSpeechUtil.isModelDownloaded()) {
+            Alert info = new Alert(Alert.AlertType.INFORMATION);
+            info.setTitle("📥 Téléchargement requis");
+            info.setHeaderText("Premier lancement - Téléchargement du modèle");
+            info.setContentText(
+                "Vosk va télécharger le modèle français (~40 MB) une seule fois.\n\n" +
+                "✅ Ensuite, tout fonctionnera HORS LIGNE !\n" +
+                "✅ Aucune inscription requise\n" +
+                "✅ 100% gratuit\n\n" +
+                "Le téléchargement prendra 1-2 minutes selon votre connexion.\n" +
+                "Voulez-vous continuer ?"
+            );
+            
+            ButtonType continueBtn = new ButtonType("Télécharger", ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancelBtn = new ButtonType("Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
+            info.getButtonTypes().setAll(continueBtn, cancelBtn);
+            
+            Optional<ButtonType> choice = info.showAndWait();
+            // Si l'utilisateur annule ou ferme, on arrête
+            if (choice.isEmpty() || choice.get() == cancelBtn) {
+                return;
+            }
+            // Sinon, on continue avec le téléchargement et l'enregistrement
+        }
+
+        try {
+            // Transcribe audio avec Vosk (local, hors ligne)
+            // Le téléchargement du modèle se fait automatiquement ici si nécessaire
+            String transcribedText = org.example.util.SpeechUtil.recordAndTranscribe();
+
+            if (transcribedText == null || transcribedText.trim().isEmpty()) {
+                showAlert("Aucun texte", "Aucun texte transcrit. Parlez plus fort et plus clairement.", Alert.AlertType.INFORMATION);
+                return;
+            }
+
+            // Show transcription for review — user can edit before inserting
+            Alert reviewAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            reviewAlert.setTitle("Transcription vocale");
+            reviewAlert.setHeaderText("Vérifier le texte transcrit");
+
+            TextArea textArea = new TextArea(transcribedText);
+            textArea.setWrapText(true);
+            textArea.setEditable(true);   // user can correct mistakes
+            textArea.setPrefRowCount(4);
+
+            VBox vbox = new VBox(8);
+            vbox.setPadding(new javafx.geometry.Insets(10));
+            
+            Label info = new Label("Vous pouvez modifier le texte avant de l'insérer dans le formulaire de commentaire :");
+            info.setStyle("-fx-text-fill: #555; -fx-font-size: 11px;");
+            info.setWrapText(true);
+            vbox.getChildren().addAll(info, textArea);
+
+            reviewAlert.getDialogPane().setContent(vbox);
+            reviewAlert.getDialogPane().setPrefWidth(500);
+
+            // Customize button text
+            ButtonType insertButton = new ButtonType("Insérer dans le formulaire", ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancelButton = new ButtonType("Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
+            reviewAlert.getButtonTypes().setAll(insertButton, cancelButton);
+
+            Optional<ButtonType> reviewResult = reviewAlert.showAndWait();
+
+            if (reviewResult.isPresent() && reviewResult.get() == insertButton) {
+                // ✅ Insert transcribed text into the content field of the form
+                String finalText = textArea.getText().trim();
+                contentField.setText(finalText);
+
+                // Open the form if it's not already visible
+                if (!commentFormContainer.isVisible()) {
+                    editingComment = null;
+                    clearForm();
+                    formTitle.setText("Nouveau commentaire (Vocal)");
+                    commentFormContainer.setVisible(true);
+                    commentFormContainer.setManaged(true);
+                    addCommentBtn.setText("Annuler");
+                }
+
+                // Focus on subject field so user fills it next
+                subjectField.requestFocus();
+
+                showAlert("Texte vocal inséré",
+                    "Le texte transcrit a été inséré dans le formulaire de commentaire.\nVeuillez remplir le Sujet, le Type, la Cible et l'Importance, puis cliquez sur Enregistrer.",
+                    Alert.AlertType.INFORMATION);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "L'enregistrement vocal a échoué : " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    /**
+     * Lire un commentaire à voix haute (Text-to-Speech)
+     */
+    private void handleListenComment(Comment comment) {
+        try {
+            if (!TextToSpeechUtil.isAvailable()) {
+                showAlert("TTS non disponible", 
+                    "La synthèse vocale n'est pas disponible sur votre système.\n" +
+                    "Moteur TTS : " + TextToSpeechUtil.getTTSEngine(),
+                    Alert.AlertType.WARNING);
+                return;
+            }
+
+            // Lire le commentaire de manière asynchrone (non bloquant)
+            String textToRead = comment.getSubject() + ". " + comment.getContent();
+            TextToSpeechUtil.speakAsync(textToRead);
+            
+            // Notification
+            NotificationUtil.showInfo("Lecture en cours", 
+                "Le commentaire est en cours de lecture...");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Impossible de lire le commentaire : " + e.getMessage(), 
+                Alert.AlertType.ERROR);
+        }
+    }
+
+    /**
+     * Exporter les commentaires en Excel
+     */
+    @FXML
+    public void handleExportExcel() {
+        if (allComments == null || allComments.isEmpty()) {
+            showAlert("Avertissement", "Aucun commentaire à exporter", Alert.AlertType.WARNING);
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Exporter en Excel");
+        fileChooser.setInitialFileName(project.getTitle().replaceAll("[^a-zA-Z0-9]", "_") + "_comments.xlsx");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+        
+        File file = fileChooser.showSaveDialog(dialogStage);
+        if (file != null) {
+            try {
+                ExcelExporter.exportComments(allComments, file);
+                showAlert("Succès", "Export Excel réussi !", Alert.AlertType.INFORMATION);
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert("Erreur", "Échec de l'export Excel : " + e.getMessage(), Alert.AlertType.ERROR);
+            }
+        }
+    }
+
+    /**
+     * Générer un QR Code pour partager le projet
+     */
+    @FXML
+    public void handleGenerateQRCode() {
+        try {
+            String qrCodePath = QRCodeUtil.generateProjectQRCode(project.getId(), project.getTitle());
+            
+            if (qrCodePath != null) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("QR Code généré");
+                alert.setHeaderText("QR Code créé avec succès !");
+                alert.setContentText("Le QR Code a été sauvegardé dans :\n" + qrCodePath + 
+                    "\n\nVous pouvez le scanner pour accéder rapidement au projet.");
+                
+                ButtonType openButton = new ButtonType("Ouvrir le dossier");
+                ButtonType closeButton = new ButtonType("Fermer", ButtonBar.ButtonData.CANCEL_CLOSE);
+                alert.getButtonTypes().setAll(openButton, closeButton);
+                
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == openButton) {
+                    // Ouvrir le dossier contenant le QR code
+                    File qrFile = new File(qrCodePath);
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop.getDesktop().open(qrFile.getParentFile());
+                    }
+                }
+            } else {
+                showAlert("Erreur", "Impossible de générer le QR Code", Alert.AlertType.ERROR);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Échec de la génération du QR Code : " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    /**
+     * Générer des graphiques statistiques
+     */
+    @FXML
+    public void handleGenerateCharts() {
+        try {
+            if (allComments == null || allComments.isEmpty()) {
+                showAlert("Avertissement", "Aucun commentaire pour générer des statistiques", Alert.AlertType.WARNING);
+                return;
+            }
+
+            // Générer les graphiques
+            String chartPath = ChartUtil.generateCommentsTypeChart(allComments, 
+                "Commentaires par Type - " + project.getTitle());
+            
+            if (chartPath != null) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Graphiques générés");
+                alert.setHeaderText("Statistiques créées avec succès !");
+                alert.setContentText("Les graphiques ont été sauvegardés dans :\n" + chartPath + 
+                    "\n\nOuvrir le fichier HTML dans votre navigateur pour voir les graphiques interactifs.");
+                
+                ButtonType openButton = new ButtonType("Ouvrir dans le navigateur");
+                ButtonType closeButton = new ButtonType("Fermer", ButtonBar.ButtonData.CANCEL_CLOSE);
+                alert.getButtonTypes().setAll(openButton, closeButton);
+                
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == openButton) {
+                    // Ouvrir le fichier HTML dans le navigateur
+                    File chartFile = new File(chartPath);
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop.getDesktop().browse(chartFile.toURI());
+                    }
+                }
+            } else {
+                showAlert("Erreur", "Impossible de générer les graphiques", Alert.AlertType.ERROR);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Échec de la génération des graphiques : " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 

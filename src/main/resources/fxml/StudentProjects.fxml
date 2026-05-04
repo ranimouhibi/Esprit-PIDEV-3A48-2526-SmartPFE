@@ -15,7 +15,9 @@
             <Label text="Create and manage your academic projects" style="-fx-font-size: 13px; -fx-text-fill: #888;"/>
         </VBox>
         <HBox spacing="12" alignment="CENTER_RIGHT">
-            <Button text="Export PDF" onAction="#handleExportPDF"
+            <Button text="📊 Export Excel" onAction="#handleExportExcel"
+                    style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand; -fx-font-size: 12px;"/>
+            <Button text="📄 Export PDF" onAction="#handleExportPDF"
                     style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand; -fx-font-size: 12px;"/>
             <VBox spacing="4" alignment="CENTER_RIGHT">
                 <Label text="Join a Team Project:" style="-fx-font-size: 11px; -fx-text-fill: #666; -fx-font-weight: bold;"/>
