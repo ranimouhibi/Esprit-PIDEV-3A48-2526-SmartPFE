@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import org.example.util.ModernAlert;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
@@ -149,6 +150,15 @@ public class UserController implements Initializable {
                 }
             }
         });
+        if (selectedUser == null) { showMessage("Sélectionnez un utilisateur.", true); return; }
+        if (ModernAlert.confirmDelete(selectedUser.getName())) {
+            try {
+                userDAO.delete(selectedUser.getId());
+                showMessage("Utilisateur supprimé.", false);
+                handleClear();
+                loadUsers();
+            } catch (Exception e) { showMessage("Erreur: " + e.getMessage(), true); }
+        }
     }
 
     @FXML

@@ -3,90 +3,81 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.example.controller.TaskController">
-    <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.controller.TaskController"
+      spacing="0" style="-fx-background-color: #f4f6fb;">
 
-    <top>
-        <VBox spacing="10">
-            <Label text="Task Management" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <TextField fx:id="searchField" promptText="Search a task..." prefWidth="250"/>
-                <Button text="🔍 Search" onAction="#handleSearch" style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6;"/>
-            </HBox>
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+        <padding><Insets top="20" bottom="20" left="30" right="30"/></padding>
+        <VBox spacing="4" HBox.hgrow="ALWAYS">
+            <Label text="Tasks Management" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+            <Label text="Track and manage all project tasks" style="-fx-font-size: 13px; -fx-text-fill: #888;"/>
         </VBox>
-    </top>
+        <Button text="➕ New Task" onAction="#handleAddDialog"
+                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand; -fx-font-size: 12px;"/>
+    </HBox>
 
-    <center>
-        <SplitPane dividerPositions="0.6">
-            <TableView fx:id="taskTable" VBox.vgrow="ALWAYS">
-                <columns>
-                    <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
-                    <TableColumn fx:id="colTitle" text="Title" prefWidth="200"/>
-                    <TableColumn fx:id="colStatus" text="Status" prefWidth="90"/>
-                    <TableColumn fx:id="colPriority" text="Priority" prefWidth="90"/>
-                    <TableColumn fx:id="colProject" text="Project" prefWidth="150"/>
-                    <TableColumn fx:id="colAssigned" text="Assigned to" prefWidth="130"/>
-                    <TableColumn fx:id="colDeadline" text="Deadline" prefWidth="100"/>
-                </columns>
-            </TableView>
+    <!-- Stats Bar -->
+    <HBox spacing="0" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+        <padding><Insets top="16" bottom="16" left="30" right="30"/></padding>
 
-            <ScrollPane fitToWidth="true">
-                <VBox spacing="10">
-                    <padding><Insets top="10" left="15" right="15" bottom="10"/></padding>
-                    <Label text="Task Form" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 12 24;">
+            <Label fx:id="statTotal" text="0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+            <Label text="Total" style="-fx-font-size: 11px; -fx-text-fill: #888;"/>
+        </VBox>
 
-                    <Label text="Title *"/>
-                    <TextField fx:id="titleField" promptText="Task title"/>
+        <Region HBox.hgrow="ALWAYS"/>
 
-                    <Label text="Description"/>
-                    <TextArea fx:id="descriptionField" prefRowCount="2"/>
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #f59e0b22; -fx-background-radius: 8; -fx-padding: 12 24;">
+            <Label fx:id="statTodo" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #f59e0b;"/>
+            <Label text="To Do" style="-fx-font-size: 10px; -fx-text-fill: #f59e0b;"/>
+        </VBox>
 
-                    <HBox spacing="10">
-                        <VBox spacing="5" HBox.hgrow="ALWAYS">
-                            <Label text="Status"/>
-                            <ComboBox fx:id="statusCombo" maxWidth="Infinity"/>
-                        </VBox>
-                        <VBox spacing="5" HBox.hgrow="ALWAYS">
-                            <Label text="Priority"/>
-                            <ComboBox fx:id="priorityCombo" maxWidth="Infinity"/>
-                        </VBox>
-                    </HBox>
+        <Region prefWidth="12"/>
 
-                    <Label text="Project *"/>
-                    <ComboBox fx:id="projectCombo" maxWidth="Infinity"/>
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #3b82f622; -fx-background-radius: 8; -fx-padding: 12 24;">
+            <Label fx:id="statInProgress" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #3b82f6;"/>
+            <Label text="In Progress" style="-fx-font-size: 10px; -fx-text-fill: #3b82f6;"/>
+        </VBox>
 
-                    <Label text="Sprint"/>
-                    <ComboBox fx:id="sprintCombo" maxWidth="Infinity"/>
+        <Region prefWidth="12"/>
 
-                    <Label text="Assigned to"/>
-                    <ComboBox fx:id="assignedCombo" maxWidth="Infinity"/>
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #10b98122; -fx-background-radius: 8; -fx-padding: 12 24;">
+            <Label fx:id="statDone" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #10b981;"/>
+            <Label text="Done" style="-fx-font-size: 10px; -fx-text-fill: #10b981;"/>
+        </VBox>
 
-                    <HBox spacing="10">
-                        <VBox spacing="5" HBox.hgrow="ALWAYS">
-                            <Label text="Story Points"/>
-                            <Spinner fx:id="storyPointsSpinner" maxWidth="Infinity"/>
-                        </VBox>
-                        <VBox spacing="5" HBox.hgrow="ALWAYS">
-                            <Label text="Deadline"/>
-                            <DatePicker fx:id="deadlinePicker" maxWidth="Infinity"/>
-                        </VBox>
-                    </HBox>
+        <Region prefWidth="12"/>
 
-                    <CheckBox fx:id="blockedCheck" text="Blocked task"/>
+        <VBox alignment="CENTER" spacing="4" style="-fx-background-color: #dc262622; -fx-background-radius: 8; -fx-padding: 12 24;">
+            <Label fx:id="statCritical" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #dc2626;"/>
+            <Label text="Critical" style="-fx-font-size: 10px; -fx-text-fill: #dc2626;"/>
+        </VBox>
+    </HBox>
 
-                    <Label fx:id="messageLabel" text="" wrapText="true"/>
+    <!-- Search & Filter Bar -->
+    <HBox spacing="12" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+        <padding><Insets top="14" bottom="14" left="30" right="30"/></padding>
+        <TextField fx:id="searchField" promptText="Search tasks..." prefWidth="280"
+                   style="-fx-pref-height: 38px; -fx-background-radius: 19; -fx-border-radius: 19; -fx-border-color: #ddd; -fx-border-width: 1.5; -fx-padding: 0 16;"/>
+        <ComboBox fx:id="filterStatus" promptText="All Statuses" prefWidth="150"
+                  style="-fx-pref-height: 38px; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+        <ComboBox fx:id="filterPriority" promptText="All Priorities" prefWidth="150"
+                  style="-fx-pref-height: 38px; -fx-background-radius: 8; -fx-border-radius: 8;"/>
+        <Button text="Reset" onAction="#handleReset"
+                style="-fx-background-color: #6b7280; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="messageLabel" text="" wrapText="true" style="-fx-font-size: 12px;"/>
+    </HBox>
 
-                    <HBox spacing="10">
-                        <Button text="💾 Save" onAction="#handleSave" maxWidth="Infinity" HBox.hgrow="ALWAYS"
-                                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                        <Button text="🗑 Delete" onAction="#handleDelete" maxWidth="Infinity" HBox.hgrow="ALWAYS"
-                                style="-fx-background-color: #FF6B6B; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                        <Button text="✖ Clear" onAction="#handleClear" maxWidth="Infinity" HBox.hgrow="ALWAYS"
-                                style="-fx-background-color: #aaa; -fx-text-fill: white; -fx-background-radius: 6;"/>
-                    </HBox>
-                </VBox>
-            </ScrollPane>
-        </SplitPane>
-    </center>
-</BorderPane>
+    <!-- Task Cards Grid -->
+    <ScrollPane fx:id="scrollPane" fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER"
+                style="-fx-background-color: transparent; -fx-border-color: transparent;">
+        <VBox spacing="20">
+            <padding><Insets top="24" bottom="24" left="30" right="30"/></padding>
+            <FlowPane fx:id="cardPane" hgap="20" vgap="20" prefWrapLength="1000"/>
+        </VBox>
+    </ScrollPane>
+
+</VBox>

@@ -3,9 +3,10 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.example.controller.SupervisorDashboardController"
-      spacing="0" style="-fx-background-color: #f4f6fb;">
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="org.example.controller.SupervisorDashboardController">
+
+<VBox spacing="0" style="-fx-background-color: #f4f6fb;">
 
     <!-- NAVBAR -->
     <HBox alignment="CENTER_LEFT"
@@ -21,11 +22,17 @@
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label fx:id="navProjects" text="MY PROJECTS" onMouseClicked="#showProjects"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
-            <Label fx:id="navComments" text="COMMENTS" onMouseClicked="#showComments"
+            <Label fx:id="navSprints" text="SPRINTS" onMouseClicked="#showSprints"
+                   style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
+            <Label fx:id="navTasks" text="TASKS" onMouseClicked="#showTasks"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label fx:id="navDocuments" text="DOCUMENTS" onMouseClicked="#showDocuments"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
-            <Label fx:id="navTasks" text="TASKS" onMouseClicked="#showTasks"
+            <Label fx:id="navComments" text="COMMENTS" onMouseClicked="#showComments"
+                   style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
+            <Label fx:id="navCandidatures" text="CANDIDATURES" onMouseClicked="#showCandidatures"
+                   style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
+            <Label fx:id="navSprints" text="SPRINTS" onMouseClicked="#showSprints"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
             <Label fx:id="navProfile" text="PROFILE" onMouseClicked="#showProfile"
                    style="-fx-font-size: 12px; -fx-text-fill: #ccc; -fx-cursor: hand;"/>
@@ -37,7 +44,8 @@
     <!-- CONTENT AREA -->
     <BorderPane fx:id="contentArea" VBox.vgrow="ALWAYS">
         <center>
-            <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                        VBox.vgrow="ALWAYS"
                         style="-fx-background-color: transparent; -fx-border-color: transparent;">
                 <VBox fx:id="homePane" spacing="0">
 
@@ -45,6 +53,7 @@
                     <HBox style="-fx-background-color: #2d2d2d;" prefHeight="380" alignment="CENTER">
                         <padding><Insets left="80" right="60"/></padding>
 
+                        <!-- Left -->
                         <VBox spacing="20" HBox.hgrow="ALWAYS" maxWidth="480">
                             <Label text="HELLO SUPERVISOR"
                                    style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #a12c2f; -fx-letter-spacing: 3;"/>
@@ -57,31 +66,38 @@
                             <HBox spacing="14">
                                 <Button text="VIEW PROJECTS" onAction="#showProjects"
                                         style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 24; -fx-padding: 12 26; -fx-cursor: hand; -fx-font-size: 13px; -fx-effect: dropshadow(gaussian, rgba(161,44,47,0.4), 10, 0, 0, 3);"/>
-                                <Button text="MEETINGS" onAction="#showMeetings"
+                                <Button text="REVIEW TASKS" onAction="#showTasks"
                                         style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 24; -fx-padding: 12 26; -fx-cursor: hand; -fx-font-size: 13px; -fx-border-color: rgba(255,255,255,0.4); -fx-border-radius: 24; -fx-border-width: 1.5;"/>
                             </HBox>
                         </VBox>
 
-                        <!-- Stats grid -->
+                        <!-- Right — stat pills (same layout as student) -->
                         <VBox spacing="14" HBox.hgrow="ALWAYS" alignment="CENTER" maxWidth="360">
                             <padding><Insets left="40"/></padding>
                             <HBox spacing="14">
                                 <VBox spacing="8" alignment="CENTER"
                                       style="-fx-background-color: #3a3a3a; -fx-background-radius: 14;" prefWidth="160" prefHeight="110">
-                                    <Label text="📁" style="-fx-font-size: 28px;"/>
-                                    <Label text="Supervised" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                                    <Label text="📋" style="-fx-font-size: 28px;"/>
+                                    <Label text="Projects" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
                                     <Label fx:id="projectCountLabel" text="0"
                                            style="-fx-text-fill: #a12c2f; -fx-font-size: 22px; -fx-font-weight: bold;"/>
                                 </VBox>
                                 <VBox spacing="8" alignment="CENTER"
                                       style="-fx-background-color: #3a3a3a; -fx-background-radius: 14;" prefWidth="160" prefHeight="110">
                                     <Label text="✅" style="-fx-font-size: 28px;"/>
-                                    <Label text="Total Tasks" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                                    <Label text="Tasks" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
                                     <Label fx:id="taskCountLabel" text="0"
                                            style="-fx-text-fill: #a12c2f; -fx-font-size: 22px; -fx-font-weight: bold;"/>
                                 </VBox>
                             </HBox>
                             <HBox spacing="14">
+                                <VBox spacing="8" alignment="CENTER"
+                                      style="-fx-background-color: #3a3a3a; -fx-background-radius: 14;" prefWidth="160" prefHeight="110">
+                                    <Label text="🔄" style="-fx-font-size: 28px;"/>
+                                    <Label text="Sprints" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                                    <Label fx:id="sprintCountLabel" text="0"
+                                           style="-fx-text-fill: #a12c2f; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                                </VBox>
                                 <VBox spacing="8" alignment="CENTER"
                                       style="-fx-background-color: #3a3a3a; -fx-background-radius: 14;" prefWidth="160" prefHeight="110">
                                     <Label text="📅" style="-fx-font-size: 28px;"/>
@@ -92,8 +108,8 @@
                                 <VBox spacing="8" alignment="CENTER"
                                       style="-fx-background-color: #a12c2f; -fx-background-radius: 14;" prefWidth="160" prefHeight="110">
                                     <Label text="👨‍🎓" style="-fx-font-size: 28px;"/>
-                                    <Label text="Students" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;"/>
-                                    <Label text="Active" style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 12px;"/>
+                                    <Label text="Pending Requests" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11px;"/>
+                                    <Label fx:id="pendingRequestsLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
                                 </VBox>
                             </HBox>
                         </VBox>
@@ -104,7 +120,7 @@
                         <padding><Insets top="40" bottom="40" left="60" right="60"/></padding>
                         <Label text="QUICK ACTIONS"
                                style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #a12c2f; -fx-letter-spacing: 3;"/>
-                        <Label text="Manage your supervision activities"
+                        <Label text="What would you like to do today?"
                                style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
 
                         <HBox spacing="18">
@@ -113,7 +129,7 @@
                                   onMouseClicked="#showProjects">
                                 <padding><Insets top="24" bottom="24" left="24" right="24"/></padding>
                                 <Label text="📁" style="-fx-font-size: 32px; -fx-background-color: #a12c2f15; -fx-background-radius: 12; -fx-padding: 10 12;"/>
-                                <Label text="Supervised Projects" style="-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e1e1e;"/>
+                                <Label text="My Projects" style="-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e1e1e;"/>
                                 <Label text="Review and manage all projects under your supervision"
                                        style="-fx-text-fill: #888; -fx-font-size: 12px;" wrapText="true"/>
                                 <Label text="Open →" style="-fx-text-fill: #a12c2f; -fx-font-weight: bold; -fx-font-size: 12px;"/>
@@ -123,7 +139,7 @@
                                   onMouseClicked="#showTasks">
                                 <padding><Insets top="24" bottom="24" left="24" right="24"/></padding>
                                 <Label text="✅" style="-fx-font-size: 32px; -fx-background-color: #22c55e15; -fx-background-radius: 12; -fx-padding: 10 12;"/>
-                                <Label text="Review Tasks" style="-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e1e1e;"/>
+                                <Label text="Tasks" style="-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e1e1e;"/>
                                 <Label text="Validate and provide feedback on student tasks"
                                        style="-fx-text-fill: #888; -fx-font-size: 12px;" wrapText="true"/>
                                 <Label text="Open →" style="-fx-text-fill: #22c55e; -fx-font-weight: bold; -fx-font-size: 12px;"/>
@@ -133,31 +149,88 @@
                                   onMouseClicked="#showMeetings">
                                 <padding><Insets top="24" bottom="24" left="24" right="24"/></padding>
                                 <Label text="📅" style="-fx-font-size: 32px; -fx-background-color: #3b82f615; -fx-background-radius: 12; -fx-padding: 10 12;"/>
-                                <Label text="Schedule Meeting" style="-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e1e1e;"/>
+                                <Label text="Meetings" style="-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e1e1e;"/>
                                 <Label text="Plan and organize meetings with your students"
                                        style="-fx-text-fill: #888; -fx-font-size: 12px;" wrapText="true"/>
                                 <Label text="Open →" style="-fx-text-fill: #3b82f6; -fx-font-weight: bold; -fx-font-size: 12px;"/>
                             </VBox>
+                            <VBox spacing="12" HBox.hgrow="ALWAYS" alignment="TOP_LEFT"
+                                  style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 12, 0, 0, 3); -fx-cursor: hand;"
+                                  onMouseClicked="#showComments">
+                                <padding><Insets top="24" bottom="24" left="24" right="24"/></padding>
+                                <Label text="💬" style="-fx-font-size: 32px; -fx-background-color: #f59e0b15; -fx-background-radius: 12; -fx-padding: 10 12;"/>
+                                <Label text="Comments" style="-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #1e1e1e;"/>
+                                <Label text="Leave feedback and comments on student projects"
+                                       style="-fx-text-fill: #888; -fx-font-size: 12px;" wrapText="true"/>
+                                <Label text="Open →" style="-fx-text-fill: #f59e0b; -fx-font-weight: bold; -fx-font-size: 12px;"/>
+                            </VBox>
                         </HBox>
                     </VBox>
 
-                    <!-- BANNER -->
+                    <!-- TIPS BANNER -->
                     <HBox alignment="CENTER_LEFT" spacing="24"
-                          style="-fx-background-color: #2d2d2d;" prefHeight="90">
+                          style="-fx-background-color: #a12c2f;" prefHeight="90">
                         <padding><Insets left="60" right="60"/></padding>
-                        <Label text="🏆" style="-fx-font-size: 28px;"/>
+                        <Label text="💡" style="-fx-font-size: 28px;"/>
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
-                            <Label text="Your students are counting on you!"
+                            <Label text="Pro Tip — Keep your students on track!"
                                    style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 14px;"/>
                             <Label text="Review pending tasks and provide timely feedback to keep projects on track."
-                                   style="-fx-text-fill: #aaa; -fx-font-size: 12px;" wrapText="true"/>
+                                   style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 12px;" wrapText="true"/>
                         </VBox>
-                        <Button text="Review Tasks" onAction="#showTasks"
-                                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 22; -fx-cursor: hand;"/>
+                        <Button text="View Sprints" onAction="#showSprints"
+                                style="-fx-background-color: white; -fx-text-fill: #a12c2f; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 22; -fx-cursor: hand;"/>
                     </HBox>
+
+                    <!-- CHATBOT WIDGET removed — now floating FAB -->
 
                 </VBox>
             </ScrollPane>
         </center>
     </BorderPane>
 </VBox>
+
+<!-- ── FLOATING CHATBOT ── -->
+<StackPane alignment="BOTTOM_RIGHT" pickOnBounds="false">
+    <padding><Insets bottom="24" right="24"/></padding>
+    <VBox spacing="0" alignment="BOTTOM_RIGHT" pickOnBounds="false">
+        <VBox fx:id="supChatPanel" spacing="0" visible="false" managed="false"
+              style="-fx-background-color: white; -fx-background-radius: 16;
+                     -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.22),20,0,0,6);
+                     -fx-border-color: #e0e0e0; -fx-border-radius: 16; -fx-border-width: 1;"
+              prefWidth="340" maxHeight="460">
+            <HBox alignment="CENTER_LEFT" spacing="10"
+                  style="-fx-background-color: #a12c2f; -fx-background-radius: 16 16 0 0; -fx-padding: 12 16;">
+                <Label text="🤖" style="-fx-font-size: 18px;"/>
+                <VBox spacing="1" HBox.hgrow="ALWAYS">
+                    <Label text="SmartPFE Assistant" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: white;"/>
+                    <Label text="Ask about candidatures &amp; AI scores" style="-fx-font-size: 10px; -fx-text-fill: rgba(255,255,255,0.75);"/>
+                </VBox>
+                <Button text="✕" onAction="#handleSupChatToggle"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-cursor: hand; -fx-padding: 0 4;"/>
+            </HBox>
+            <ScrollPane fx:id="supChatScroll" fitToWidth="true" prefHeight="300" hbarPolicy="NEVER"
+                        style="-fx-background-color: #f8f8f8; -fx-background: #f8f8f8; -fx-border-color: transparent;">
+                <VBox fx:id="supChatMessages" spacing="5">
+                    <padding><Insets top="10" bottom="10" left="10" right="10"/></padding>
+                </VBox>
+            </ScrollPane>
+            <HBox spacing="8" alignment="CENTER_LEFT"
+                  style="-fx-background-color: white; -fx-background-radius: 0 0 16 16; -fx-padding: 10 12; -fx-border-color: #eee; -fx-border-width: 1 0 0 0;">
+                <TextField fx:id="supChatInput" promptText="Ask a question..." HBox.hgrow="ALWAYS"
+                           style="-fx-pref-height: 34px; -fx-background-radius: 17; -fx-border-radius: 17; -fx-border-color: #ddd; -fx-padding: 0 12;"
+                           onAction="#handleSupChatSend"/>
+                <Button text="➤" onAction="#handleSupChatSend"
+                        style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-background-radius: 17; -fx-padding: 7 14; -fx-cursor: hand; -fx-font-weight: bold;"/>
+            </HBox>
+        </VBox>
+        <Button fx:id="supChatFab" text="🤖" onAction="#handleSupChatToggle"
+                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-size: 22px;
+                       -fx-background-radius: 30; -fx-min-width: 58; -fx-min-height: 58;
+                       -fx-cursor: hand; -fx-effect: dropshadow(gaussian,rgba(161,44,47,0.5),14,0,0,4);">
+            <VBox.margin><Insets top="8"/></VBox.margin>
+        </Button>
+    </VBox>
+</StackPane>
+
+</StackPane>

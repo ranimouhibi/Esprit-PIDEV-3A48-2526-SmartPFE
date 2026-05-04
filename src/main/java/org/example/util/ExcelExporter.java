@@ -32,7 +32,7 @@ public class ExcelExporter {
 
         // En-têtes
         Row headerRow = sheet.createRow(0);
-        String[] headers = {"ID", "Titre", "Description", "Type", "Statut", "Encadrant", 
+        String[] headers = {"Titre", "Description", "Type", "Statut", "Encadrant", 
                            "Date création"};
         
         for (int i = 0; i < headers.length; i++) {
@@ -46,14 +46,13 @@ public class ExcelExporter {
         for (Project project : projects) {
             Row row = sheet.createRow(rowNum++);
             
-            row.createCell(0).setCellValue(project.getId());
-            row.createCell(1).setCellValue(project.getTitle() != null ? project.getTitle() : "");
-            row.createCell(2).setCellValue(project.getDescription() != null ? project.getDescription() : "");
-            row.createCell(3).setCellValue(project.getProjectType() != null ? project.getProjectType() : "");
-            row.createCell(4).setCellValue(project.getStatus() != null ? project.getStatus() : "");
-            row.createCell(5).setCellValue(project.getSupervisorName() != null ? project.getSupervisorName() : "");
+            row.createCell(0).setCellValue(project.getTitle() != null ? project.getTitle() : "");
+            row.createCell(1).setCellValue(project.getDescription() != null ? project.getDescription() : "");
+            row.createCell(2).setCellValue(project.getProjectType() != null ? project.getProjectType() : "");
+            row.createCell(3).setCellValue(project.getStatus() != null ? project.getStatus() : "");
+            row.createCell(4).setCellValue(project.getSupervisorName() != null ? project.getSupervisorName() : "");
             
-            Cell dateCell = row.createCell(6);
+            Cell dateCell = row.createCell(5);
             if (project.getCreatedAt() != null) {
                 dateCell.setCellValue(project.getCreatedAt().format(DATE_FORMATTER));
             }
@@ -88,7 +87,7 @@ public class ExcelExporter {
 
         // En-têtes
         Row headerRow = sheet.createRow(0);
-        String[] headers = {"ID", "Sujet", "Contenu", "Type", "Cible", "Importance", 
+        String[] headers = {"Sujet", "Contenu", "Type", "Cible", "Importance", 
                            "Auteur", "Date création"};
         
         for (int i = 0; i < headers.length; i++) {
@@ -102,15 +101,14 @@ public class ExcelExporter {
         for (Comment comment : comments) {
             Row row = sheet.createRow(rowNum++);
             
-            row.createCell(0).setCellValue(comment.getId());
-            row.createCell(1).setCellValue(comment.getSubject() != null ? comment.getSubject() : "");
-            row.createCell(2).setCellValue(comment.getContent() != null ? comment.getContent() : "");
-            row.createCell(3).setCellValue(comment.getCommentType() != null ? comment.getCommentType() : "");
-            row.createCell(4).setCellValue(comment.getTarget() != null ? comment.getTarget() : "");
-            row.createCell(5).setCellValue(comment.getImportance() != null ? comment.getImportance() : "");
-            row.createCell(6).setCellValue(comment.getAuthorName() != null ? comment.getAuthorName() : "");
+            row.createCell(0).setCellValue(comment.getSubject() != null ? comment.getSubject() : "");
+            row.createCell(1).setCellValue(comment.getContent() != null ? comment.getContent() : "");
+            row.createCell(2).setCellValue(comment.getCommentType() != null ? comment.getCommentType() : "");
+            row.createCell(3).setCellValue(comment.getTarget() != null ? comment.getTarget() : "");
+            row.createCell(4).setCellValue(comment.getImportance() != null ? comment.getImportance() : "");
+            row.createCell(5).setCellValue(comment.getAuthorName() != null ? comment.getAuthorName() : "");
             
-            Cell dateCell = row.createCell(7);
+            Cell dateCell = row.createCell(6);
             if (comment.getCreatedAt() != null) {
                 dateCell.setCellValue(comment.getCreatedAt().format(DATE_FORMATTER));
             }

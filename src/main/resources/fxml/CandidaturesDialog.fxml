@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.controller.CandidaturesDialogController"
+      spacing="0" prefWidth="900" prefHeight="650"
+      style="-fx-background-color: white; -fx-background-radius: 16;">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" style="-fx-background-color: #2d2d2d; -fx-background-radius: 16 16 0 0; -fx-padding: 20 24;">
+        <VBox spacing="3" HBox.hgrow="ALWAYS">
+            <Label text="Candidatures" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            <Label fx:id="offerTitleLabel" text="" style="-fx-font-size: 12px; -fx-text-fill: #bbb;"/>
+        </VBox>
+        <Button text="Close" onAction="#handleClose"
+                style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 18; -fx-cursor: hand;"/>
+    </HBox>
+
+    <!-- Stats -->
+    <HBox spacing="0" style="-fx-background-color: #f9fafb; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+        <padding><Insets top="12" bottom="12" left="24" right="24"/></padding>
+        <HBox HBox.hgrow="ALWAYS" alignment="CENTER" spacing="6" style="-fx-border-color: #e0e0e0; -fx-border-width: 0 1 0 0; -fx-padding: 8 0;">
+            <Label fx:id="statTotal" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2d2d2d;"/>
+            <Label text="Total" style="-fx-font-size: 11px; -fx-text-fill: #888;"/>
+        </HBox>
+        <HBox HBox.hgrow="ALWAYS" alignment="CENTER" spacing="6" style="-fx-border-color: #e0e0e0; -fx-border-width: 0 1 0 0; -fx-padding: 8 0;">
+            <Label fx:id="statPending" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #f59e0b;"/>
+            <Label text="Pending" style="-fx-font-size: 11px; -fx-text-fill: #f59e0b;"/>
+        </HBox>
+        <HBox HBox.hgrow="ALWAYS" alignment="CENTER" spacing="6" style="-fx-border-color: #e0e0e0; -fx-border-width: 0 1 0 0; -fx-padding: 8 0;">
+            <Label fx:id="statAccepted" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #22c55e;"/>
+            <Label text="Accepted" style="-fx-font-size: 11px; -fx-text-fill: #22c55e;"/>
+        </HBox>
+        <HBox HBox.hgrow="ALWAYS" alignment="CENTER" spacing="6" style="-fx-padding: 8 0;">
+            <Label fx:id="statRejected" text="0" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #ef4444;"/>
+            <Label text="Rejected" style="-fx-font-size: 11px; -fx-text-fill: #ef4444;"/>
+        </HBox>
+    </HBox>
+
+    <!-- Filter -->
+    <HBox spacing="12" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+        <padding><Insets top="12" bottom="12" left="24" right="24"/></padding>
+        <Label text="Filter:" style="-fx-font-size: 12px; -fx-text-fill: #666;"/>
+        <ComboBox fx:id="filterStatus" prefWidth="150" style="-fx-pref-height: 34px; -fx-background-radius: 8;"/>
+    </HBox>
+
+    <!-- Feedback Form -->
+    <VBox fx:id="feedbackFormContainer" spacing="12" visible="false" managed="false"
+          style="-fx-background-color: #fff8f0; -fx-border-color: #f59e0b; -fx-border-width: 0 0 0 4;">
+        <padding><Insets top="16" bottom="16" left="24" right="24"/></padding>
+        <Label fx:id="feedbackCandidateName" text="" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+        <HBox spacing="16">
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label text="Decision *" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                <ComboBox fx:id="statusCombo" promptText="Accept or Reject" prefWidth="200"
+                          style="-fx-pref-height: 36px; -fx-background-radius: 8;"/>
+            </VBox>
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label text="Feedback (optional)" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                <TextArea fx:id="feedbackField" promptText="Add a message for the student..." prefRowCount="2"
+                          style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd;"/>
+            </VBox>
+        </HBox>
+        <Label fx:id="feedbackError" text="" style="-fx-text-fill: #ef4444; -fx-font-size: 11px;"/>
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button text="Cancel" onAction="#handleCancelFeedback"
+                    style="-fx-background-color: transparent; -fx-text-fill: #666; -fx-cursor: hand;"/>
+            <Button text="Submit Decision" onAction="#handleSubmitFeedback"
+                    style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 20; -fx-cursor: hand;"/>
+        </HBox>
+    </VBox>
+
+    <!-- Candidatures List -->
+    <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER"
+                style="-fx-background-color: transparent; -fx-border-color: transparent;">
+        <VBox fx:id="candidaturesContainer" spacing="12">
+            <padding><Insets top="16" bottom="16" left="24" right="24"/></padding>
+        </VBox>
+    </ScrollPane>
+</VBox>

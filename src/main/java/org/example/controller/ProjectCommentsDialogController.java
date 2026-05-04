@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import org.example.util.ModernAlert;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -616,104 +617,6 @@ public class ProjectCommentsDialogController implements Initializable {
     }
 
     /**
-     * Créer un commentaire vocal
-     */
-    @FXML
-    public void handleVocalComment() {
-        // Vérifier si le modèle Vosk doit être téléchargé
-        if (!VoskSpeechUtil.isModelDownloaded()) {
-            Alert info = new Alert(Alert.AlertType.INFORMATION);
-            info.setTitle("📥 Téléchargement requis");
-            info.setHeaderText("Premier lancement - Téléchargement du modèle");
-            info.setContentText(
-                "Vosk va télécharger le modèle français (~40 MB) une seule fois.\n\n" +
-                "✅ Ensuite, tout fonctionnera HORS LIGNE !\n" +
-                "✅ Aucune inscription requise\n" +
-                "✅ 100% gratuit\n\n" +
-                "Le téléchargement prendra 1-2 minutes selon votre connexion.\n" +
-                "Voulez-vous continuer ?"
-            );
-            
-            ButtonType continueBtn = new ButtonType("Télécharger", ButtonBar.ButtonData.OK_DONE);
-            ButtonType cancelBtn = new ButtonType("Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
-            info.getButtonTypes().setAll(continueBtn, cancelBtn);
-            
-            Optional<ButtonType> choice = info.showAndWait();
-            // Si l'utilisateur annule ou ferme, on arrête
-            if (choice.isEmpty() || choice.get() == cancelBtn) {
-                return;
-            }
-            // Sinon, on continue avec le téléchargement et l'enregistrement
-        }
-
-        try {
-            // Transcribe audio avec Vosk (local, hors ligne)
-            // Le téléchargement du modèle se fait automatiquement ici si nécessaire
-            String transcribedText = org.example.util.SpeechUtil.recordAndTranscribe();
-
-            if (transcribedText == null || transcribedText.trim().isEmpty()) {
-                showAlert("Aucun texte", "Aucun texte transcrit. Parlez plus fort et plus clairement.", Alert.AlertType.INFORMATION);
-                return;
-            }
-
-            // Show transcription for review — user can edit before inserting
-            Alert reviewAlert = new Alert(Alert.AlertType.CONFIRMATION);
-            reviewAlert.setTitle("Transcription vocale");
-            reviewAlert.setHeaderText("Vérifier le texte transcrit");
-
-            TextArea textArea = new TextArea(transcribedText);
-            textArea.setWrapText(true);
-            textArea.setEditable(true);   // user can correct mistakes
-            textArea.setPrefRowCount(4);
-
-            VBox vbox = new VBox(8);
-            vbox.setPadding(new javafx.geometry.Insets(10));
-            
-            Label info = new Label("Vous pouvez modifier le texte avant de l'insérer dans le formulaire de commentaire :");
-            info.setStyle("-fx-text-fill: #555; -fx-font-size: 11px;");
-            info.setWrapText(true);
-            vbox.getChildren().addAll(info, textArea);
-
-            reviewAlert.getDialogPane().setContent(vbox);
-            reviewAlert.getDialogPane().setPrefWidth(500);
-
-            // Customize button text
-            ButtonType insertButton = new ButtonType("Insérer dans le formulaire", ButtonBar.ButtonData.OK_DONE);
-            ButtonType cancelButton = new ButtonType("Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
-            reviewAlert.getButtonTypes().setAll(insertButton, cancelButton);
-
-            Optional<ButtonType> reviewResult = reviewAlert.showAndWait();
-
-            if (reviewResult.isPresent() && reviewResult.get() == insertButton) {
-                // ✅ Insert transcribed text into the content field of the form
-                String finalText = textArea.getText().trim();
-                contentField.setText(finalText);
-
-                // Open the form if it's not already visible
-                if (!commentFormContainer.isVisible()) {
-                    editingComment = null;
-                    clearForm();
-                    formTitle.setText("Nouveau commentaire (Vocal)");
-                    commentFormContainer.setVisible(true);
-                    commentFormContainer.setManaged(true);
-                    addCommentBtn.setText("Annuler");
-                }
-
-                // Focus on subject field so user fills it next
-                subjectField.requestFocus();
-
-                showAlert("Texte vocal inséré",
-                    "Le texte transcrit a été inséré dans le formulaire de commentaire.\nVeuillez remplir le Sujet, le Type, la Cible et l'Importance, puis cliquez sur Enregistrer.",
-                    Alert.AlertType.INFORMATION);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Erreur", "L'enregistrement vocal a échoué : " + e.getMessage(), Alert.AlertType.ERROR);
-        }
-    }
-
-    /**
      * Lire un commentaire à voix haute (Text-to-Speech)
      */
     private void handleListenComment(Comment comment) {
@@ -850,10 +753,9 @@ public class ProjectCommentsDialogController implements Initializable {
     }
 
     private void showAlert(String title, String message, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        ModernAlert.Type mType = (type == Alert.AlertType.ERROR) ? ModernAlert.Type.ERROR :
+                                 (type == Alert.AlertType.WARNING) ? ModernAlert.Type.WARNING :
+                                 ModernAlert.Type.INFO;
+        ModernAlert.show(mType, title, message);
     }
 }

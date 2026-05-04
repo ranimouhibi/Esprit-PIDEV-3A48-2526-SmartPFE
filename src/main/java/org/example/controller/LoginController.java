@@ -81,6 +81,13 @@ public class LoginController {
             User user = userDAO.authenticate(email, password);
             if (user != null) {
                 completeLogin(user, rememberMeCheck.isSelected());
+                SessionManager.setCurrentUser(user);
+                switch (user.getRole().toLowerCase()) {
+                    case "student"       -> NavigationUtil.navigateTo("StudentDashboard.fxml");
+                    case "supervisor"    -> NavigationUtil.navigateTo("SupervisorDashboard.fxml");
+                    case "establishment" -> NavigationUtil.navigateTo("EstablishmentDashboard.fxml");
+                    default              -> NavigationUtil.navigateTo("Dashboard.fxml");
+                }
             } else {
                 showError("Incorrect email or password.");
                 highlight(emailField);

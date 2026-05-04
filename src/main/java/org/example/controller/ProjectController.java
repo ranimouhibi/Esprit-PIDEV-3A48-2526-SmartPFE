@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import org.example.util.ModernAlert;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 
@@ -338,10 +339,9 @@ public class ProjectController implements Initializable {
     }
 
     private void showAlert(String title, String message, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        ModernAlert.Type mType = (type == Alert.AlertType.ERROR) ? ModernAlert.Type.ERROR :
+                                 (type == Alert.AlertType.WARNING) ? ModernAlert.Type.WARNING :
+                                 ModernAlert.Type.INFO;
+        ModernAlert.show(mType, title, message);
     }
 }
