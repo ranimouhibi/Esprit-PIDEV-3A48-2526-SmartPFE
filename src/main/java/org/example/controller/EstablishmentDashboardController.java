@@ -70,7 +70,14 @@ public class EstablishmentDashboardController implements Initializable {
 
     private void loadStats() {
         try {
-            userCountLabel.setText(String.valueOf(userDAO.findAll().size()));
+            User me = SessionManager.getCurrentUser();
+            if (me != null) {
+                // Count only users that belong to this establishment
+                int memberCount = userDAO.findByEstablishment(me.getId()).size();
+                userCountLabel.setText(String.valueOf(memberCount));
+            } else {
+                userCountLabel.setText("0");
+            }
             projectCountLabel.setText(String.valueOf(projectDAO.findAll().size()));
             User user = SessionManager.getCurrentUser();
             int estId = resolveEstId(user);
@@ -87,6 +94,32 @@ public class EstablishmentDashboardController implements Initializable {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
+    @FXML public void showHome() {
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.Node node = homePane.getParent() instanceof javafx.scene.control.ScrollPane sp ? sp : homePane;
+        contentArea.setCenter(node);
+        if (node != null) node.setVisible(true);
+    }
+
+    @FXML public void showUsers() {
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+
+        // Scope the user list to this establishment only
+        User me = SessionManager.getCurrentUser();
+        if (me != null) {
+            UserController.setEstablishmentScope(me.getId());
+        }
+
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Users.fxml");
+
+        // Clear scope after loading so other dashboards are unaffected
+        UserController.clearEstablishmentScope();
+
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
     // ── AI Suggestions ────────────────────────────────────────────────────────
 
     @FXML public void handleAISuggestions() {
@@ -156,6 +189,13 @@ public class EstablishmentDashboardController implements Initializable {
         if (estChatScroll != null) Platform.runLater(() -> estChatScroll.setVvalue(1.0));
     }
 
+    @FXML public void showProjects() {
+        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
+        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Projects.fxml");
+        if (pane != null) {
+            contentArea.setCenter(pane);
+            pane.setVisible(true);
     private String generateReply(String msg) {
         String lower = msg.toLowerCase();
         User user = SessionManager.getCurrentUser();
@@ -230,6 +270,7 @@ public class EstablishmentDashboardController implements Initializable {
         if (estChatScroll != null) Platform.runLater(() -> estChatScroll.setVvalue(1.0));
     }
 
+    @FXML public void showApplications() {
     // ── Navigation ────────────────────────────────────────────────────────────
 
     private void load(String fxml) {
@@ -242,6 +283,7 @@ public class EstablishmentDashboardController implements Initializable {
         }
     }
 
+    @FXML public void showProfile() {
     @FXML public void showHome() {
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
         javafx.scene.Node node = homePane.getParent() instanceof ScrollPane sp ? sp : homePane;
