@@ -12,31 +12,27 @@ import java.util.List;
 public class UserDAO {
 
     public User authenticate(String email, String password) throws SQLException {
-        String sql = "SELECT * FROM users WHERE email = ? AND password = ? AND is_active = 1";
+        // Fetch user by email only, then verify password
+        String sql = "SELECT * FROM users WHERE email = ? AND is_active = 1";
         try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql)) {
             ps.setString(1, email);
-            ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) return mapRow(rs);
-            if (rs.next()) {
-                String stored = rs.getString("password");
-                boolean match;
-                if (stored != null && stored.startsWith("$2")) {
-                    // BCrypt hash — normalize $2y$ and $2b$ to $2a$
-                    String hashed = stored.replaceAll("^\\$2[yb]\\$", "\\$2a\\$");
-                    try {
-                        match = BCrypt.checkpw(password, hashed);
-                    } catch (Exception e) {
-                        match = false;
-                    }
-                } else {
-                    // Plain text password (test accounts)
-                    match = password.equals(stored);
-                }
-                if (match) return mapRow(rs);
+            if (!rs.next()) return null;
+            String stored = rs.getString("password");
+            if (stored == null) return null;
+
+            boolean match;
+            if (stored.startsWith("$2")) {
+                // BCrypt hash (Symfony uses $2y$, Java BCrypt uses $2a$)
+                String normalized = stored.replaceAll("^\\$2[yb]\\$", "\\$2a\\$");
+                try { match = BCrypt.checkpw(password, normalized); }
+                catch (Exception e) { match = false; }
+            } else {
+                // Plain text (legacy / test accounts)
+                match = password.equals(stored);
             }
+            return match ? mapRow(rs) : null;
         }
-        return null;
     }
 
     public List<User> findAll() throws SQLException {
@@ -74,7 +70,12 @@ public class UserDAO {
         String sql = "INSERT INTO users (email, password, role, name, phone, is_active, is_verified, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement ps = DatabaseConfig.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, user.getEmail());
-            ps.setString(2, user.getPassword());
+            // Always store BCrypt hash so Symfony can also authenticate this user
+            String pwd = user.getPassword();
+            if (pwd != null && !pwd.startsWith("$2")) {
+                pwd = BCrypt.hashpw(pwd, BCrypt.gensalt(10));
+            }
+            ps.setString(2, pwd);
             ps.setString(3, user.getRole());
             ps.setString(4, user.getName());
             ps.setString(5, user.getPhone());
