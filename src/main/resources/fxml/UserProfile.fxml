@@ -14,21 +14,25 @@
             <VBox spacing="0" style="-fx-background-color: #f4f6fb;">
 
                 <!-- ── HEADER BANNER ──────────────────────────────────── -->
-                <HBox style="-fx-background-color: #2d2d2d;" prefHeight="160" alignment="CENTER_LEFT">
+                <HBox style="-fx-background-color: #2d2d2d;" prefHeight="160" minHeight="160" maxHeight="160" alignment="CENTER_LEFT">
                     <padding><Insets left="60" right="60"/></padding>
 
-                    <StackPane fx:id="avatarStack" prefWidth="100" prefHeight="100"
+                    <!-- Avatar: fixed 100×100 circle -->
+                    <StackPane fx:id="avatarStack"
+                               prefWidth="100" prefHeight="100" minWidth="100" minHeight="100" maxWidth="100" maxHeight="100"
                                style="-fx-background-color: #a12c2f; -fx-background-radius: 50; -fx-cursor: hand;"
                                onMouseClicked="#chooseProfilePicture">
                         <ImageView fx:id="avatarImage" fitWidth="100" fitHeight="100"
-                                   preserveRatio="false" visible="false" managed="false"/>
+                                   preserveRatio="false" visible="false" managed="false"
+                                   style="-fx-background-radius: 50;"/>
                         <Label fx:id="avatarInitials" text="?"
                                style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-                        <VBox alignment="BOTTOM_CENTER" prefWidth="100" prefHeight="100" mouseTransparent="true">
-                            <Label text="📷"
-                                   style="-fx-font-size: 14px; -fx-background-color: rgba(0,0,0,0.5); -fx-padding: 3 0 2 0;"
-                                   maxWidth="100" alignment="CENTER"/>
-                        </VBox>
+                        <!-- Camera overlay pinned to bottom, constrained to circle width -->
+                        <Label text="📷" mouseTransparent="true"
+                               prefWidth="100" prefHeight="24"
+                               alignment="CENTER"
+                               style="-fx-font-size: 13px; -fx-background-color: rgba(0,0,0,0.45); -fx-text-fill: white;"
+                               StackPane.alignment="BOTTOM_CENTER"/>
                     </StackPane>
 
                     <VBox spacing="6" HBox.hgrow="ALWAYS">
@@ -87,6 +91,44 @@
                             <Label fx:id="phoneError" text="" style="-fx-text-fill: #dc2626; -fx-font-size: 11px;" visible="false" managed="false"/>
                         </VBox>
 
+                        <!-- Skills & Experience (supervisor only — hidden for establishment) -->
+                        <VBox fx:id="skillsBox" spacing="6">
+                            <Label text="Skills" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #444;"/>
+                            <TextField fx:id="skillsField" promptText="e.g. Machine Learning, Embedded Systems, Agile"
+                                       style="-fx-pref-height: 42px; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e0e0e0; -fx-border-width: 1.5; -fx-background-color: #fafafa; -fx-padding: 0 14; -fx-font-size: 13px;"/>
+                        </VBox>
+
+                        <VBox fx:id="experienceBox" spacing="6">
+                            <Label text="Experience" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #444;"/>
+                            <TextArea fx:id="experienceField" promptText="e.g. 10 years supervising PFE projects, PhD in Computer Science…"
+                                      prefRowCount="3" wrapText="true"
+                                      style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e0e0e0; -fx-border-width: 1.5; -fx-background-color: #fafafa; -fx-padding: 10 14; -fx-font-size: 13px;"/>
+                        </VBox>
+
+                        <VBox fx:id="formationsBox" spacing="6">
+                            <Label text="Formations / Education" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #444;"/>
+                            <TextArea fx:id="formationsField" promptText="e.g. PhD Computer Science, University of Tunis…"
+                                      prefRowCount="3" wrapText="true"
+                                      style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e0e0e0; -fx-border-width: 1.5; -fx-background-color: #fafafa; -fx-padding: 10 14; -fx-font-size: 13px;"/>
+                        </VBox>
+
+                        <!-- Bio -->
+                        <VBox spacing="6">
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Label text="Bio" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #444;"/>
+                                <HBox HBox.hgrow="ALWAYS"/>
+                                <Button fx:id="generateBioBtn" text="✨ Generate with AI" onAction="#handleGenerateBio"
+                                        style="-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-font-size: 11px;
+                                               -fx-font-weight: bold; -fx-background-radius: 14; -fx-padding: 5 14; -fx-cursor: hand;"/>
+                            </HBox>
+                            <TextArea fx:id="bioField" promptText="Write a short bio about yourself, or click ✨ Generate with AI…"
+                                      prefRowCount="4" wrapText="true"
+                                      style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e0e0e0;
+                                             -fx-border-width: 1.5; -fx-background-color: #fafafa; -fx-padding: 10 14; -fx-font-size: 13px;"/>
+                            <Label fx:id="bioStatus" text="" wrapText="true"
+                                   style="-fx-font-size: 11px;" visible="false" managed="false"/>
+                        </VBox>
+
                         <!-- Role-specific extra field (institution name for establishment) -->
                         <VBox fx:id="extraFieldBox" spacing="6" visible="false" managed="false">
                             <Label fx:id="extraFieldLabel" text="Institution Name"
@@ -119,7 +161,8 @@
                             </VBox>
                             <Separator/>
 
-                            <StackPane fx:id="previewStack" prefWidth="80" prefHeight="80" maxWidth="80"
+                            <StackPane fx:id="previewStack"
+                                       prefWidth="80" prefHeight="80" minWidth="80" minHeight="80" maxWidth="80" maxHeight="80"
                                        style="-fx-background-color: #a12c2f; -fx-background-radius: 40;">
                                 <ImageView fx:id="previewImage" fitWidth="80" fitHeight="80"
                                            preserveRatio="false" visible="false" managed="false"/>
@@ -180,6 +223,38 @@
                             <Button text="Update Password" onAction="#handleChangePassword"
                                     prefHeight="40" maxWidth="Infinity"
                                     style="-fx-background-color: #1e1e1e; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;"/>
+                        </VBox>
+
+                        <!-- PIN card -->
+                        <VBox spacing="14"
+                              style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 12, 0, 0, 3);">
+                            <padding><Insets top="24" bottom="24" left="24" right="24"/></padding>
+                            <VBox spacing="4">
+                                <Label text="Quick PIN Login"
+                                       style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1e1e1e;"/>
+                                <Label fx:id="pinStatusLabel" text="No PIN set"
+                                       style="-fx-font-size: 11px; -fx-text-fill: #888;"/>
+                            </VBox>
+                            <Separator/>
+                            <VBox spacing="6">
+                                <Label text="New PIN (6 digits)" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #444;"/>
+                                <PasswordField fx:id="pinField" promptText="6-digit PIN"
+                                               style="-fx-pref-height: 40px; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e0e0e0; -fx-border-width: 1.5; -fx-background-color: #fafafa; -fx-padding: 0 14; -fx-font-size: 13px;"/>
+                            </VBox>
+                            <VBox spacing="6">
+                                <Label text="Confirm PIN" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #444;"/>
+                                <PasswordField fx:id="pinConfirmField" promptText="Repeat PIN"
+                                               style="-fx-pref-height: 40px; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e0e0e0; -fx-border-width: 1.5; -fx-background-color: #fafafa; -fx-padding: 0 14; -fx-font-size: 13px;"/>
+                            </VBox>
+                            <Label fx:id="pinFeedback" text="" wrapText="true"
+                                   style="-fx-font-size: 12px; -fx-font-weight: bold;" visible="false" managed="false"/>
+                            <Button text="Save PIN" onAction="#handleSavePin"
+                                    prefHeight="38" maxWidth="Infinity"
+                                    style="-fx-background-color: #a12c2f; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;"/>
+                            <Button fx:id="removePinBtn" text="Remove PIN" onAction="#handleRemovePin"
+                                    prefHeight="36" maxWidth="Infinity"
+                                    visible="false" managed="false"
+                                    style="-fx-background-color: transparent; -fx-text-fill: #dc2626; -fx-font-size: 12px; -fx-background-radius: 10; -fx-border-color: #fca5a5; -fx-border-radius: 10; -fx-cursor: hand;"/>
                         </VBox>
 
                     </VBox>
