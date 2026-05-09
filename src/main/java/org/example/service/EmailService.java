@@ -32,13 +32,13 @@ public class EmailService {
         this.password = System.getenv("MAIL_APP_PASSWORD");
         this.enabled = username != null && !username.isBlank() && password != null && !password.isBlank();
         if (!enabled) {
-            LOG.warning("EmailService désactivé : MAIL_USERNAME ou MAIL_APP_PASSWORD non configuré.");
+            LOG.warning("EmailService d??sactiv?? : MAIL_USERNAME ou MAIL_APP_PASSWORD non configur??.");
         }
     }
 
     public boolean isEnabled() { return enabled; }
 
-    // ─── 3 méthodes publiques ────────────────────────────────────────────────
+    // ????????? 3 m??thodes publiques ????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
 
     public void sendMeetingInvitation(Meeting meeting, List<User> participants) {
         if (!enabled) return;
@@ -48,7 +48,7 @@ public class EmailService {
                 String html = buildInvitationHtml(meeting, user);
                 sendEmail(user.getEmail(), subject, html);
             } catch (Exception e) {
-                LOG.severe("Erreur envoi invitation à " + user.getEmail() + " : " + e.getMessage());
+                LOG.severe("Erreur envoi invitation ?? " + user.getEmail() + " : " + e.getMessage());
             }
         }
     }
@@ -61,7 +61,7 @@ public class EmailService {
                 String html = buildUpdateHtml(meeting, user);
                 sendEmail(user.getEmail(), subject, html);
             } catch (Exception e) {
-                LOG.severe("Erreur envoi update à " + user.getEmail() + " : " + e.getMessage());
+                LOG.severe("Erreur envoi update ?? " + user.getEmail() + " : " + e.getMessage());
             }
         }
     }
@@ -74,7 +74,7 @@ public class EmailService {
                 String html = buildFollowUpHtml(user, body);
                 sendEmail(user.getEmail(), subject, html);
             } catch (Exception e) {
-                LOG.severe("Erreur envoi follow-up à " + user.getEmail() + " : " + e.getMessage());
+                LOG.severe("Erreur envoi follow-up ?? " + user.getEmail() + " : " + e.getMessage());
             }
         }
     }
@@ -84,7 +84,7 @@ public class EmailService {
         return "<!DOCTYPE html><html><body style='font-family:Arial,sans-serif;background:#f5f5f5;margin:0;padding:20px;'>"
             + "<div style='max-width:600px;margin:0 auto;background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);'>"
             + "<div style='background:linear-gradient(135deg,#a12c2f,#c0392b);padding:32px 24px;text-align:center;'>"
-            + "<h1 style='color:white;margin:0;font-size:22px;'>📋 Email de Suivi Meeting</h1>"
+            + "<h1 style='color:white;margin:0;font-size:22px;'>???? Email de Suivi Meeting</h1>"
             + "</div>"
             + "<div style='padding:24px;'>"
             + "<p style='font-size:16px;color:#333;'>Bonjour <strong>" + safe(user.getName()) + "</strong>,</p>"
@@ -93,7 +93,7 @@ public class EmailService {
             + "</div>"
             + "</div>"
             + "<div style='background:#f8f9fa;padding:16px 24px;text-align:center;border-top:1px solid #e9ecef;'>"
-            + "<p style='color:#999;font-size:12px;margin:0;'>Smart PFE — Automated Follow-up</p>"
+            + "<p style='color:#999;font-size:12px;margin:0;'>Smart PFE ??? Automated Follow-up</p>"
             + "</div>"
             + "</div></body></html>";
     }
@@ -106,12 +106,12 @@ public class EmailService {
                 String html = buildCancellationHtml(meeting, user);
                 sendEmail(user.getEmail(), subject, html);
             } catch (Exception e) {
-                LOG.severe("Erreur envoi annulation à " + user.getEmail() + " : " + e.getMessage());
+                LOG.severe("Erreur envoi annulation ?? " + user.getEmail() + " : " + e.getMessage());
             }
         }
     }
 
-    // ─── Envoi SMTP ──────────────────────────────────────────────────────────
+    // ????????? Envoi SMTP ??????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
 
     private void sendEmail(String to, String subject, String htmlBody) throws MessagingException, java.io.UnsupportedEncodingException {
         Properties props = new Properties();
@@ -138,43 +138,43 @@ public class EmailService {
         Transport.send(message);
     }
 
-    // ─── Templates HTML ──────────────────────────────────────────────────────
+    // ????????? Templates HTML ??????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
 
     private String buildInvitationHtml(Meeting meeting, User user) {
         String headerGradient = "linear-gradient(135deg, #a12c2f, #FF6B6B)";
-        String title = "📅 Meeting Invitation";
+        String title = "???? Meeting Invitation";
         String intro = "You have been invited to a new meeting.";
         return buildEmailHtml(meeting, user, headerGradient, title, intro, true);
     }
 
     private String buildUpdateHtml(Meeting meeting, User user) {
         String headerGradient = "linear-gradient(135deg, #f5a425, #FFD700)";
-        String title = "🔄 Meeting Updated";
+        String title = "???? Meeting Updated";
         String intro = "A meeting you are participating in has been updated.";
         return buildEmailHtml(meeting, user, headerGradient, title, intro, true);
     }
 
     private String buildCancellationHtml(Meeting meeting, User user) {
         String headerGradient = "linear-gradient(135deg, #dc3545, #c82333)";
-        String title = "❌ Meeting Cancelled";
+        String title = "??? Meeting Cancelled";
         String intro = "A meeting you were participating in has been cancelled.";
         return buildEmailHtml(meeting, user, headerGradient, title, intro, false);
     }
 
     private String buildEmailHtml(Meeting meeting, User user, String headerGradient,
                                    String title, String intro, boolean showJitsiLink) {
-        String dateStr = meeting.getScheduledDate() != null ? meeting.getScheduledDate().format(FMT) : "—";
+        String dateStr = meeting.getScheduledDate() != null ? meeting.getScheduledDate().format(FMT) : "???";
         String timeStr = meeting.getScheduledDate() != null
-                ? meeting.getScheduledDate().format(DateTimeFormatter.ofPattern("HH:mm")) : "—";
+                ? meeting.getScheduledDate().format(DateTimeFormatter.ofPattern("HH:mm")) : "???";
 
         StringBuilder jitsiBlock = new StringBuilder();
         if (showJitsiLink && "ONLINE".equals(meeting.getMeetingType())
                 && meeting.getMeetingLink() != null && !meeting.getMeetingLink().isBlank()) {
             jitsiBlock.append("<div style='background: linear-gradient(135deg,#a12c2f,#FF6B6B); border-radius:8px; padding:16px; margin:16px 0; text-align:center;'>")
-                    .append("<p style='color:white; margin:0 0 10px 0; font-weight:bold;'>🎥 Online Meeting Link</p>")
+                    .append("<p style='color:white; margin:0 0 10px 0; font-weight:bold;'>???? Online Meeting Link</p>")
                     .append("<a href='").append(meeting.getMeetingLink()).append("' ")
                     .append("style='background:white; color:#a12c2f; padding:10px 24px; border-radius:6px; text-decoration:none; font-weight:bold; display:inline-block;'>")
-                    .append("🎥 Join Online Meeting</a>")
+                    .append("???? Join Online Meeting</a>")
                     .append("</div>");
         }
 
@@ -191,12 +191,12 @@ public class EmailService {
                 // Details card
                 + "<div style='background:#f8f9fa; border-radius:8px; padding:16px; margin:16px 0;'>"
                 + "<table style='width:100%; border-collapse:collapse;'>"
-                + row("📁 Project", safe(meeting.getProjectTitle()))
-                + row("📋 Type", safe(meeting.getMeetingType()))
-                + row("📅 Date", dateStr)
-                + row("🕐 Time", timeStr)
-                + row("⏱️ Duration", meeting.getDuration() + " minutes")
-                + row("📍 Location", safe(meeting.getLocation()))
+                + row("???? Project", safe(meeting.getProjectTitle()))
+                + row("???? Type", safe(meeting.getMeetingType()))
+                + row("???? Date", dateStr)
+                + row("???? Time", timeStr)
+                + row("?????? Duration", meeting.getDuration() + " minutes")
+                + row("???? Location", safe(meeting.getLocation()))
                 + "</table>"
                 + "</div>"
                 + jitsiBlock
@@ -216,5 +216,5 @@ public class EmailService {
                 + "<td style='padding:6px 0; color:#333; font-size:13px; font-weight:bold;'>" + value + "</td></tr>";
     }
 
-    private String safe(String s) { return s != null ? s : "—"; }
+    private String safe(String s) { return s != null ? s : "???"; }
 }

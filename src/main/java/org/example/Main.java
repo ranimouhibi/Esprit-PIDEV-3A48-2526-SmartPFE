@@ -21,7 +21,7 @@ public class Main extends Application {
         stage.setMinHeight(650);
         stage.setResizable(true);
 
-        // ── Auto-login: check for a saved session token ───────────────────────
+        // ?????? Auto-login: check for a saved session token ?????????????????????????????????????????????????????????????????????
         String startFxml = tryAutoLogin();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/" + startFxml));
@@ -48,7 +48,7 @@ public class Main extends Application {
                 return "Home.fxml";
             }
 
-            // Valid token — restore session
+            // Valid token ??? restore session
             SessionManager.setCurrentUser(user);
             return switch (user.getRole()) {
                 case "student"       -> "StudentDashboard.fxml";

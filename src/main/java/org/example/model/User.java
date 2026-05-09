@@ -10,15 +10,13 @@ public class User {
     private String name;
     private String phone;
     private String skills;
+    private String experience;
+    private String formations;
+    private String bio;
     private boolean isActive;
     private int establishmentId; // links to establishments.id for role=establishment
     private LocalDateTime createdAt;
     private String profilePicture; // stored as base64 or file path
-    private Integer establishmentId; // FK to users.id where role='establishment'
-    private String bio;
-    private String skills;
-    private String experience;
-    private String formations;
 
     public User() {}
 
@@ -51,6 +49,15 @@ public class User {
     public String getSkills() { return skills; }
     public void setSkills(String skills) { this.skills = skills; }
 
+    public String getExperience() { return experience; }
+    public void setExperience(String experience) { this.experience = experience; }
+
+    public String getFormations() { return formations; }
+    public void setFormations(String formations) { this.formations = formations; }
+
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
+
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { isActive = active; }
 
@@ -62,21 +69,6 @@ public class User {
 
     public String getProfilePicture() { return profilePicture; }
     public void setProfilePicture(String profilePicture) { this.profilePicture = profilePicture; }
-
-    public Integer getEstablishmentId() { return establishmentId; }
-    public void setEstablishmentId(Integer establishmentId) { this.establishmentId = establishmentId; }
-
-    public String getBio() { return bio; }
-    public void setBio(String bio) { this.bio = bio; }
-
-    public String getSkills() { return skills; }
-    public void setSkills(String skills) { this.skills = skills; }
-
-    public String getExperience() { return experience; }
-    public void setExperience(String experience) { this.experience = experience; }
-
-    public String getFormations() { return formations; }
-    public void setFormations(String formations) { this.formations = formations; }
 
     @Override
     public String toString() {

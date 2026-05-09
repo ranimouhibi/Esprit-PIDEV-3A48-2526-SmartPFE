@@ -32,9 +32,6 @@ public class EstablishmentDashboardController implements Initializable {
     @FXML private Label offerCountLabel;
     @FXML private BorderPane contentArea;
     @FXML private VBox homePane;
-
-
-
     @FXML private TextArea aiSuggestionsArea;
     @FXML private VBox estChatMessages;
     @FXML private TextField estChatInput;
@@ -72,7 +69,6 @@ public class EstablishmentDashboardController implements Initializable {
         try {
             User me = SessionManager.getCurrentUser();
             if (me != null) {
-                // Count only users that belong to this establishment
                 int memberCount = userDAO.findByEstablishment(me.getId()).size();
                 userCountLabel.setText(String.valueOf(memberCount));
             } else {
@@ -94,32 +90,6 @@ public class EstablishmentDashboardController implements Initializable {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    @FXML public void showHome() {
-        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
-        contentArea.setCenter(null);
-        javafx.scene.Node node = homePane.getParent() instanceof javafx.scene.control.ScrollPane sp ? sp : homePane;
-        contentArea.setCenter(node);
-        if (node != null) node.setVisible(true);
-    }
-
-    @FXML public void showUsers() {
-        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
-        contentArea.setCenter(null);
-
-        // Scope the user list to this establishment only
-        User me = SessionManager.getCurrentUser();
-        if (me != null) {
-            UserController.setEstablishmentScope(me.getId());
-        }
-
-        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Users.fxml");
-
-        // Clear scope after loading so other dashboards are unaffected
-        UserController.clearEstablishmentScope();
-
-        if (pane != null) {
-            contentArea.setCenter(pane);
-            pane.setVisible(true);
     // ── AI Suggestions ────────────────────────────────────────────────────────
 
     @FXML public void handleAISuggestions() {
@@ -189,13 +159,6 @@ public class EstablishmentDashboardController implements Initializable {
         if (estChatScroll != null) Platform.runLater(() -> estChatScroll.setVvalue(1.0));
     }
 
-    @FXML public void showProjects() {
-        if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
-        contentArea.setCenter(null);
-        javafx.scene.layout.Pane pane = NavigationUtil.loadPane("Projects.fxml");
-        if (pane != null) {
-            contentArea.setCenter(pane);
-            pane.setVisible(true);
     private String generateReply(String msg) {
         String lower = msg.toLowerCase();
         User user = SessionManager.getCurrentUser();
@@ -205,7 +168,7 @@ public class EstablishmentDashboardController implements Initializable {
             try {
                 List<Offer> offers = offerDAO.findByEstablishment(estId);
                 long open = offers.stream().filter(o -> "open".equals(o.getStatus())).count();
-                return "You have " + offers.size() + " total offer(s), " + open + " currently open. Go to OFFERS to manage them.";
+                return "You have " + offers.size() + " total offer(s), " + open + " currently open.";
             } catch (Exception e) { return "Go to OFFERS to manage your offers."; }
         }
         if (lower.contains("application") || lower.contains("pending") || lower.contains("candidature")) {
@@ -213,31 +176,16 @@ public class EstablishmentDashboardController implements Initializable {
                 List<Offer> offers = offerDAO.findByEstablishment(estId);
                 long total = offers.stream().mapToLong(o -> { try { return candidatureDAO.findByOffer(o.getId()).size(); } catch (Exception e2) { return 0; } }).sum();
                 long pending = offers.stream().mapToLong(o -> { try { return candidatureDAO.findByOffer(o.getId()).stream().filter(c -> "pending".equals(c.getStatus())).count(); } catch (Exception e2) { return 0; } }).sum();
-                return "You have " + total + " total application(s), " + pending + " pending review. Go to APPLICATIONS.";
+                return "You have " + total + " total application(s), " + pending + " pending review.";
             } catch (Exception e) { return "Go to APPLICATIONS to review candidatures."; }
         }
-        if (lower.contains("score") || lower.contains("average") || lower.contains("ai")) {
-            return "Go to APPLICATIONS > Statistics to see average AI scores, conversion rates, and score distributions.";
-        }
-        if (lower.contains("statistic") || lower.contains("stat")) {
-            return "Click 'Statistics' in APPLICATIONS to see conversion rates, score distributions, and monthly trends.";
-        }
-        if (lower.contains("calendar") || lower.contains("deadline")) {
-            return "Go to CALENDAR to see offer deadlines and scheduled interviews on a monthly view.";
-        }
-        if (lower.contains("compare") || lower.contains("comparison")) {
-            return "In APPLICATIONS, select 2-3 candidates (Ctrl+Click) then click 'Compare' for a side-by-side comparison.";
-        }
-        if (lower.contains("email") || lower.contains("notification")) {
-            return "Emails are sent automatically to students on every status change (accepted, rejected, interview).";
-        }
         if (lower.contains("hello") || lower.contains("hi")) {
-            return "Hello " + user.getName() + "! How can I help you manage your offers and applications today?";
+            return "Hello " + user.getName() + "! How can I help you today?";
         }
         if (lower.contains("help")) {
-            return "I can help with:\n• Offers management\n• Applications review\n• AI Matching scores\n• Statistics\n• Calendar\n• Candidate comparison";
+            return "I can help with:\n• Offers management\n• Applications review\n• AI Matching scores\n• Statistics\n• Calendar";
         }
-        return "Try asking about: offers, applications, AI score, statistics, calendar, or comparison.";
+        return "Try asking about: offers, applications, AI score, statistics, or calendar.";
     }
 
     private void addBotMessage(String text) {
@@ -270,7 +218,6 @@ public class EstablishmentDashboardController implements Initializable {
         if (estChatScroll != null) Platform.runLater(() -> estChatScroll.setVvalue(1.0));
     }
 
-    @FXML public void showApplications() {
     // ── Navigation ────────────────────────────────────────────────────────────
 
     private void load(String fxml) {
@@ -283,21 +230,22 @@ public class EstablishmentDashboardController implements Initializable {
         }
     }
 
-    @FXML public void showProfile() {
     @FXML public void showHome() {
         if (contentArea.getCenter() != null) contentArea.getCenter().setVisible(false);
+        contentArea.setCenter(null);
         javafx.scene.Node node = homePane.getParent() instanceof ScrollPane sp ? sp : homePane;
-        // Reset prefHeight before re-attaching to prevent JavaFX from freezing it
-        if (node instanceof ScrollPane sp) {
-            sp.setPrefHeight(javafx.scene.layout.Region.USE_COMPUTED_SIZE);
-            sp.setMaxHeight(Double.MAX_VALUE);
-        }
         contentArea.setCenter(node);
         if (node != null) node.setVisible(true);
         loadStats();
     }
 
-    @FXML public void showUsers()        { load("Users.fxml"); }
+    @FXML public void showUsers() {
+        User me = SessionManager.getCurrentUser();
+        if (me != null) UserController.setEstablishmentScope(me.getId());
+        load("Users.fxml");
+        UserController.clearEstablishmentScope();
+    }
+
     @FXML public void showProjects()     { load("Projects.fxml"); }
     @FXML public void showOffers()       { load("EstablishmentOffers.fxml"); }
     @FXML public void showApplications() { load("EstablishmentCandidatures.fxml"); }

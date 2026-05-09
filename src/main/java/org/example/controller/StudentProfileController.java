@@ -126,7 +126,7 @@ public class StudentProfileController {
 
         // Resolve establishment name from DB if linked
         String institution = null;
-        if (user.getEstablishmentId() != null) {
+        if (user.getEstablishmentId() != 0) {
             try {
                 org.example.model.User est = new org.example.dao.UserDAO().findById(user.getEstablishmentId());
                 if (est != null) institution = est.getName();

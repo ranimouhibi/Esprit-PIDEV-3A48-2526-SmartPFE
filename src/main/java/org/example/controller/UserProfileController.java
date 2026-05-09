@@ -148,7 +148,7 @@ public class UserProfileController {
         String institution = null;
         if ("establishment".equals(user.getRole()) && extraField != null) {
             institution = extraField.getText().trim();
-        } else if ("supervisor".equals(user.getRole()) && user.getEstablishmentId() != null) {
+        } else if ("supervisor".equals(user.getRole()) && user.getEstablishmentId() != 0) {
             try {
                 User est = userDAO.findById(user.getEstablishmentId());
                 if (est != null) institution = est.getName();
