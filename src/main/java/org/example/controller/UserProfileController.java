@@ -2,7 +2,9 @@ package org.example.controller;
 
 import org.example.dao.UserDAO;
 import org.example.model.User;
+import org.example.util.AIService;
 import org.example.util.CloudinaryService;
+import org.example.util.LocalSessionStore;
 import org.example.util.SessionManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -11,26 +13,22 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.File;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Shared profile controller for Supervisor and Establishment roles.
- * The establishment role gets an extra "Institution Name" field (stored in the `name` field
- * as the institution name, with a separate display name handled via the User.name field).
- */
 public class UserProfileController {
 
-    // Header
+    // ── Header ────────────────────────────────────────────────────────────────
     @FXML private Label headerName;
     @FXML private Label headerEmail;
     @FXML private Label headerRole;
     @FXML private Label headerMember;
 
-    // Avatar
+    // ── Avatar ────────────────────────────────────────────────────────────────
     @FXML private StackPane avatarStack;
     @FXML private ImageView avatarImage;
     @FXML private Label     avatarInitials;
@@ -40,7 +38,7 @@ public class UserProfileController {
     @FXML private Button    removePicBtn;
     @FXML private Label     picFeedback;
 
-    // Personal info
+    // ── Personal info ─────────────────────────────────────────────────────────
     @FXML private Label     infoSubtitle;
     @FXML private TextField nameField;
     @FXML private TextField emailField;
@@ -50,30 +48,52 @@ public class UserProfileController {
     @FXML private Label     phoneError;
     @FXML private Label     infoFeedback;
 
-    // Role-specific extra field
+    // ── Skills & Experience ───────────────────────────────────────────────────
+    @FXML private VBox      skillsBox;
+    @FXML private TextField skillsField;
+    @FXML private VBox      experienceBox;
+    @FXML private TextArea  experienceField;
+    @FXML private VBox      formationsBox;
+    @FXML private TextArea  formationsField;
+
+    // ── Bio ───────────────────────────────────────────────────────────────────
+    @FXML private TextArea  bioField;
+    @FXML private Button    generateBioBtn;
+    @FXML private Label     bioStatus;
+
+    // ── Role-specific extra field ─────────────────────────────────────────────
     @FXML private VBox      extraFieldBox;
     @FXML private Label     extraFieldLabel;
     @FXML private TextField extraField;
 
-    // Password
+    // ── Change password ───────────────────────────────────────────────────────
     @FXML private PasswordField currentPassField;
     @FXML private PasswordField newPassField;
     @FXML private PasswordField confirmPassField;
-    @FXML private Label currentPassError;
-    @FXML private Label newPassError;
-    @FXML private Label confirmPassError;
-    @FXML private Label passFeedback;
+    @FXML private Label         currentPassError;
+    @FXML private Label         newPassError;
+    @FXML private Label         confirmPassError;
+    @FXML private Label         passFeedback;
 
+    // ── PIN card ──────────────────────────────────────────────────────────────
+    @FXML private PasswordField pinField;
+    @FXML private PasswordField pinConfirmField;
+    @FXML private Label         pinStatusLabel;
+    @FXML private Label         pinFeedback;
+    @FXML private Button        removePinBtn;
+
+    // ── State ─────────────────────────────────────────────────────────────────
     private final UserDAO userDAO = new UserDAO();
     private File    pendingImageFile     = null;
     private boolean removePicturePending = false;
+
+    // ── Init ──────────────────────────────────────────────────────────────────
 
     @FXML
     public void initialize() {
         User user = SessionManager.getCurrentUser();
         if (user == null) return;
 
-        // Header
         headerName.setText(user.getName());
         headerEmail.setText(user.getEmail());
         headerRole.setText(capitalize(user.getRole()));
@@ -82,54 +102,118 @@ public class UserProfileController {
                 + user.getCreatedAt().format(DateTimeFormatter.ofPattern("MMM yyyy")));
         }
 
-        // Fields
         nameField.setText(user.getName());
         emailField.setText(user.getEmail());
         phoneField.setText(user.getPhone() != null ? user.getPhone() : "");
+        bioField.setText(user.getBio() != null ? user.getBio() : "");
 
-        // Role-specific customisation
         switch (user.getRole()) {
             case "supervisor" -> {
                 infoSubtitle.setText("Update your name, email, phone and contact details");
-                headerRole.setStyle(headerRole.getStyle()
-                    .replace("#a12c2f", "#2563eb"));
+                headerRole.setStyle(headerRole.getStyle().replace("#a12c2f", "#2563eb"));
+                skillsField.setText(user.getSkills() != null ? user.getSkills() : "");
+                experienceField.setText(user.getExperience() != null ? user.getExperience() : "");
+                formationsField.setText(user.getFormations() != null ? user.getFormations() : "");
             }
             case "establishment" -> {
                 infoSubtitle.setText("Update your institution's contact information");
-                // Show extra field for institution/organisation name
                 extraFieldBox.setVisible(true);
                 extraFieldBox.setManaged(true);
                 extraFieldLabel.setText("Institution / Organisation Name");
                 extraField.setPromptText("e.g. University of Algiers");
-                extraField.setText(user.getName()); // name IS the institution name
+                extraField.setText(user.getName());
                 nameField.setPromptText("Contact person full name");
+                skillsBox.setVisible(false);      skillsBox.setManaged(false);
+                experienceBox.setVisible(false);  experienceBox.setManaged(false);
+                formationsBox.setVisible(false);  formationsBox.setManaged(false);
             }
         }
 
         loadAvatarFromUrl(user.getProfilePicture(), user);
+        avatarImage.setClip(new Circle(50, 50, 50));
+        previewImage.setClip(new Circle(40, 40, 40));
+
+        refreshPinStatus(user);
     }
 
-    // ── Profile Picture ──────────────────────────────────────────────────────
+    // ── AI Bio Generator ──────────────────────────────────────────────────────
+
+    @FXML
+    public void handleGenerateBio() {
+        User user = SessionManager.getCurrentUser();
+        String name = nameField.getText().trim();
+        if (name.isEmpty()) name = user.getName();
+
+        // Institution: from extraField for establishment, or from linked establishment for supervisor
+        String institution = null;
+        if ("establishment".equals(user.getRole()) && extraField != null) {
+            institution = extraField.getText().trim();
+        } else if ("supervisor".equals(user.getRole()) && user.getEstablishmentId() != null) {
+            try {
+                User est = userDAO.findById(user.getEstablishmentId());
+                if (est != null) institution = est.getName();
+            } catch (Exception ignored) {}
+        }
+
+        String skills     = skillsBox.isVisible()     ? skillsField.getText().trim()     : null;
+        String experience = experienceBox.isVisible()  ? experienceField.getText().trim() : null;
+        String formations = formationsBox.isVisible()  ? formationsField.getText().trim() : null;
+
+        generateBioBtn.setDisable(true);
+        generateBioBtn.setText("⏳ Generating…");
+        showBioStatus("Calling AI, please wait…", true);
+
+        final String fn = name;
+        final String fi = institution;
+        final String fs = (skills != null && !skills.isEmpty()) ? skills : null;
+        final String fe = (experience != null && !experience.isEmpty()) ? experience : null;
+        final String ff = (formations != null && !formations.isEmpty()) ? formations : null;
+
+        new Thread(() -> {
+            try {
+                String bio = AIService.generateBio(fn, user.getRole(), fi, fs, fe, ff);
+                Platform.runLater(() -> {
+                    bioField.setText(bio);
+                    generateBioBtn.setDisable(false);
+                    generateBioBtn.setText("✨ Generate with AI");
+                    showBioStatus("Bio generated! Review and click Save Changes to keep it.", true);
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    generateBioBtn.setDisable(false);
+                    generateBioBtn.setText("✨ Generate with AI");
+                    showBioStatus("Failed: " + e.getMessage(), false);
+                });
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private void showBioStatus(String msg, boolean success) {
+        bioStatus.setText(msg);
+        bioStatus.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: "
+                + (success ? "#7c3aed" : "#dc2626") + ";");
+        bioStatus.setVisible(true);
+        bioStatus.setManaged(true);
+    }
+
+    // ── Profile Picture ───────────────────────────────────────────────────────
 
     @FXML
     public void chooseProfilePicture() {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Choose Profile Picture");
         chooser.getExtensionFilters().add(
-            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp")
-        );
+            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp"));
         File file = chooser.showOpenDialog(avatarStack.getScene().getWindow());
         if (file == null) return;
-
         if (file.length() > 5 * 1024 * 1024) {
             showFeedback(picFeedback, "Image must be smaller than 5 MB.", false);
             return;
         }
         pendingImageFile     = file;
         removePicturePending = false;
-
-        Image preview = new Image(file.toURI().toString());
-        setAvatarImage(preview);
+        setAvatarImage(new Image(file.toURI().toString()));
         removePicBtn.setVisible(true);
         removePicBtn.setManaged(true);
         showFeedback(picFeedback, "Photo selected — click Save Changes to upload.", true);
@@ -145,7 +229,7 @@ public class UserProfileController {
         showFeedback(picFeedback, "Photo will be removed on Save.", true);
     }
 
-    // ── Save Personal Info ───────────────────────────────────────────────────
+    // ── Save Personal Info ────────────────────────────────────────────────────
 
     @FXML
     public void handleSaveInfo() {
@@ -198,8 +282,11 @@ public class UserProfileController {
                 user.setName(name);
                 user.setEmail(email);
                 user.setPhone(phone);
+                user.setBio(bioField.getText().trim());
+                if (skillsBox.isVisible()) user.setSkills(skillsField.getText().trim());
+                if (experienceBox.isVisible()) user.setExperience(experienceField.getText().trim());
+                if (formationsBox.isVisible()) user.setFormations(formationsField.getText().trim());
 
-                // Upload picture if pending
                 if (pendingImageFile != null) {
                     Platform.runLater(() -> showFeedback(infoFeedback, "Uploading photo…", true));
                     String url = CloudinaryService.uploadImage(pendingImageFile, "profile_pictures");
@@ -222,7 +309,6 @@ public class UserProfileController {
                     hide(picFeedback);
                     showFeedback(infoFeedback, "Profile updated successfully!", true);
                 });
-
             } catch (Exception e) {
                 e.printStackTrace();
                 Platform.runLater(() ->
@@ -231,7 +317,7 @@ public class UserProfileController {
         }).start();
     }
 
-    // ── Change Password ──────────────────────────────────────────────────────
+    // ── Change Password ───────────────────────────────────────────────────────
 
     @FXML
     public void handleChangePassword() {
@@ -281,7 +367,49 @@ public class UserProfileController {
         }
     }
 
-    // ── Avatar helpers ───────────────────────────────────────────────────────
+    // ── PIN management ────────────────────────────────────────────────────────
+
+    private void refreshPinStatus(User user) {
+        String hash = LocalSessionStore.loadPinHash(user.getId());
+        boolean hasPin = hash != null;
+        pinStatusLabel.setText(hasPin ? "✓ PIN is set — you can use it at login" : "No PIN set");
+        pinStatusLabel.setStyle(hasPin
+            ? "-fx-font-size: 11px; -fx-text-fill: #16a34a;"
+            : "-fx-font-size: 11px; -fx-text-fill: #888;");
+        removePinBtn.setVisible(hasPin);
+        removePinBtn.setManaged(hasPin);
+    }
+
+    @FXML
+    public void handleSavePin() {
+        hide(pinFeedback);
+        String pin     = pinField.getText();
+        String confirm = pinConfirmField.getText();
+        if (pin.isEmpty())          { showPinFeedback("Enter a PIN.", false); return; }
+        if (!pin.matches("\\d{6}")) { showPinFeedback("PIN must be exactly 6 digits.", false); return; }
+        if (!pin.equals(confirm))   { showPinFeedback("PINs do not match.", false); return; }
+
+        User user = SessionManager.getCurrentUser();
+        LocalSessionStore.savePin(user.getId(), BCrypt.hashpw(pin, BCrypt.gensalt()));
+        pinField.clear();
+        pinConfirmField.clear();
+        showPinFeedback("PIN saved! You can now use it at login.", true);
+        refreshPinStatus(user);
+    }
+
+    @FXML
+    public void handleRemovePin() {
+        User user = SessionManager.getCurrentUser();
+        LocalSessionStore.clearPin(user.getId());
+        showPinFeedback("PIN removed.", true);
+        refreshPinStatus(user);
+    }
+
+    private void showPinFeedback(String msg, boolean success) {
+        showFeedback(pinFeedback, msg, success);
+    }
+
+    // ── Avatar helpers ────────────────────────────────────────────────────────
 
     private void loadAvatarFromUrl(String url, User user) {
         if (url != null && !url.isBlank()) {
@@ -300,10 +428,10 @@ public class UserProfileController {
 
     private void setAvatarImage(Image img) {
         avatarImage.setImage(img);
-        avatarImage.setVisible(true);   avatarImage.setManaged(true);
+        avatarImage.setVisible(true);    avatarImage.setManaged(true);
         avatarInitials.setVisible(false); avatarInitials.setManaged(false);
         previewImage.setImage(img);
-        previewImage.setVisible(true);  previewImage.setManaged(true);
+        previewImage.setVisible(true);   previewImage.setManaged(true);
         previewInitials.setVisible(false); previewInitials.setManaged(false);
     }
 
@@ -318,11 +446,11 @@ public class UserProfileController {
         previewImage.setVisible(false);   previewImage.setManaged(false);
     }
 
-    // ── UI helpers ───────────────────────────────────────────────────────────
+    // ── UI helpers ────────────────────────────────────────────────────────────
 
-    private void showError(Label l, String msg) { l.setText(msg); l.setVisible(true); l.setManaged(true); }
-    private void clearErrors(Label... labels)   { for (Label l : labels) { l.setText(""); l.setVisible(false); l.setManaged(false); } }
-    private void hide(Label l)                  { l.setVisible(false); l.setManaged(false); }
+    private void showError(Label l, String msg)  { l.setText(msg); l.setVisible(true); l.setManaged(true); }
+    private void clearErrors(Label... labels)    { for (Label l : labels) { l.setText(""); l.setVisible(false); l.setManaged(false); } }
+    private void hide(Label l)                   { l.setVisible(false); l.setManaged(false); }
 
     private void showFeedback(Label label, String msg, boolean success) {
         label.setText(msg);

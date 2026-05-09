@@ -4,8 +4,8 @@ import org.example.config.AppConfig;
 import org.example.model.Project;
 import org.example.model.User;
 
-import javax.mail.*;
-import javax.mail.internet.*;
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
